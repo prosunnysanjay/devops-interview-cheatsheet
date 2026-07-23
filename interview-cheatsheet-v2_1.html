@@ -192,6 +192,7 @@ td.wrap:first-child{white-space:normal}
       <button type="button" data-subj="aws">AWS (vs Azure)</button>
       <button type="button" data-subj="terraform">Terraform</button>
       <button type="button" data-subj="seniordevops">Senior DevOps</button>
+      <button type="button" data-subj="rancher">Rancher</button>
     </nav>
     <nav class="pane2" id="pane2">
       <div class="grp" data-subj="linux">
@@ -590,6 +591,23 @@ td.wrap:first-child{white-space:normal}
       <div class="grp" data-subj="seniordevops">
         <div class="grph"><span class="gsubj">Senior DevOps</span>Remaining</div>
         <a href="#gaps-seniordevops">Gaps to fill</a>
+      </div>
+
+      <div class="grp" data-subj="rancher">
+        <div class="grph"><span class="gsubj">Rancher</span>Fundamentals</div>
+        <a href="#rancher-intro">What is Rancher?</a>
+        <a href="#rancher-arch">Architecture &amp; Components</a>
+      </div>
+      <div class="grp" data-subj="rancher">
+        <div class="grph"><span class="gsubj">Rancher</span>Multi-cluster Management</div>
+        <a href="#rancher-multicluster">Multi-cluster Features</a>
+        <a href="#rancher-fleet">Fleet &amp; Apps Management</a>
+      </div>
+      <div class="grp" data-subj="rancher">
+        <div class="grph"><span class="gsubj">Rancher</span>Operations &amp; Security</div>
+        <a href="#rancher-rbac">RBAC &amp; Multi-tenancy</a>
+        <a href="#rancher-monitoring">Monitoring &amp; Logging</a>
+        <a href="#rancher-backup">Backup &amp; Disaster Recovery</a>
       </div>
     </nav>
   </div>
@@ -9635,6 +9653,342 @@ Gradually move code out, old code removed once extracted</code></pre>
       <div class="gap"><h4>GitOps workflows</h4><p>ArgoCD ApplicationSets, Kyverno policy engine, policy enforcement across clusters</p></div>
       <div class="gap"><h4>Capacity planning</h4><p>Forecasting growth, right-sizing infrastructure, headroom calculation, cost prediction</p></div>
       <div class="gap"><h4>Runbook automation</h4><p>Self-healing systems, auto-remediation, chaos engineering, reliability testing</p></div>
+      <div class="gap"><h4>eBPF &amp; kernel observability</h4><p>Network monitoring at kernel level, Cilium, Falco, runtime security</p></div>
+      <div class="gap"><h4>Supply chain security</h4><p>SLSA framework, SBOM, Sigstore, image signing, policy enforcement</p></div>
+      <div class="gap"><h4>Serverless architecture</h4><p>AWS Lambda, Azure Functions, cold starts, cost optimization, observability</p></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ RANCHER ═══════════ -->
+  <div class="band"><span class="eyebrow">Subject 11</span><h2>Rancher</h2></div>
+
+  <section id="rancher-intro">
+    <span class="sec-num">Fundamentals</span>
+    <h3>"What is Rancher? Why use it for multi-cluster Kubernetes?"</h3>
+    <p class="intro">Rancher is a Kubernetes management platform that lets you manage multiple clusters (on-premises, cloud, edge) from a single pane of glass. Instead of SSH-ing into each cluster or using kubectl on each one, you manage them all through Rancher's UI. It's essential for enterprises running Kubernetes at scale.</p>
+    <details class="entry" open>
+      <summary><span class="state ok">Platform</span>Centralized cluster management<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Problem Rancher Solves</div>
+          <ul>
+            <li><strong>Without Rancher:</strong> 10 K8s clusters, deploy on each separately, manage RBAC on each, check logs on each</li>
+            <li><strong>With Rancher:</strong> One UI for all 10 clusters. Deploy once → goes to all. Manage RBAC centrally. Check logs from one dashboard.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Local vs Downstream Clusters</div>
+          <ul>
+            <li><strong>Local cluster:</strong> The Rancher management cluster (runs Rancher server, database, monitoring)</li>
+            <li><strong>Downstream clusters:</strong> Regular K8s clusters managed BY Rancher (just need an agent)</li>
+            <li><strong>Communication:</strong> Agents on downstream clusters call home to Rancher, Rancher sends commands back</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Key Features</div>
+          <ul>
+            <li>Multi-cluster dashboard (health, nodes, pods, CPU/memory usage per cluster)</li>
+            <li>One-click cluster provisioning on AWS/Azure/vSphere</li>
+            <li>Fleet management (deploy apps to multiple clusters simultaneously)</li>
+            <li>Built-in monitoring (Prometheus + Grafana) and logging (Loki/ELK)</li>
+            <li>Centralized RBAC &amp; multi-tenancy (different teams, different permissions)</li>
+            <li>Helm chart catalog (pre-built apps ready to deploy)</li>
+            <li>Backup &amp; disaster recovery (restore clusters to point-in-time)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rancher is a Kubernetes management platform for multi-cluster environments. If you have 5+ clusters, managing each separately (kubectl on each) doesn't scale. Rancher gives you one UI to manage them all—deploy apps to multiple clusters, monitor health centrally, manage RBAC globally. It's essential for enterprises."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="rancher-arch">
+    <span class="sec-num">Fundamentals</span>
+    <h3>"Rancher Architecture: Local vs Downstream, Communication Flow"</h3>
+    <p class="intro">Rancher architecture is simple: local cluster (runs Rancher) + downstream clusters (managed by Rancher). Agents on downstream clusters call home to Rancher, which sends commands. This means downstream clusters can be behind firewalls. Understanding this helps troubleshoot multi-cluster issues.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Architecture</span>Components &amp; communication<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Local Cluster (Rancher management)</div>
+          <ul>
+            <li><strong>Rancher server:</strong> Main API/UI pod in kube-system</li>
+            <li><strong>Database:</strong> etcd (local) or external (HA)</li>
+            <li><strong>Monitoring:</strong> Prometheus + Grafana (built-in)</li>
+            <li><strong>Logging:</strong> Loki or ELK (built-in)</li>
+            <li><strong>Backup controller:</strong> Backs up etcd + persistent volumes</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Downstream Cluster Components</div>
+          <ul>
+            <li><strong>Rancher agent:</strong> Pod in cattle-system namespace. Watches for commands from Rancher server.</li>
+            <li><strong>Fleet agent:</strong> Pod in fleet-system namespace. Manages app deployments from Fleet.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Communication Flow (Bidirectional)</div>
+          <ul>
+            <li><strong>Downstream initiates:</strong> Agent calls home to Rancher (agent is client). Downstream can be behind firewall.</li>
+            <li><strong>Command chain:</strong>
+              <pre><code>User clicks "Deploy" in Rancher UI
+  → Rancher server sends command to agent via secure channel
+  → Agent deploys app using kubectl apply
+  → Agent reports status back to Rancher
+  → UI shows "Deployed successfully"</code></pre>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Authentication</div>
+          <ul>
+            <li><strong>User logs into Rancher:</strong> Gets JWT token</li>
+            <li><strong>User performs action:</strong> Rancher verifies token, applies RBAC rules</li>
+            <li><strong>Rancher impersonates user:</strong> Acts on behalf of user on downstream cluster (user doesn't get direct kubectl access)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">High Availability</div>
+          <ul>
+            <li><strong>Local cluster HA:</strong> 3+ Rancher server replicas, external etcd with replication</li>
+            <li><strong>If Rancher goes down:</strong> Downstream clusters keep running (Rancher is for management, not runtime)</li>
+            <li><strong>Recovery:</strong> You can still kubectl directly into downstream clusters if Rancher is down for days</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rancher local cluster runs Rancher server + monitoring. Downstream clusters run agents. Communication is bidirectional—agents call home to Rancher, Rancher sends commands back. Agents can be behind firewalls (they initiate connections). If Rancher goes down, downstream clusters still work independently. For HA, use 3+ Rancher replicas + external etcd."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="rancher-multicluster">
+    <span class="sec-num">Multi-cluster Management</span>
+    <h3>"Rancher Multi-cluster: Unified Dashboard, Provisioning, Upgrades"</h3>
+    <p class="intro">Rancher's killer feature: manage 10+ clusters as one. See all clusters' health in one dashboard. Provision new clusters one-click. Upgrade K8s version across all clusters simultaneously. This is how enterprises scale from 3 clusters to 30 without operations going crazy.</p>
+    <details class="entry" open>
+      <summary><span class="state ok">Feature</span>Unified multi-cluster operations<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Multi-cluster Dashboard</div>
+          <ul>
+            <li><strong>See all clusters:</strong> Health status, node count, pod count, CPU/memory per cluster</li>
+            <li><strong>Drill down:</strong> Click cluster → see nodes, pods, events, logs</li>
+            <li><strong>Alerts across clusters:</strong> One alert if ANY cluster has issues</li>
+            <li><strong>Users:</strong> Operations team checks dashboard in morning. "All clusters healthy? Good."</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">One-Click Cluster Provisioning</div>
+          <ul>
+            <li><strong>From Rancher UI:</strong> Click "Create cluster" → fill form → cluster is created on cloud provider</li>
+            <li><strong>Supports:</strong> AWS, Azure, vSphere, DigitalOcean, Google Cloud</li>
+            <li><strong>Templates:</strong> Save configs (3 nodes, t3.large, VPC X). Reuse for dev/staging clusters.</li>
+            <li><strong>Auto-upgrades:</strong> Rancher can upgrade K8s version across all clusters on schedule</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Common Use Cases</div>
+          <ul>
+            <li><strong>Hybrid cloud:</strong> AWS + Azure + on-prem clusters, all managed by Rancher</li>
+            <li><strong>Multi-region:</strong> Cluster per region (US, EU, APAC), Rancher sees all</li>
+            <li><strong>Multi-tenant:</strong> Each customer gets cluster, Rancher manages all 100 clusters</li>
+            <li><strong>Dev/staging/prod:</strong> Separate clusters, Rancher orchestrates deployments</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rancher's multi-cluster dashboard shows all clusters' health in one view. Provision new clusters one-click from UI. Upgrade K8s simultaneously across all clusters. Use cluster templates to standardize and reuse configs. Perfect for hybrid cloud (AWS + Azure + on-prem) or multi-region deployments."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="rancher-fleet">
+    <span class="sec-num">Multi-cluster Management</span>
+    <h3>"Rancher Fleet: GitOps-style Multi-cluster Deployments"</h3>
+    <p class="intro">Fleet is Rancher's GitOps tool. Push app configs to Git, Fleet automatically syncs them to multiple clusters. Deploy once, it rolls out to 5 clusters simultaneously with canary rollout strategy. This is how you do continuous deployment at scale.</p>
+    <details class="entry" open>
+      <summary><span class="state info">GitOps</span>Multi-cluster app deployment<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Fleet Workflow</div>
+          <ul>
+            <li><strong>1. Create fleet:</strong> Group clusters (e.g., "prod-fleet" = 5 production clusters)</li>
+            <li><strong>2. Connect Git repo:</strong> Fleet watches this repo for changes</li>
+            <li><strong>3. Define targets:</strong> "prod-fleet gets app v2.0", "dev-fleet gets v2.1-beta"</li>
+            <li><strong>4. Developer pushes code:</strong> Updates app version in Git</li>
+            <li><strong>5. Fleet detects change:</strong> Pulls from Git, deploys to all clusters in fleet</li>
+            <li><strong>6. Rollback:</strong> If deployment fails on any cluster, roll back all (atomic)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Rollout Strategies</div>
+          <ul>
+            <li><strong>Canary:</strong> Deploy to 1 cluster, monitor metrics for 1 hour, then roll to others</li>
+            <li><strong>Blue-green:</strong> Deploy new version parallel to old, switch traffic once healthy</li>
+            <li><strong>Progressive:</strong> Deploy to 20% clusters, wait, then 50%, wait, then 100%</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Fleet vs ArgoCD</div>
+          <ul>
+            <li><strong>Fleet:</strong> Native to Rancher, built-in to Rancher UI, simpler</li>
+            <li><strong>ArgoCD:</strong> Standalone, more powerful, works with any K8s (not just Rancher)</li>
+            <li><strong>Choose Fleet:</strong> Already using Rancher, want integrated experience</li>
+            <li><strong>Choose ArgoCD:</strong> Not using Rancher, need advanced GitOps features</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Fleet is Rancher's GitOps tool for multi-cluster deployments. Push configs to Git, Fleet syncs them to all clusters. Supports canary rollouts (deploy to 1 cluster, monitor, roll to others). Progressive rollouts (deploy to 20%, 50%, 100%). Simpler than ArgoCD but less powerful. Great for teams already using Rancher."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="rancher-rbac">
+    <span class="sec-num">Operations &amp; Security</span>
+    <h3>"Rancher RBAC & Multi-tenancy: Isolate Teams & Permissions"</h3>
+    <p class="intro">Different teams need different permissions on different clusters. Rancher RBAC lets you give DevOps team full access to all clusters, app team only deploy to staging, compliance team read-only everywhere. All controlled centrally from Rancher, not per-cluster.</p>
+    <details class="entry" open>
+      <summary><span class="state fail">Security</span>Authorization &amp; isolation<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Rancher RBAC Model</div>
+          <ul>
+            <li><strong>Global roles:</strong> Admin (manage everything), user (read-only), custom</li>
+            <li><strong>Cluster roles:</strong> Owner (manage cluster), member (deploy), viewer (read-only)</li>
+            <li><strong>Project roles:</strong> (Within cluster) Owner (manage namespace), developer, viewer</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Multi-tenancy Example</div>
+          <ul>
+            <li><strong>Scenario:</strong> Two teams, each needs isolated cluster</li>
+            <li><strong>Setup:</strong> Cluster A → Team A (owner), Cluster B → Team B (owner), DevOps → admin (all clusters)</li>
+            <li><strong>Result:</strong> Team A can't see Cluster B. Team B can't deploy to Cluster A. Both can self-serve their own cluster. DevOps sees everything.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Authentication Integrations</div>
+          <ul>
+            <li><strong>Local:</strong> Username/password (simple, labs only)</li>
+            <li><strong>AD/LDAP:</strong> Sync groups from Active Directory (enterprise)</li>
+            <li><strong>OAuth:</strong> GitHub, Google login (modern)</li>
+            <li><strong>SAML:</strong> Enterprise SSO, single login for all tools</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">API Tokens & Service Accounts</div>
+          <ul>
+            <li><strong>Service accounts:</strong> Apps authenticate to Rancher with tokens (not passwords)</li>
+            <li><strong>Scoped tokens:</strong> Token limited to specific cluster/project (reduces blast radius)</li>
+            <li><strong>Rotation:</strong> Rotate tokens regularly (best: every 90 days)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rancher has global roles (admin, user), cluster roles (owner, member), and project roles (within cluster). Assign Team A to Cluster A, Team B to Cluster B, DevOps as global admin. Integrate with LDAP/AD for enterprise auth or SAML for SSO. Use scoped API tokens for service accounts to minimize blast radius if leaked."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="rancher-monitoring">
+    <span class="sec-num">Operations &amp; Security</span>
+    <h3>"Rancher Monitoring & Logging: Built-in Observability"</h3>
+    <p class="intro">Rancher includes Prometheus + Grafana for metrics and Loki/ELK for logs. Pre-built dashboards, alerting, log search—all from one place. No need to install and manage these separately. Essential for operating 10+ clusters reliably.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Observability</span>Metrics &amp; logs from all clusters<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Built-in Monitoring (Prometheus + Grafana)</div>
+          <ul>
+            <li><strong>Included:</strong> Installed by default with Rancher (no extra setup)</li>
+            <li><strong>Metrics:</strong> Cluster health, node metrics, pod metrics, app metrics</li>
+            <li><strong>Dashboards:</strong> Pre-built (cluster, node, pod, workload). Also can create custom.</li>
+            <li><strong>Scrape targets:</strong> Automatically discovers pods with Prometheus annotation</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Built-in Logging</div>
+          <ul>
+            <li><strong>Options:</strong> Rancher can use Loki (lightweight) or ELK (powerful)</li>
+            <li><strong>Logs collected:</strong> Pod logs, system logs, audit logs from all clusters</li>
+            <li><strong>Search:</strong> Rancher UI has log viewer. Query logs from all clusters in one place.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Alerting</div>
+          <ul>
+            <li><strong>Alert rules:</strong> "If CPU > 80% for 5 minutes, fire alert"</li>
+            <li><strong>Receivers:</strong> Slack, email, PagerDuty, webhook</li>
+            <li><strong>Silencing:</strong> Mute alerts temporarily (e.g., during maintenance)</li>
+            <li><strong>Routing:</strong> Route different alerts to different channels</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rancher includes Prometheus + Grafana for monitoring and Loki/ELK for logging (built-in, no extra installation). Pre-built dashboards show cluster health, node metrics, pod metrics. Query logs from all clusters from one place. Set up alert rules (CPU > 80%), route to Slack/email. No need to manage Prometheus/Grafana separately."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="rancher-backup">
+    <span class="sec-num">Operations &amp; Security</span>
+    <h3>"Rancher Backup & Disaster Recovery: Protect Your Clusters"</h3>
+    <p class="intro">Rancher backs up cluster etcd and persistent volumes. If disaster strikes (ransomware, accidental deletion), restore from backup to point-in-time. Essential for compliance (regulators require backup proof) and reliability (data loss should never happen).</p>
+    <details class="entry" open>
+      <summary><span class="state ok">Backup</span>Backup &amp; restore strategy<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What Gets Backed Up</div>
+          <ul>
+            <li><strong>etcd:</strong> Cluster state (configs, CRDs, RBAC, secrets)</li>
+            <li><strong>Persistent Volumes:</strong> App data (databases, file storage)</li>
+            <li><strong>Rancher config:</strong> Multi-cluster settings, users, RBAC</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Backup Storage</div>
+          <ul>
+            <li><strong>Local (not recommended):</strong> Store on cluster (single point of failure)</li>
+            <li><strong>S3-compatible (recommended):</strong> AWS S3, MinIO, Azure Blob. Backups survive cluster death.</li>
+            <li><strong>NFS:</strong> Network storage. Accessible from outside cluster.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Restore Scenarios</div>
+          <ul>
+            <li><strong>Cluster crashed:</strong> Restore entire cluster from yesterday's backup</li>
+            <li><strong>Accidental deletion:</strong> Restore namespace/data from last week's backup</li>
+            <li><strong>Ransomware:</strong> Restore from clean snapshot, skip compromised data</li>
+            <li><strong>Data corruption:</strong> Database got corrupted, restore to 1 hour ago</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practices</div>
+          <ul>
+            <li><strong>Backup frequency:</strong> Daily for prod, hourly for critical. Weekly for dev.</li>
+            <li><strong>Test restores:</strong> Quarterly test restore to new cluster. Backup is useless if restore fails!</li>
+            <li><strong>Separate storage:</strong> Backups outside cluster (if cluster data corrupted, backup not affected)</li>
+            <li><strong>Encryption:</strong> Backups contain secrets → encrypt at rest + in transit</li>
+            <li><strong>Retention:</strong> Keep 30+ days (compliance requirement). Some regulations require 7 years!</li>
+            <li><strong>Document recovery:</strong> Have runbook for restore procedure. Tested.</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rancher backs up etcd (cluster state) + persistent volumes (app data). Store backups in S3/blob storage (not local). Test restores quarterly—backup is only good if recovery works. For compliance, keep backups 30+ days and encrypt them. If cluster data corrupted or ransomware hits, restore from clean backup to new cluster in &lt;1 hour."
+        </div>
+      </div>
+    </details>
+  </section>
 
 </main>
 
