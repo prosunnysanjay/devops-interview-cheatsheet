@@ -539,57 +539,56 @@ td.wrap:first-child{white-space:normal}
         <a href="#gaps-terraform">Gaps to fill</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Infrastructure &amp; Connectivity</div>
-        <a href="#sd-vnet">VNet Connectivity (Azure)</a>
-        <a href="#sd-vpc">VPC Connectivity (AWS)</a>
-        <a href="#sd-networking">Networking Comparison</a>
-        <a href="#sd-landing-zone">Landing Zone</a>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Kubernetes &amp; Cluster</div>
+        <a href="#sd-aks-design">AKS Cluster Design &amp; Operate</a>
+        <a href="#sd-eks-design">EKS Cluster Design &amp; Operate</a>
+        <a href="#sd-k8s-advanced">Kubernetes Advanced (CRDs, Operators)</a>
+        <a href="#sd-multicluster">Multi-cluster Strategy</a>
+        <a href="#sd-multitenancy">Multi-tenancy &amp; Isolation</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Security &amp; Governance</div>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Infrastructure &amp; Networking</div>
+        <a href="#sd-vnet">Azure VNet Connectivity</a>
+        <a href="#sd-vpc">AWS VPC Connectivity</a>
+        <a href="#sd-network-arch">Network Architecture &amp; Design</a>
+        <a href="#sd-landing-zone">Landing Zones</a>
+      </div>
+      <div class="grp" data-subj="seniordevops">
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Security, IAM &amp; Secrets</div>
+        <a href="#sd-iam-identity">Identity &amp; Access Management</a>
         <a href="#sd-devsecops">DevSecOps &amp; CI/CD Security</a>
-        <a href="#sd-platform-security">Platform Security &amp; Governance</a>
+        <a href="#sd-platform-security">Platform Security</a>
+        <a href="#sd-secrets">Secrets Rotation</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Reliability &amp; Cost</div>
-        <a href="#sd-ha-dr">High Availability &amp; Disaster Recovery</a>
-        <a href="#sd-cost-optimization">Cloud Cost Optimization</a>
-      </div>
-      <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>CI/CD &amp; Platform</div>
-        <a href="#sd-cicd-gitflow">CI/CD &amp; Git Flow</a>
-        <a href="#sd-automation">Automation &amp; Self-Service</a>
-      </div>
-      <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Kubernetes &amp; Operations</div>
-        <a href="#sd-aks-design">AKS Cluster Design, Deploy &amp; Operate</a>
-        <a href="#sd-eks-design">EKS Cluster Design, Deploy &amp; Operate</a>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Reliability &amp; Observability</div>
+        <a href="#sd-ha-dr">HA &amp; Disaster Recovery</a>
+        <a href="#sd-observability">Advanced Observability</a>
         <a href="#sd-incident-mgmt">Incident Management</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Data &amp; Messaging</div>
-        <a href="#sd-kafka">Message Queues &amp; Event Streaming</a>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Data, Messaging &amp; APIs</div>
+        <a href="#sd-kafka">Kafka &amp; Message Queues</a>
         <a href="#sd-database-ha">Database Replication &amp; HA</a>
         <a href="#sd-api-gateway">API Gateway &amp; Rate Limiting</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Service Delivery</div>
-        <a href="#sd-feature-flags">Feature Flags &amp; Progressive Delivery</a>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Service Delivery &amp; CI/CD</div>
+        <a href="#sd-cicd-gitflow">CI/CD &amp; Git Flow</a>
+        <a href="#sd-feature-flags">Feature Flags &amp; Progressive</a>
         <a href="#sd-service-mesh">Service Mesh (Istio/Linkerd)</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Platform &amp; Architecture</div>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Platform &amp; Operations</div>
         <a href="#sd-platform-eng">Platform Engineering &amp; IDP</a>
-        <a href="#sd-multitenancy">Multi-tenancy &amp; Tenant Isolation</a>
+        <a href="#sd-cost-optimization">Cost Optimization &amp; FinOps</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Operations &amp; Reliability</div>
-        <a href="#sd-multicluster">Multi-cluster Strategy</a>
-        <a href="#sd-observability">Advanced Observability</a>
-        <a href="#sd-secrets">Secrets Rotation &amp; Management</a>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Interview Scenarios</div>
+        <a href="#sd-scenarios">Real-World Architecture Challenges</a>
       </div>
       <div class="grp" data-subj="seniordevops">
-        <div class="grph"><span class="gsubj">Senior DevOps</span>Remaining gaps</div>
+        <div class="grph"><span class="gsubj">Senior DevOps</span>Remaining</div>
         <a href="#gaps-seniordevops">Gaps to fill</a>
       </div>
     </nav>
@@ -7649,7 +7648,7 @@ inputs = {
   <div class="band"><span class="eyebrow">Subject 10</span><h2>Senior DevOps Topics</h2></div>
 
   <section id="sd-vnet">
-    <span class="sec-num">Infrastructure &amp; Connectivity</span>
+    <span class="sec-num">2. Infrastructure &amp; Networking</span>
     <h3>Azure VNet Connectivity (Virtual Network)</h3>
     <p class="intro">When I need to connect VNets, I first consider how many VNets we have. For two or three VNets, VNet peering is simple—direct, low latency, free. But it's not transitive, so if I have many VNets, I use hub-and-spoke with a hub VNet and user-defined routes. For hybrid on-premises connectivity, I use ExpressRoute—it's expensive but gives us dedicated bandwidth and private connectivity, which is critical for compliance.</p>
     <details class="entry" open>
@@ -7724,7 +7723,7 @@ inputs = {
   </section>
 
   <section id="sd-vpc">
-    <span class="sec-num">Infrastructure &amp; Connectivity</span>
+    <span class="sec-num">2. Infrastructure &amp; Networking</span>
     <h3>AWS VPC Connectivity (Virtual Private Cloud)</h3>
     <p class="intro">AWS has VPC Peering like Azure VNet peering, but for complex multi-VPC setups, I use Transit Gateway—it's like a hub, and all VPCs attach to it. The advantage over hub-and-spoke is that traffic doesn't route through a central VM; Transit Gateway is a managed service. For on-premises, I use AWS Direct Connect instead of ExpressRoute. It's the same concept—dedicated private connection, but AWS manages it differently and billing is also different.</p>
     <details class="entry" open>
@@ -7808,8 +7807,91 @@ inputs = {
     </details>
   </section>
 
+  <section id="sd-network-arch">
+    <span class="sec-num">2. Infrastructure &amp; Networking</span>
+    <h3>"Network Architecture: Design for Scale, Security & Resilience"</h3>
+    <p class="intro">Network design is the foundation. I think about: how do services talk to each other? How do external users reach my services? How do I prevent one service's traffic spike from affecting others? How do I segment for security (zero trust)? I design DNS (split-horizon for hybrid), load balancing (global + regional), and service discovery at scale.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Architecture</span>Patterns for enterprise networks<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">DNS Strategy (Critical!)</div>
+          <ul>
+            <li><strong>Public DNS:</strong> users.example.com → resolves to public IP on internet</li>
+            <li><strong>Private DNS:</strong> database.internal → resolves only inside VNet/VPC, not on internet</li>
+            <li><strong>Split-brain DNS (hybrid):</strong>
+              <ul>
+                <li>users.example.com resolves to private IP inside company, public IP outside</li>
+                <li>Use case: Hybrid cloud. On-premises uses private IP, internet users use public IP</li>
+                <li>Tools: Azure Private Zones, AWS Route 53, external DNS in K8s</li>
+              </ul>
+            </li>
+            <li><strong>Service discovery in K8s:</strong> pod.namespace.svc.cluster.local automatically resolved by kube-dns</li>
+            <li><strong>What I design:</strong> Private DNS for internal services. CDN + public DNS for external. Split-brain if hybrid.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Load Balancing Strategy</div>
+          <ul>
+            <li><strong>Layer 3/4 (Network Load Balancer):</strong> Ultra-fast, handles millions of requests. For: TCP/UDP traffic, non-HTTP</li>
+            <li><strong>Layer 7 (Application Load Balancer):</strong> Smarter routing by URL path, hostname, headers. For: REST APIs, web apps</li>
+            <li><strong>Global load balancing:</strong> Route traffic across regions based on geo, latency, health. Azure Traffic Manager, AWS Route 53, CloudFlare</li>
+            <li><strong>Local load balancing:</strong> K8s Service with ClusterIP. Round-robin across pods in same cluster</li>
+            <li><strong>What I design:</strong> Global ALB for entry point (directs to regional clusters), local K8s services for pod-to-pod</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Service-to-Service Communication</div>
+          <ul>
+            <li><strong>Direct calls (API):</strong> Service A calls Service B directly. Problem: no retries, no circuit breaker, no mTLS</li>
+            <li><strong>Service mesh (Istio/Linkerd):</strong> Intercepted at pod level. Provides mTLS, retries, circuit breakers, observability. Cost: latency, complexity</li>
+            <li><strong>API Gateway + backend services:</strong> Central gateway handles auth &amp; routing, backends don't need to. Simpler than mesh.</li>
+            <li><strong>Message queue (Kafka/AMQP):</strong> Async communication. Decoupled, resilient, but eventual consistency</li>
+            <li><strong>What I choose:</strong> For &lt;50 services: API Gateway. For &gt;200 services: service mesh. For async: message queue.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Network Segmentation (Zero Trust)</div>
+          <ul>
+            <li><strong>Subnets:</strong> Divide network into small subnets by function (db subnet, app subnet, dmz). Default deny between subnets.</li>
+            <li><strong>Network Security Groups / Security Groups:</strong> Stateful firewall rules. Only allow traffic that's explicitly permitted.</li>
+            <li><strong>Network Policies (K8s):</strong> Pod-to-pod firewall. Example: "frontend pods can reach backend, backend can reach database"</li>
+            <li><strong>mTLS (Service Mesh):</strong> Mutual TLS between pods. Even if attacker is inside network, they can't intercept traffic.</li>
+            <li><strong>Zero trust network flow:</strong>
+              <pre><code>User → WAF (check bot) → ALB (auth) → API Gateway (JWT) → K8s Service (mTLS) → Pod (RBAC)</code></pre>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Handling Traffic Spikes &amp; Noisy Neighbors</div>
+          <ul>
+            <li><strong>Problem:</strong> One service (e.g., reporting) hammers shared database, everyone else slows down</li>
+            <li><strong>Solution 1: Rate limiting</strong> - API Gateway or ingress controller limits requests per user/IP</li>
+            <li><strong>Solution 2: Circuit breaker</strong> - If database is slow, quickly reject requests instead of queuing</li>
+            <li><strong>Solution 3: Separate databases</strong> - Reporting uses separate read-only replica, doesn't compete with production traffic</li>
+            <li><strong>Solution 4: Message queue</strong> - Reports go to queue, processed asynchronously at safe rate</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">WAF (Web Application Firewall)</div>
+          <ul>
+            <li><strong>What it does:</strong> Sits in front of web apps, blocks common attacks (SQL injection, XSS, DDoS)</li>
+            <li><strong>Rules:</strong> Block if request matches known malicious patterns</li>
+            <li><strong>Azure:</strong> WAF on Application Gateway or Azure Front Door</li>
+            <li><strong>AWS:</strong> WAF on CloudFront or ALB</li>
+            <li><strong>Best practice:</strong> Enable WAF on every public endpoint. Blocks 90% of attacks automatically.</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I design networks with DNS first (private zones for internal, CDN for external), layer load balancing (global then regional), and segment with NSGs/network policies. Zero trust: default deny, only allow explicit traffic. For scale, I use service mesh for observability or API Gateway for simplicity. Rate limiting and circuit breakers prevent cascading failures from noisy neighbors."
+        </div>
+      </div>
+    </details>
+  </section>
+
   <section id="sd-landing-zone">
-    <span class="sec-num">Infrastructure &amp; Connectivity</span>
+    <span class="sec-num">2. Infrastructure &amp; Networking</span>
     <h3>"What is a Landing Zone? Why is it critical?"</h3>
     <details class="entry" open>
       <summary><span class="state info">Concept</span>Pre-configured governed cloud environment<span class="chev">›</span></summary>
@@ -7860,8 +7942,134 @@ inputs = {
     </details>
   </section>
 
+  <section id="sd-iam-identity">
+    <span class="sec-num">3. Security, IAM &amp; Secrets</span>
+    <h3>"Identity & Access Management: RBAC, Workload Identity, Zero Trust"</h3>
+    <p class="intro">IAM is how I prevent unauthorized access. I design RBAC for least privilege, use managed identities instead of secrets, implement just-in-time access for sensitive operations, and audit every permission change. In Kubernetes, I use workload identity federation so pods authenticate without storing credentials.</p>
+    <details class="entry" open>
+      <summary><span class="state fail">Security</span>Authorization strategies &amp; implementation<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">RBAC vs ABAC: When to use each</div>
+          <ul>
+            <li><strong>RBAC (Role-Based):</strong>
+              <ul>
+                <li>User has a role (e.g., "DevOps Engineer"), role has permissions</li>
+                <li>Simple to understand and audit: who has what role?</li>
+                <li>Kubernetes native - ServiceAccount → ClusterRole → permissions</li>
+                <li>Azure/AWS: Roles (Contributor, Reader, Custom Role)</li>
+                <li>Downside: Role explosion (too many similar roles)</li>
+              </ul>
+            </li>
+            <li><strong>ABAC (Attribute-Based):</strong>
+              <ul>
+                <li>Permissions based on attributes (department, cost-center, environment)</li>
+                <li>More flexible: "allow if department=engineering AND env=prod"</li>
+                <li>Harder to audit: did the permission come from department or env tag?</li>
+                <li>Use case: cross-account access with tagging strategy</li>
+              </ul>
+            </li>
+            <li><strong>In practice:</strong> Start with RBAC, add attributes/conditions as you scale. Most orgs use hybrid.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Service Principals vs Managed Identities</div>
+          <ul>
+            <li><strong>Service Principal (Old way):</strong>
+              <ul>
+                <li>You create credentials (client ID + secret), store them in Key Vault</li>
+                <li>App reads secret from Key Vault and authenticates</li>
+                <li>Problem: secret rotation, accidental exposure, revocation is manual</li>
+              </ul>
+            </li>
+            <li><strong>Managed Identity (New way, Azure/AWS):</strong>
+              <ul>
+                <li>Cloud provider creates and rotates credentials automatically</li>
+                <li>Pod/VM gets identity from cloud metadata service (no secrets in code)</li>
+                <li>Azure: Azure Managed Identity, AWS: IAM role for pods (IRSA)</li>
+                <li>Kubernetes: Workload Identity Federation (K8s service account → cloud identity)</li>
+              </ul>
+            </li>
+            <li><strong>What I do:</strong> Always use managed identities. If forced to use service principals, rotate every 90 days and audit access logs.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Workload Identity Federation (OIDC)</div>
+          <ul>
+            <li><strong>Problem:</strong> Pod needs to access Azure Storage. How without a secret?</li>
+            <li><strong>Solution:</strong> Kubernetes service account issues a JWT token. Cloud provider trusts K8s issuer. Pod exchanges JWT for cloud token.</li>
+            <li><strong>Flow:</strong>
+              <pre><code>1. Pod: "I am sa-my-app in my-namespace"
+2. K8s: Issues JWT signed by cluster OIDC key
+3. Pod: Exchanges JWT to cloud provider
+4. Cloud: Verifies JWT signature (trusts K8s OIDC issuer)
+5. Cloud: Issues temporary token for Azure Storage access
+6. No secret stored anywhere!</code></pre>
+            </li>
+            <li><strong>Setup:</strong> Enable OIDC on AKS/EKS, create Azure AD app with federated credential, annotate K8s service account</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Just-In-Time (JIT) Access</div>
+          <ul>
+            <li><strong>Concept:</strong> Temporary elevated access, not permanent. Engineer gets access for 1 hour to prod database, then revoked automatically.</li>
+            <li><strong>Why:</strong> Reduces attack surface. If access token leaked, it expires soon. Audit trail shows who accessed when.</li>
+            <li><strong>Implementation:</strong>
+              <ul>
+                <li>Azure: Privileged Identity Management (PIM) - approve temp role</li>
+                <li>AWS: Assume role with session token (expires in 1-12 hours)</li>
+                <li>Kubernetes: RBAC + audit logging + approval system (e.g., Teleport)</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Least Privilege Principle</div>
+          <ul>
+            <li><strong>Golden rule:</strong> Every identity gets only the minimum permissions needed for their job. Not more, not less.</li>
+            <li><strong>Anti-pattern:</strong> "Developer asked for access, give them Contributor on subscription" → too much!</li>
+            <li><strong>Right way:</strong> "Developer needs to deploy to staging K8s cluster → give them deploy role on that cluster only"</li>
+            <li><strong>Audit:</strong> Review permissions quarterly. Remove unused roles. Log all permission changes.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Zero Trust Architecture</div>
+          <ul>
+            <li><strong>Old model:</strong> Trust network perimeter, lock down inside</li>
+            <li><strong>Zero Trust:</strong> Never trust, always verify. Every request authenticated &amp; authorized, logged.</li>
+            <li><strong>Principles:</strong>
+              <ul>
+                <li>Verify identity (service account, user, pod)</li>
+                <li>Verify device (only approved machines can deploy)</li>
+                <li>Verify location (only traffic from office/VPN)</li>
+                <li>Log everything (who did what, when, from where)</li>
+                <li>Encrypt everything (network, storage, in-transit)</li>
+              </ul>
+            </li>
+            <li><strong>Kubernetes example:</strong> Pod A → Pod B. Even within cluster, use mTLS + NetworkPolicy + RBAC.</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Common IAM Mistakes (Don't do this!)</div>
+          <ul>
+            <li>Storing secrets in code or config files → use managed identity instead</li>
+            <li>Using one service account for everything → create per-app/per-namespace accounts</li>
+            <li>Granting Contributor/Admin roles broadly → use custom roles with minimal permissions</li>
+            <li>Not auditing IAM changes → enable audit logging, review monthly</li>
+            <li>Long-lived credentials with no rotation → rotate every 90 days max</li>
+            <li>Forgetting to revoke access when person leaves → automate deprovisioning</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I design IAM with zero trust: verify every request, use managed identities instead of secrets, implement least privilege, and audit everything. For Kubernetes, I use workload identity federation so pods never see credentials. Just-in-time access for sensitive operations. Regular audits to remove unused permissions."
+        </div>
+      </div>
+    </details>
+  </section>
+
   <section id="sd-devsecops">
-    <span class="sec-num">Security &amp; Governance</span>
+    <span class="sec-num">3. Security &amp; Secrets</span>
     <h3>"DevSecOps &amp; CI/CD Security: Shift-Left"</h3>
     <p class="intro">I embed security into every stage of the CI/CD pipeline, not as an afterthought. In the checkout phase, I scan for hardcoded secrets. In build, I run SAST (static analysis) and SCA (dependency scanning). After the container is built, I scan the image for vulnerabilities. At deployment, I enforce OPA policies to block non-compliant deployments. This shift-left approach catches issues early when they're cheap to fix, not in production.</p>
     <details class="entry" open>
@@ -7905,7 +8113,7 @@ inputs = {
   </section>
 
   <section id="sd-platform-security">
-    <span class="sec-num">Security &amp; Governance</span>
+    <span class="sec-num">3. Security &amp; Secrets</span>
     <h3>"Platform Security &amp; Governance"</h3>
     <details class="entry">
       <summary><span class="state fail">Defense</span>Defense-in-depth strategy<span class="chev">›</span></summary>
@@ -7946,7 +8154,7 @@ inputs = {
   </section>
 
   <section id="sd-ha-dr">
-    <span class="sec-num">Reliability &amp; Cost</span>
+    <span class="sec-num">4. Reliability &amp; Observability</span>
     <h3>"High Availability &amp; Disaster Recovery"</h3>
     <p class="intro">Before I design any HA/DR strategy, I always ask: what's the RTO and RPO? If we can tolerate an hour of downtime and 1 hour of data loss, we backup to a secondary region asynchronously. If we need 5-minute RTO and zero data loss, we deploy multi-AZ with synchronous replication—but that costs more. For databases, I use read replicas in a secondary AZ for failover, and enable automated backups with point-in-time restore. The design follows the business requirement, not the other way around.</p>
     <details class="entry" open>
@@ -8000,7 +8208,7 @@ inputs = {
   </section>
 
   <section id="sd-cost-optimization">
-    <span class="sec-num">Reliability &amp; Cost</span>
+    <span class="sec-num">7. Platform &amp; Operations</span>
     <h3>"Cloud Cost Optimization: FinOps"</h3>
     <details class="entry">
       <summary><span class="state info">Cost</span>Visibility → Optimization → Culture<span class="chev">›</span></summary>
@@ -8047,7 +8255,7 @@ inputs = {
   </section>
 
   <section id="sd-cicd-gitflow">
-    <span class="sec-num">CI/CD &amp; Platform</span>
+    <span class="sec-num">6. Service Delivery &amp; CI/CD</span>
     <h3>"CI/CD &amp; Git Flow: Enterprise Patterns"</h3>
     <details class="entry" open>
       <summary><span class="state ok">Git</span>Branching &amp; promotion strategy<span class="chev">›</span></summary>
@@ -8157,7 +8365,7 @@ Goal → Zero tickets → developers provision on demand</code></pre>
   </section>
 
   <section id="sd-aks-design">
-    <span class="sec-num">Kubernetes &amp; Operations</span>
+    <span class="sec-num">1. Kubernetes &amp; Cluster</span>
     <h3>"AKS Cluster Design, Deploy &amp; Operate"</h3>
     <details class="entry" open>
       <summary><span class="state ok">AKS</span>Production-grade design<span class="chev">›</span></summary>
@@ -8228,7 +8436,7 @@ Goal → Zero tickets → developers provision on demand</code></pre>
   </section>
 
   <section id="sd-eks-design">
-    <span class="sec-num">Kubernetes &amp; Operations</span>
+    <span class="sec-num">1. Kubernetes &amp; Cluster</span>
     <h3>"EKS Cluster Design, Deploy &amp; Operate"</h3>
     <details class="entry">
       <summary><span class="state ok">EKS</span>AWS Kubernetes best practices<span class="chev">›</span></summary>
@@ -8291,7 +8499,7 @@ Goal → Zero tickets → developers provision on demand</code></pre>
   </section>
 
   <section id="sd-incident-mgmt">
-    <span class="sec-num">Kubernetes &amp; Operations</span>
+    <span class="sec-num">4. Reliability &amp; Observability</span>
     <h3>"Incident Management: P1 to Resolution"</h3>
     <details class="entry">
       <summary><span class="state fail">Incident</span>Structured response<span class="chev">›</span></summary>
@@ -8348,7 +8556,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-kafka">
-    <span class="sec-num">Data &amp; Messaging</span>
+    <span class="sec-num">5. Data, Messaging &amp; APIs</span>
     <h3>"Message Queues & Event Streaming: Kafka vs Azure vs AWS"</h3>
     <p class="intro">Kafka is a streaming platform—data is ordered within a partition, and consumers form groups to share partitions. We use Kafka when we need message replay, topic retention, or complex processing like joins. Azure Service Bus and Event Hubs are simpler—they're transient message queues. SQS in AWS is even simpler—fire-and-forget, no ordering guarantee. The choice depends on whether we need ordering, replay capability, and the complexity of downstream processing.</p>
     <details class="entry" open>
@@ -8414,7 +8622,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-database-ha">
-    <span class="sec-num">Data &amp; Messaging</span>
+    <span class="sec-num">5. Data, Messaging &amp; APIs</span>
     <h3>"Database Replication & High Availability"</h3>
     <p class="intro">I choose between sync and async replication based on consistency needs. Sync replication guarantees all replicas are updated before acknowledging the write—slower but strong consistency. Async is faster but there's a small window where reads might see stale data. For scaling, I add read replicas in a secondary AZ for failover. I always enable automated backups with point-in-time restore. And I use connection pooling to prevent the app from exhausting database connections under load.</p>
     <details class="entry">
@@ -8470,7 +8678,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-api-gateway">
-    <span class="sec-num">Data &amp; Messaging</span>
+    <span class="sec-num">5. Data, Messaging &amp; APIs</span>
     <h3>"API Gateway & Rate Limiting: Azure vs AWS"</h3>
     <p class="intro">I use an API Gateway to centralize authentication, rate limiting, and request transformations. For rate limiting, I use token bucket algorithm—it's smooth and handles burst traffic well. I validate JWT tokens at the gateway before the request reaches the backend. In Azure, I use API Management (APIM). In AWS, I use API Gateway with Lambda authorizers. I always apply rate limits per API key or per tenant so one customer doesn't consume all our capacity.</p>
     <details class="entry">
@@ -8525,7 +8733,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-feature-flags">
-    <span class="sec-num">Service Delivery</span>
+    <span class="sec-num">6. Service Delivery &amp; CI/CD</span>
     <h3>"Feature Flags & Progressive Delivery"</h3>
     <p class="intro">Feature flags let me decouple deployment from release. I deploy code to production but the feature is hidden behind a flag. With canary deployments, I enable the flag for 5% of users first, monitor metrics, and gradually increase it. Blue-green is faster—I switch all traffic at once, but I need to be confident. Dark launches let me run the new code in production silently, collect real-world data, and decide whether to flip the switch. I choose based on risk tolerance and the blast radius of a bug.</p>
     <details class="entry" open>
@@ -8571,7 +8779,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-service-mesh">
-    <span class="sec-num">Service Delivery</span>
+    <span class="sec-num">6. Service Delivery &amp; CI/CD</span>
     <h3>"Service Mesh: Istio & Linkerd"</h3>
     <p class="intro">A service mesh sits between microservices and handles communication—mutual TLS for encryption, automatic retries, circuit breakers to prevent cascading failures, and traffic splitting for gradual rollouts. Istio is feature-rich but complex; Linkerd is lightweight and easier to operate. But I only recommend a service mesh if we have many services and need these features. For a small team or a few services, it adds complexity without benefit. The operational overhead is real—debugging becomes harder when the mesh is in the middle.</p>
     <details class="entry">
@@ -8628,7 +8836,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-platform-eng">
-    <span class="sec-num">Platform &amp; Architecture</span>
+    <span class="sec-num">7. Platform &amp; Operations</span>
     <h3>"Platform Engineering & Internal Developer Platform (IDP)"</h3>
     <p class="intro">Platform Engineering is about building products for developers. I create golden paths—pre-approved patterns for microservices, data pipelines, or batch jobs. Developers use a self-service portal (like Backstage) to scaffold new services, which generates Git repos, CI/CD pipelines, and Helm charts automatically. They don't need to know Kubernetes or Terraform; the platform handles it. I start small with a catalog and one template, then gradually add more based on what teams actually need. The goal is to reduce toil and accelerate delivery.</p>
     <details class="entry" open>
@@ -8718,7 +8926,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-multitenancy">
-    <span class="sec-num">Platform &amp; Architecture</span>
+    <span class="sec-num">1. Kubernetes &amp; Cluster</span>
     <h3>"Multi-tenancy & Tenant Isolation"</h3>
     <p class="intro">When designing multi-tenant systems, I consider three isolation levels. Namespace isolation within a cluster is cheapest but has noisy neighbor risk—one tenant's spike affects others. Database per tenant is moderate cost and reduces noisy neighbor risk. Cluster per tenant is expensive but provides strong isolation, which is critical for tier-1 customers or regulated workloads. Regardless of the level, I always enforce RBAC so tenants can't access other tenants' resources, use network policies to prevent cross-tenant traffic, and implement row-level security in the database so queries can't return other tenants' data even if there's a code bug.</p>
     <details class="entry" open>
@@ -8875,8 +9083,149 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
     </details>
   </section>
 
+  <section id="sd-k8s-advanced">
+    <span class="sec-num">1. Kubernetes &amp; Cluster</span>
+    <h3>"Kubernetes Advanced: CRDs, Operators, Webhooks, Policies"</h3>
+    <p class="intro">At senior level, I don't just run Kubernetes—I extend it. I create Custom Resources (CRDs) to represent business concepts (Database, Certificate, Ingress). I write Operators that automate complex tasks (backup, upgrade, scaling). I use admission webhooks to enforce policies (no containers as root, image pull secrets required). This is how you scale Kubernetes beyond basic deployments.</p>
+    <details class="entry" open>
+      <summary><span class="state ok">Advanced</span>Extending Kubernetes for your use case<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Custom Resource Definitions (CRDs)</div>
+          <ul>
+            <li><strong>What:</strong> Extend Kubernetes API with your own resources. Instead of just Pods/Deployments, add "Database" or "Certificate" resources</li>
+            <li><strong>Example:</strong>
+              <pre><code>apiVersion: databases.example.com/v1
+kind: Database
+metadata:
+  name: my-app-db
+spec:
+  type: PostgreSQL
+  size: 10Gi
+  backup: true</code></pre>
+            </li>
+            <li><strong>Why:</strong> Developers use familiar K8s commands (kubectl apply, kubectl get database) for your custom resources</li>
+            <li><strong>How it works:</strong> Define CRD schema (what fields are allowed), then custom controller watches for Database resources and creates actual cloud resources (Azure DB, RDS)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Operators (Controllers + CRDs)</div>
+          <ul>
+            <li><strong>Operator = CRD + Controller logic.</strong> Controller watches for CRD changes and takes action</li>
+            <li><strong>Examples:</strong>
+              <ul>
+                <li>Cert-manager Operator: watches Certificate resources, auto-renews before expiry</li>
+                <li>Database Operator: watches Database resources, creates backups, handles failover</li>
+                <li>Velero Operator: watches backup schedules, auto-backs up etcd/PVs</li>
+              </ul>
+            </li>
+            <li><strong>Operator pattern lifecycle:</strong>
+              <pre><code>1. User creates Database resource
+2. Operator detects it (watches API)
+3. Operator creates Azure DB instance
+4. Operator configures backups
+5. Operator monitors health
+6. If DB crashes, operator fails over to replica
+7. User sees: kubectl get database → all good!</code></pre>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Admission Webhooks (Enforcing Policies)</div>
+          <ul>
+            <li><strong>Validating Webhook:</strong> K8s asks external service: "Is this valid?" before accepting the resource</li>
+            <li><strong>Mutating Webhook:</strong> External service modifies the resource before K8s stores it</li>
+            <li><strong>Examples:</strong>
+              <ul>
+                <li>Validating: "Only allow images from our registry (no public images)"</li>
+                <li>Validating: "Pods must have resource limits"</li>
+                <li>Mutating: "Every pod gets image pull secret automatically"</li>
+                <li>Mutating: "Add monitoring sidecar to every app pod"</li>
+              </ul>
+            </li>
+            <li><strong>Mature tool:</strong> Use Kyverno or OPA Gatekeeper instead of custom webhooks</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Pod Security (PSP vs Pod Security Standards)</div>
+          <ul>
+            <li><strong>PSP (Pod Security Policy - deprecated):</strong> Old way to restrict what pods can do (no root, read-only filesystem, etc.)</li>
+            <li><strong>Pod Security Standards (current):</strong> Labels on namespaces, K8s enforces. Three levels:</li>
+            <li><strong>Restricted:</strong> Strictest. No root, no privileged, read-only filesystem. For sensitive workloads</li>
+            <li><strong>Baseline:</strong> Allows some risk. Can run as root but not privileged. Default for most</li>
+            <li><strong>Unrestricted:</strong> No security checks. Only for system components (kube-proxy, kube-flannel)</li>
+            <li><strong>How to apply:</strong> Label namespace: kubectl label namespace default pod-security.kubernetes.io/enforce=restricted</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Network Policies Deep Dive</div>
+          <ul>
+            <li><strong>Default behavior:</strong> K8s allows all pod-to-pod traffic</li>
+            <li><strong>Network Policy:</strong> Whitelist traffic. Example: "Only let frontend reach backend"</li>
+            <li><strong>Requires CNI plugin:</strong> Calico, Cilium, Flannel (not all support policies)</li>
+            <li><strong>Policy example:</strong>
+              <pre><code>kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {} # applies to all pods
+  policyTypes:
+  - Ingress
+  - Egress
+---
+kind: NetworkPolicy
+metadata:
+  name: allow-backend
+spec:
+  podSelector:
+    matchLabels:
+      tier: backend
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          tier: frontend
+    ports:
+    - protocol: TCP
+      port: 8080</code></pre>
+            </li>
+            <li><strong>Best practice:</strong> Start with deny-all, explicitly allow what's needed</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Storage Classes &amp; Persistent Volumes</div>
+          <ul>
+            <li><strong>StorageClass:</strong> Defines type of storage (SSD fast, HDD cheap, Azure managed, AWS EBS)</li>
+            <li><strong>PersistentVolumeClaim:</strong> Pod says "I need 10Gi of fast storage" → K8s finds matching StorageClass, provisions volume</li>
+            <li><strong>Volume lifecycle:</strong>
+              <ul>
+                <li>Pod created with PVC → K8s provisions PV → pod mounts volume → app writes data</li>
+                <li>Pod deleted → volume persists (by default)</li>
+                <li>Reclaim policy: Delete (clean up volume), Retain (keep forever), Recycle (format and reuse)</li>
+              </ul>
+            </li>
+            <li><strong>For stateful apps:</strong> Use StatefulSets (not Deployments) + PVCs. Ensures pod0 always gets the same PV</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Common Advanced Patterns</div>
+          <ul>
+            <li><strong>Sidecar injection (via mutating webhook):</strong> Automatically inject logging/monitoring sidecar into every pod</li>
+            <li><strong>Init containers:</strong> Run setup tasks (db migrations) before app starts. Example: liquibase to migrate DB</li>
+            <li><strong>DaemonSets:</strong> Run pod on every node. Example: logging agent (Fluentd), monitoring (Prometheus node-exporter)</li>
+            <li><strong>Jobs &amp; CronJobs:</strong> One-time tasks or scheduled tasks. Example: daily backup job</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I extend Kubernetes with CRDs for domain concepts and Operators to automate complex tasks. I use admission webhooks/Kyverno for policy enforcement (images from registry only, no root containers). Network Policies enforce pod-level segmentation (default deny, allow only required traffic). For storage, I use StatefulSets with PVCs for stateful apps, DaemonSets for node-level agents, and regular Deployments for stateless services."
+        </div>
+      </div>
+    </details>
+  </section>
+
   <section id="sd-multicluster">
-    <span class="sec-num">Operations &amp; Reliability</span>
+    <span class="sec-num">1. Kubernetes &amp; Cluster</span>
     <h3>"Multi-cluster Strategy: Federation, Mesh, and Load Balancing"</h3>
     <p class="intro">When a single cluster isn't enough (cost, resilience, compliance), I deploy multiple clusters. The challenge is: how do services in cluster-1 talk to services in cluster-2? I can use cluster federation for automatic service discovery, a service mesh (Istio multi-cluster) for traffic management, or a global load balancer. Each has tradeoffs in complexity, latency, and operational overhead.</p>
     <details class="entry" open>
@@ -8942,7 +9291,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-observability">
-    <span class="sec-num">Operations &amp; Reliability</span>
+    <span class="sec-num">4. Reliability &amp; Observability</span>
     <h3>"Advanced Observability: SLI, SLO, SLA, Error Budgets"</h3>
     <p class="intro">Observability isn't just metrics and logs—it's about understanding service reliability through SLIs (measurable indicators), SLOs (objectives we commit to), and error budgets (how much we can fail). I use this framework to decide when to deploy (within error budget?) and when to stop and stabilize.</p>
     <details class="entry" open>
@@ -9023,7 +9372,7 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
   </section>
 
   <section id="sd-secrets">
-    <span class="sec-num">Operations &amp; Reliability</span>
+    <span class="sec-num">3. Security &amp; Secrets</span>
     <h3>"Secrets Rotation & Certificate Management"</h3>
     <p class="intro">Static secrets stored in vaults are better than hardcoded, but rotating them manually is a compliance nightmare. I automate rotation so database passwords, API keys, and certificates update without manual intervention. The key is: rotation shouldn't break running services.</p>
     <details class="entry" open>
@@ -9075,6 +9424,202 @@ POST-MORTEM → Blameless RCA, timeline, action items</code></pre>
         <div class="note say">
           <span class="tag">Say this in interview</span>
           "I automate secrets rotation using dual credentials—create new secret, keep old active, then deactivate after a grace period. For certificates, I use cert-manager so they auto-renew. For database passwords, I rotate them in the vault and apps pick up the new one on next connection. The key principle: rotation should be transparent to apps. I always test in staging first."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="sd-scenarios">
+    <span class="sec-num">Interview Scenarios</span>
+    <h3>"Real-World Architecture Challenges: Decision-Making Under Pressure"</h3>
+    <p class="intro">Senior engineers don't just answer "what" questions—they solve "how do we build this?" problems. These are real scenarios you'll face. Show decision-making: gather requirements, explain tradeoffs, make a choice, and justify it. Interviewers love when you ask clarifying questions.</p>
+    <details class="entry" open>
+      <summary><span class="state fail">Scenario</span>Complex architecture &amp; design decisions<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Scenario 1: "Design a system for 100M requests/day, high availability required"</div>
+          <ul>
+            <li><strong>Questions I'd ask first:</strong>
+              <ul>
+                <li>What's the read/write ratio? (99% reads → cache heavily)</li>
+                <li>Acceptable latency? (10ms vs 1s changes everything)</li>
+                <li>Is it peak traffic 24/7 or spiky? (affects auto-scaling)</li>
+                <li>Budget constraints? (affects cloud choices)</li>
+                <li>Data consistency requirements? (strong vs eventual)</li>
+              </ul>
+            </li>
+            <li><strong>My design (assuming REST API, 99% reads, &lt;100ms latency):</strong>
+              <pre><code>Users (global)
+  ↓ (DNS geo-routing)
+CDN + WAF (CloudFlare/Azure Front Door)
+  ↓ (caches static, blocks attacks)
+Regional ALBs (US, EU, APAC)
+  ↓
+Kubernetes clusters (regional, auto-scale)
+  ↓
+Redis cache (hot data) + DB read replicas
+  ↓
+Database (PostgreSQL with streaming replication to standby)
+  ↓
+S3/Blob storage (cold data, backups)</code></pre>
+            </li>
+            <li><strong>Key decisions:</strong>
+              <ul>
+                <li>CDN for static assets + caching (reduce DB load)</li>
+                <li>Regional clusters for latency (users hit closest region)</li>
+                <li>Read replicas for scaling reads (writes to primary)</li>
+                <li>Redis for hot data (microsecond latency)</li>
+                <li>Multi-AZ for each region (3 AZs for HA)</li>
+              </ul>
+            </li>
+            <li><strong>Cost optimization:</strong> Spot instances for stateless app servers (50% cheaper), reserved instances for DB</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Scenario 2: "Migrate monolith to 200+ microservices in 6 months"</div>
+          <ul>
+            <li><strong>Questions I'd ask:</strong>
+              <ul>
+                <li>How tightly coupled is the monolith? (hard to decompose)</li>
+                <li>Any shared databases? (need careful migration)</li>
+                <li>Team size and experience with microservices?</li>
+                <li>Acceptable downtime during migration?</li>
+              </ul>
+            </li>
+            <li><strong>My strategy (strangler pattern):</strong>
+              <pre><code>Timeline:
+Months 1-2: Decompose services, set up infrastructure
+Months 3-4: Extract first 20 services, route via API Gateway
+Months 5-6: Continue extracting, monolith shrinks
+
+Key pattern: Service interface on monolith
+Requests → API Gateway → either Service (if extracted) or Monolith (if not yet)
+Gradually move code out, old code removed once extracted</code></pre>
+            </li>
+            <li><strong>Challenges &amp; solutions:</strong>
+              <ul>
+                <li><strong>Shared DB:</strong> Use database change data capture (CDC), eventual consistency initially</li>
+                <li><strong>Distributed transactions:</strong> Replace with saga pattern (choreography or orchestration)</li>
+                <li><strong>Monolith gets in the way:</strong> Extract heaviest services first (60/20 rule: 20% of code is 60% of load)</li>
+                <li><strong>New bugs:</strong> Canary rollout for each service, feature flags to toggle between old/new</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Scenario 3: "Database connection pool exhaustion at 3AM, production down 20 mins, how?"</div>
+          <ul>
+            <li><strong>Symptoms:</strong> Requests to DB timeout, app can't connect, users see 503 errors</li>
+            <li><strong>Root cause analysis (RCA):</strong>
+              <ul>
+                <li>Check DB connection count: "SELECT count(*) FROM pg_stat_activity;"</li>
+                <li>Look for stuck queries: "SELECT * FROM pg_stat_activity WHERE state='active' AND query_start &lt; now() - interval '5 min';"</li>
+                <li>Check app logs: Did app start more instances (auto-scale triggered)? Each app creates 20 connections → 20 apps = 400 connections (pool max = 100)</li>
+              </ul>
+            </li>
+            <li><strong>Immediate fix (stop the bleeding):</strong>
+              <ul>
+                <li>Drain new connections from problematic app instances (don't accept new requests, let in-flight complete)</li>
+                <li>Manually kill long-running queries if safe: "SELECT pg_terminate_backend(pid);"</li>
+                <li>Reduce auto-scale max replicas temporarily (stop creating more app instances)</li>
+              </ul>
+            </li>
+            <li><strong>Permanent fix (prevent recurrence):</strong>
+              <ul>
+                <li>Reduce connection pool per app (from 20 to 5) + use connection pooler (PgBouncer, pgPooler)</li>
+                <li>Add circuit breaker: if DB connection fails, reject request quickly (don't wait 30s timeout)</li>
+                <li>Alert on connection count &gt; 70 (alert before it hits max of 100)</li>
+                <li>Increase connection pool on DB, but better to pool at app level</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Scenario 4: "Design a multi-tenant SaaS for 10,000 customers"</div>
+          <ul>
+            <li><strong>Questions:</strong>
+              <ul>
+                <li>Tier 1 customers (big, paying lots)? → Separate infrastructure</li>
+                <li>Data residency requirements? (EU data in EU)</li>
+                <li>Noisy neighbor risk? (one customer's spike affects others)</li>
+              </ul>
+            </li>
+            <li><strong>My design:</strong>
+              <ul>
+                <li>Tier 1 (10 big customers): Dedicated cluster + dedicated DB</li>
+                <li>Tier 2 (1000 mid customers): Shared cluster, separate DBs (60 customers per DB, 16 DBs total)</li>
+                <li>Tier 3 (8990 small customers): Shared everything (cluster + DB), row-level security</li>
+              </ul>
+            </li>
+            <li><strong>Isolation layers:</strong>
+              <ul>
+                <li>Tier 1: Everything isolated (cluster, DB, backups)</li>
+                <li>Tier 2: Namespace isolation in cluster (RBAC, network policies), separate DB</li>
+                <li>Tier 3: Row-level security in shared DB (WHERE tenant_id = X in every query), app enforces isolation</li>
+              </ul>
+            </li>
+            <li><strong>Cost model:</strong> Tier 1: High cost, guaranteed SLA. Tier 2: Medium. Tier 3: Low-cost, auto-scaling</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Scenario 5: "Security breach detected - attacker got prod credentials. Incident response?"</div>
+          <ul>
+            <li><strong>Immediate (first 1 hour):</strong>
+              <ul>
+                <li>Declare incident (P1 severity), page on-call team, start war room</li>
+                <li>Contain: Rotate compromised credentials immediately (don't wait for analysis)</li>
+                <li>Kill attacker's sessions: If it's a user credential, force re-auth for that user across all services</li>
+                <li>Block suspicious IPs/geographies</li>
+              </ul>
+            </li>
+            <li><strong>Short-term (1-6 hours):</strong>
+              <ul>
+                <li>Investigate: Check audit logs, who accessed what with the credential?</li>
+                <li>Blast radius: Did they access customer data? Payment systems? Code repos?</li>
+                <li>Containment: If they accessed prod DB, consider read-only mode until we're sure data wasn't changed</li>
+              </ul>
+            </li>
+            <li><strong>Long-term (hours to days):</strong>
+              <ul>
+                <li>Forensics: Rebuild affected systems, check for backdoors, data exfiltration</li>
+                <li>Communication: Notify customers if their data was accessed (legal requirement)</li>
+                <li>Improvements: Why did they get prod creds? → Add MFA, JIT access, better secret management</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Scenario 6: "Optimize cloud costs by 30% without impacting reliability"</div>
+          <ul>
+            <li><strong>Analysis phase:</strong>
+              <ul>
+                <li>Break down cost: compute 40%, storage 30%, network 20%, licensing 10%</li>
+                <li>Find waste: unused resources, over-provisioned instances, unused managed services</li>
+              </ul>
+            </li>
+            <li><strong>Optimization strategies:</strong>
+              <ul>
+                <li>Compute (biggest savings): Reserved instances (30-40% cheaper), spot instances (70% cheaper, but risky)</li>
+                <li>App auto-scaling: Scale down at night, weekends. Saves 30-50% for non-24/7 services</li>
+                <li>Right-sizing: Many instances are over-provisioned. Reduce from 8GB to 4GB saves 50%</li>
+                <li>Stop unused resources: Machines in stopped state (dev environments, old DBs)</li>
+                <li>Storage cleanup: Delete old backups, compress logs, archive cold data</li>
+              </ul>
+            </li>
+            <li><strong>My plan (hitting 30% target):</strong>
+              <ul>
+                <li>Reserved instances for stable baseline: 15% savings</li>
+                <li>Spot for stateless app servers: 10% savings</li>
+                <li>Auto-scaling down at night: 3% savings</li>
+                <li>Right-sizing instances: 2% savings</li>
+              </ul>
+            </li>
+            <li><strong>Risk mitigation:</strong> Test changes in staging first, monitor SLO during changes, have rollback plan</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "In complex scenarios, I always start with questions to understand constraints: budget, latency, consistency requirements, team skills. Then I design layered: global CDN → regional load balancers → Kubernetes clusters → databases with read replicas. For migrations, I use strangler pattern (extract services gradually). For incidents, contain first (rotate creds, block attacker), investigate second, improve third. I always explain tradeoffs and justify decisions."
         </div>
       </div>
     </details>
