@@ -167,6 +167,7 @@ td.wrap:first-child{white-space:normal}
       <button type="button" data-subj="monitoring">Monitoring</button>
       <button type="button" data-subj="alz">Landing Zone</button>
       <button type="button" data-subj="flows">Flow Diagrams</button>
+      <button type="button" data-subj="platform">Platform Eng</button>
       <button type="button" data-subj="concepts">Important Concepts</button>
     </nav>
     <nav class="pane2" id="pane2">
@@ -655,6 +656,13 @@ td.wrap:first-child{white-space:normal}
         <a href="#flow-terraform-apply">Terraform Apply Flow</a>
         <a href="#flow-load-balancer">Load Balancer Routing</a>
         <a href="#flow-blue-green">Blue-Green Deployment</a>
+      </div>
+
+      <!-- PLATFORM ENGINEERING SECTIONS -->
+      <div class="grp" data-subj="platform">
+        <div class="grph"><span class="gsubj">Platform Eng</span>Fundamentals</div>
+        <a href="#platform-spaced">SPACED Framework</a>
+        <a href="#platform-automation">Automation & Self-Service</a>
       </div>
 
       <!-- IMPORTANT CONCEPTS SECTIONS -->
@@ -17316,6 +17324,404 @@ BENEFITS:
         <div class="note say">
           <span class="tag">Say this in interview</span>
           "Blue-Green: v1.0 (Blue, active) + v2.0 (Green, parallel). Validate Green fully. Instant traffic switch. Monitor 5 min. If OK: delete Blue. If issues: rollback (5 seconds). Zero downtime, fast rollback, 2x resources."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- PLATFORM ENGINEERING SECTIONS -->
+  <div class="band"><span class="eyebrow">Platform 01</span><h2>Platform Engineering</h2></div>
+
+  <section id="platform-spaced">
+    <span class="sec-num">Platform Engineering</span>
+    <h3>Platform Engineering: End-to-End Developer Journey</h3>
+    <p class="intro">Simple: Developer clicks → Platform provisions → Ready to use. No tickets, no delays, security built-in.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Flow</span>Complete journey from start to end<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Developer Needs Something</div>
+          <pre>
+TRADITIONAL (WITHOUT PLATFORM):
+Dev: "I need a database"
+  ↓
+Ops: "File a ticket"
+  ↓
+Wait 3 days
+  ↓
+DBA provisions it manually
+  ↓
+Dev: "Where are my credentials?"
+  ↓
+Ops: "Here's password, connection string, IP..."
+  ↓
+Dev: Spends 2 hours setting up
+  ↓
+Ops: Need to monitor, backup, scale = more manual work
+
+RESULT: Frustrated dev, overworked ops, security issues, high cost
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">Step 2: Developer Uses Portal (Self-Service)</div>
+          <pre>
+PLATFORM ENGINEERING (WITH SELF-SERVICE PORTAL):
+Dev: Clicks "Create Database" in self-service portal
+  ↓
+Portal shows options:
+  ├─ Database type: PostgreSQL, MySQL, MariaDB
+  ├─ Size: 5GB, 10GB, 20GB, 50GB
+  ├─ Environment: Dev, Test, Prod
+  └─ Backup: Daily, Weekly, Never
+
+Dev: Selects PostgreSQL, 20GB, Prod, Daily backups
+  ↓
+Dev: Fills in project name, team name
+  ↓
+Dev: CLICKS "CREATE"
+
+RESULT: Portal collected everything needed
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">Step 3: Platform Automates Everything</div>
+          <pre>
+WHAT HAPPENS AUTOMATICALLY (NO MANUAL WORK):
+
+A) Terraform Provisions:
+   ✓ Creates PostgreSQL database
+   ✓ Sets up encryption
+   ✓ Configures backup (daily)
+   ✓ Creates firewall rules
+   ✓ Enables high availability (multi-region)
+
+B) Security Applied Automatically:
+   ✓ Secrets stored in Key Vault
+   ✓ Connection strings generated
+   ✓ Access control: only dev's IP can connect
+   ✓ Audit logging enabled
+
+C) Monitoring Wired Up (No Extra Work):
+   ✓ Prometheus scraping metrics
+   ✓ Grafana dashboard created
+   ✓ Alerts set for failures
+   ✓ Logs being collected
+
+D) Tags Applied (For Cost Tracking):
+   ✓ Project: "payment-platform"
+   ✓ Team: "platform-eng"
+   ✓ Owner: "dev@company.com"
+   ✓ Environment: "production"
+   ✓ CostCenter: "FINTECH-001"
+
+E) GitOps Deployment (Automated):
+   ✓ ArgoCD picks up database config
+   ✓ Deploys to AKS cluster
+   ✓ App can connect immediately
+
+TIME TAKEN: 5-10 minutes (all automatic)
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">Step 4: Developer Gets Everything Ready</div>
+          <pre>
+WHAT DEVELOPER RECEIVES:
+
+✓ Database connection string (automatic)
+✓ Username/password (from Key Vault, not email)
+✓ Monitoring dashboard (already created)
+✓ Backup configured (already running)
+✓ Logs flowing (already collecting)
+✓ Cost tag applied (billing automatically categorized)
+
+DEVELOPER EXPERIENCE:
+Dev: Checks email → database is READY
+Dev: Has all credentials
+Dev: Can connect immediately
+Dev: Monitoring already watching
+Dev: NO tickets filed
+Dev: NO waiting for approvals
+Dev: Security ALREADY applied
+
+RESULT: Dev happy, deployed in 5 minutes instead of 3 days
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">Step 5: OPA Gatekeeper Protects Everything</div>
+          <pre>
+OPA GATEKEEPER = SECURITY GUARD FOR KUBERNETES
+
+Developer tries to deploy an app without proper labels:
+
+Dev: kubectl apply -f pod.yaml
+  ↓
+Kubernetes checks with OPA Gatekeeper:
+  ├─ Is this image from approved registry? YES
+  ├─ Does pod have CPU/memory limits? NO ← PROBLEM
+  ├─ Does pod have required labels (app, team)? NO ← PROBLEM
+  ├─ Is privileged mode enabled? NO (good)
+  └─ Result: REJECT
+
+RESPONSE:
+Error: Pod must have:
+  - labels: app, team, cost-center
+  - resource limits: cpu, memory
+
+Dev: Fixes pod.yaml (adds labels and limits)
+Dev: kubectl apply -f pod.yaml
+  ↓
+OPA checks again: ALL REQUIREMENTS MET ✓
+  ↓
+Pod APPROVED and deployed
+
+RESULT: Bad configs BLOCKED before they cause problems
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">Key Concepts: Golden Paths</div>
+          <pre>
+GOLDEN PATH = PRE-APPROVED, SECURE PATTERNS
+
+Think: "Menu at restaurant" (don't invent new dishes)
+
+EXAMPLE GOLDEN PATHS:
+├─ Postgres 20GB Daily Backup (pre-approved by security)
+├─ 3-Tier Web App (API + DB + Cache)
+├─ Microservices on AKS (with monitoring)
+├─ Event-Driven Architecture (Kafka + Consumers)
+└─ Batch Processing (Scheduled jobs on K8s)
+
+BENEFITS OF GOLDEN PATHS:
+✓ Security reviewed ONCE by experts
+✓ Monitoring configured ONCE
+✓ Best practices built-in
+✓ All teams use same patterns
+✓ Developers can't mess up (constraints)
+✓ New engineers: copy-paste, works perfectly
+
+AUTOMATION RESULT:
+Dev does: 1 click in portal
+Platform does: 100 things automatically
+Security team: Sleeps peacefully (all pre-approved)
+Ops team: Monitors, doesn't provision manually
+          </pre>
+        </div>
+
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Platform Engineering = Self-service for developers. Dev clicks portal → Portal collects inputs → Terraform auto-provisions → Security applied → Monitoring wired up → Tags applied → Cost tracked → OPA Gatekeeper blocks bad configs → ArgoCD deploys. No tickets, no delays, security + monitoring included. Golden paths = pre-approved patterns devs can't mess up. Result: dev gets database in 5 minutes instead of 3 days."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="platform-automation">
+    <span class="sec-num">Platform Engineering</span>
+    <h3>Platform Engineering: SPACED Framework (6 Steps)</h3>
+    <p class="intro">SPACED = Standardize, Portal, Automate, Control, Enable, Deliver. How to build a developer platform.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Framework</span>SPACED methodology breakdown<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">S - Standardize (Templates & Modules)</div>
+          <pre>
+CREATE TEMPLATES ONCE, REUSE FOREVER
+
+What: Build Terraform modules for common infrastructure
+
+Examples:
+├─ Database Module
+│  └─ Input: database type, size, backup policy
+│  └─ Output: ready-to-use database + credentials
+│
+├─ Kubernetes App Module
+│  └─ Input: app name, replicas, memory/cpu
+│  └─ Output: deployment + service + ingress
+│
+├─ CI/CD Pipeline Template
+│  └─ Input: repo name
+│  └─ Output: build → test → deploy workflow
+│
+└─ Naming Convention Rules
+   └─ All resources tagged: team, project, cost-center, env
+
+BENEFIT: Every database looks same, every app deployed same way
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">P - Portal (Self-Service)</div>
+          <pre>
+BUILD A MENU FOR DEVELOPERS
+
+Tools: Backstage (Spotify), Azure Developer Center, or custom portal
+
+What developers do:
+├─ Login to portal
+├─ Click "Create Database"
+├─ Fill: Database type, size, environment
+├─ Click "Create"
+├─ Done (5 minutes)
+
+What portal does:
+├─ Collects developer inputs
+├─ Validates choices
+├─ Triggers Terraform
+├─ Tracks everything
+
+NO TICKETS FILED = Portal handles everything
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">A - Automate (CI/CD, Terraform, Deployment)</div>
+          <pre>
+ROBOTS DO THE WORK
+
+Tools: GitHub Actions, Azure DevOps, Terraform, ArgoCD
+
+Flows:
+├─ Dev pushes code
+│  └─ GitHub Actions runs: build → test → deploy
+│
+├─ Dev creates DB via portal
+│  └─ Terraform runs: creates DB + security + backup
+│
+├─ GitOps deployment
+│  └─ ArgoCD watches git repo
+│  └─ Any change → auto-deploy to Kubernetes
+│
+└─ Scheduled cleanup
+   └─ Delete old resources
+   └─ Optimize costs
+
+RESULT: Zero manual toil (humans not clicking buttons)
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">C - Control (Security & Compliance)</div>
+          <pre>
+GUARDRAILS + AUTOMATIC SECURITY
+
+Tools: RBAC, Azure Policy, OPA Gatekeeper, Key Vault
+
+What gets controlled:
+├─ WHO can do WHAT (RBAC)
+│  └─ Dev: can create databases
+│  └─ Dev: cannot delete databases
+│  └─ Only SRE: can modify Kubernetes policies
+│
+├─ WHAT resources look like (Azure Policy + OPA)
+│  └─ All databases must be encrypted
+│  └─ All pods must have resource limits
+│  └─ All apps must have labels
+│  └─ Non-compliant resources = REJECTED
+│
+└─ SECRETS (Key Vault)
+   └─ Database passwords stored encrypted
+   └─ Automatic rotation
+   └─ Audit trail of who accessed what
+
+RESULT: Security built-in, not added later
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">E - Enable (Observability by Default)</div>
+          <pre>
+EVERY RESOURCE AUTO-MONITORED
+
+Tools: Prometheus, Grafana, EFK, AlertManager
+
+What happens automatically:
+├─ Metrics collected (CPU, memory, errors, latency)
+├─ Dashboards created (no developer setup needed)
+├─ Alerts configured (notify on problems)
+├─ Logs collected (EFK: Elasticsearch, Fluent Bit, Kibana)
+├─ Traces recorded (request flow visibility)
+└─ Notifications sent (Slack, PagerDuty, email)
+
+Developer experience:
+├─ Deploy app
+├─ Monitoring already running
+├─ No extra work needed
+├─ Dashboard already created
+└─ Getting alerted automatically
+
+RESULT: Visibility by default (not optional)
+          </pre>
+        </div>
+
+        <div class="step">
+          <div class="step-label">D - Deliver (GitOps Deployment)</div>
+          <pre>
+AUTOMATIC DEPLOYMENT TO PRODUCTION
+
+Tool: ArgoCD (watches git repo, auto-deploys)
+
+Flow:
+├─ Developer commits code to git
+├─ ArgoCD watches repo
+├─ Detects change
+├─ Automatically deploys to AKS
+├─ If deployment fails → auto-rollback
+└─ Zero manual clicks
+
+No manual:
+├─ No "kubectl apply" commands
+├─ No clicking deployment buttons
+├─ No manual approval gates
+└─ Git = source of truth
+
+RESULT: Code in git → instantly live in production
+          </p>
+        </div>
+
+        <div class="step">
+          <div class="step-label">Complete SPACED Flow (Real Example)</div>
+          <pre>
+DEVELOPER CREATES A NEW MICROSERVICE
+
+Day 1:
+├─ Dev clicks "Create Microservice" in portal
+├─ Fills: app name, team, environment
+├─ Selects golden path: "Node.js + Postgres"
+└─ Clicks CREATE
+
+PLATFORM AUTOMATICALLY:
+├─ S - Standardize: Uses Node.js + Postgres modules
+├─ A - Automate: Terraform provisions database
+├─ A - Automate: GitHub Actions creates CI/CD pipeline
+├─ C - Control: RBAC applied, OPA policy set
+├─ E - Enable: Prometheus + Grafana dashboard created
+├─ E - Enable: Log collection started
+├─ D - Deliver: ArgoCD configured
+└─ P - Portal: Portal shows dashboard with status
+
+15 minutes later:
+├─ Database running
+├─ Monitoring active
+├─ CI/CD pipeline ready
+├─ Auto-deployed to Kubernetes
+├─ Dev can start writing code
+
+Dev writes code → Commits to git → Auto-deployed → Auto-monitored
+
+ZERO TICKETS FILED
+ZERO MANUAL APPROVALS
+ZERO OPS INVOLVEMENT
+          </pre>
+        </div>
+
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "SPACED: (S) Standardize using Terraform modules + naming conventions → (P) Portal for self-service provisioning → (A) Automate with GitHub Actions + Terraform + ArgoCD → (C) Control via RBAC + Azure Policy + OPA Gatekeeper → (E) Enable observability (Prometheus, Grafana, EFK) by default → (D) Deliver via GitOps (ArgoCD). Golden paths = pre-approved patterns devs can't mess up. Result: dev clicks portal, 15 minutes later everything is deployed, monitored, secured, no ops tickets."
         </div>
       </div>
     </details>
