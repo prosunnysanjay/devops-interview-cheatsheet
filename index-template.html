@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Cheatsheet Title</title>
+<style>
+:root{
+  --ink:#14161C; --ink-2:#3D4351; --ink-3:#6B7183;
+  --paper:#EEF0F5; --surface:#FFFFFF;
+  --line:#D6DAE4; --line-soft:#E6E9F0;
+  --violet:#4B3FD6; --violet-soft:#EDEBFC;
+  --red:#B4321F; --red-soft:#FBEDEA;
+  --amber:#9A6100; --amber-soft:#FCF3E2;
+  --teal:#0D6E66; --teal-soft:#E6F3F1;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --spine:272px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── sidebar ── */
+.spine{position:fixed;top:0;left:0;bottom:0;width:var(--spine);background:var(--ink);color:#B7BCCB;display:flex;flex-direction:column;z-index:40}
+.spine-head{padding:20px 18px 14px;border-bottom:1px solid #262A36}
+.spine-head .mark{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:#6B7183;display:block;margin-bottom:5px}
+.spine-head .name{font-family:var(--mono);font-size:15px;font-weight:600;color:#F4F6FA}
+.searchwrap{padding:12px 16px}
+#search{width:100%;background:#1D212B;border:1px solid #2E3341;color:#E8EBF2;font-family:var(--mono);font-size:12.5px;padding:9px 10px;border-radius:5px;outline:none}
+#search::placeholder{color:#5C6274}
+#search:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(75,63,214,.28)}
+.searchhint{font-family:var(--mono);font-size:9.5px;color:#565C6D;margin-top:7px;letter-spacing:.04em}
+.hovertoggle{display:flex;align-items:center;gap:9px;padding:9px 16px 12px;border-bottom:1px solid #262A36;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6B7183;cursor:pointer;user-select:none}
+.hovertoggle:hover{color:#AEB4C4}
+.hovertoggle input{position:absolute;opacity:0;pointer-events:none}
+.switch{width:26px;height:15px;border-radius:8px;background:#2E3341;position:relative;flex:none;transition:background .15s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#6B7183;transition:transform .15s,background .15s}
+.hovertoggle input:checked + .switch{background:var(--violet)}
+.hovertoggle input:checked + .switch::after{transform:translateX(11px);background:#fff}
+.hovertoggle input:focus-visible + .switch{box-shadow:0 0 0 3px rgba(75,63,214,.45)}
+
+/* ── two-pane index ── */
+.panes{flex:1;display:flex;min-height:0;border-top:1px solid #262A36}
+.pane1{width:94px;flex:none;border-right:1px solid #262A36;overflow-y:auto;padding:8px 0;background:#101218}
+.pane1 button{display:block;width:100%;text-align:left;background:none;border:none;border-left:2px solid transparent;color:#868D9F;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:12px 10px;cursor:pointer;line-height:1.3}
+.pane1 button:hover{color:#fff;background:#1B1F29}
+.pane1 button.on{color:#fff;background:var(--ink);border-left-color:var(--violet)}
+.pane1 button.dim{opacity:.35}
+.pane1 button:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+
+.pane2{flex:1;overflow-y:auto;padding:0 0 40px;min-width:0}
+.grph{position:sticky;top:0;z-index:2;background:var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:#5F6577;padding:13px 14px 6px;border-bottom:1px solid #1F222B}
+.gsubj{display:none}
+body.searching .gsubj{display:inline;color:var(--violet)}
+body.searching .gsubj::after{content:" · "}
+.pane2 a{display:block;padding:6px 14px;color:#AEB4C4;text-decoration:none;font-size:13px;line-height:1.35;border-left:2px solid transparent}
+.pane2 a:hover{color:#fff;background:#1B1F29}
+.pane2 a.active{color:#fff;border-left-color:var(--violet);background:#1B1F29}
+.pane2 a:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.hidden{display:none!important}
+
+/* ── main ── */
+main{margin-left:var(--spine);padding:0 44px 140px;max-width:940px}
+.masthead{padding:52px 0 26px}
+.masthead h1{font-family:var(--mono);font-size:29px;font-weight:600;letter-spacing:-.02em;margin:0 0 9px}
+.masthead p{margin:0;color:var(--ink-3);font-size:14.5px;max-width:58ch}
+.band{padding:32px 0 4px;border-top:2px solid var(--ink);margin-top:20px}
+.band .eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);display:block;margin:12px 0 6px}
+.band h2{font-family:var(--mono);font-size:25px;font-weight:600;letter-spacing:-.02em;margin:0}
+
+section{padding:34px 0 8px;border-bottom:1px solid var(--line);scroll-margin-top:20px}
+.sec-num{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--violet);text-transform:uppercase;display:block;margin-bottom:8px}
+section > h3{font-family:var(--sans);font-size:22px;font-weight:700;letter-spacing:0em;color:var(--violet);margin:0 0 12px;line-height:1.35}
+.sec-sub{color:var(--ink-3);font-size:14px;margin:0 0 20px;max-width:64ch;font-weight:500;line-height:1.5}
+.intro{background:rgba(75,63,214,0.06);border-left:3px solid var(--violet);padding:10px 14px;margin:0 0 18px;border-radius:0 4px 4px 0;font-size:14px;color:var(--ink-2);line-height:1.5;font-weight:500}
+
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:7px;margin-bottom:16px;overflow:hidden}
+.entry > summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:13.5px;font-weight:600}
+.entry > summary::-webkit-details-marker{display:none}
+.entry > summary:hover{background:#FAFBFD}
+.entry > summary:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.chev{margin-left:auto;color:var(--ink-3);font-family:var(--mono);font-size:11px;flex:none;transition:transform .15s ease;display:inline-block}
+.entry[open] > summary{border-bottom:1px solid var(--line-soft)}
+.entry[open] .chev{transform:rotate(90deg)}
+.state{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:3px;flex:none;font-weight:600}
+.state.fail{background:var(--red-soft);color:var(--red)}
+.state.warn{background:var(--amber-soft);color:var(--amber)}
+.state.ok{background:var(--teal-soft);color:var(--teal)}
+.state.info{background:var(--violet-soft);color:var(--violet)}
+
+.entry-body{padding:16px}
+.step{margin-bottom:16px}
+.step:last-child{margin-bottom:0}
+.step-label{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--violet);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.step-label::after{content:"";height:1px;background:var(--line-soft);flex:1}
+
+ul,ol{margin:0;padding-left:19px}
+li{margin-bottom:5px}
+li:last-child{margin-bottom:0}
+p{margin:0 0 10px}
+p:last-child{margin-bottom:0}
+strong{font-weight:650}
+
+code{font-family:var(--mono);font-size:12.5px;background:#F1F3F8;border:1px solid var(--line-soft);padding:1px 4px;border-radius:3px;white-space:nowrap}
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.7;background:var(--ink);color:#DDE1EA;padding:13px 15px;border-radius:5px;overflow-x:auto;margin:0}
+pre code{background:none;border:none;padding:0;white-space:pre;font-size:inherit;color:inherit}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:0 0 4px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 12px 7px 0;border-bottom:1px solid var(--line)}
+td{padding:9px 12px 9px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:600;white-space:nowrap;padding-right:20px}
+td.wrap:first-child{white-space:normal}
+
+.note{border-left:2px solid var(--violet);background:var(--violet-soft);padding:11px 14px;border-radius:0 5px 5px 0;font-size:13.5px;margin:14px 0 0}
+.note .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);display:block;margin-bottom:4px;font-weight:600}
+.note.amber{border-left-color:var(--amber);background:var(--amber-soft)}
+.note.amber .tag{color:var(--amber)}
+.note.say{border-left-color:var(--teal);background:var(--teal-soft)}
+.note.say .tag{color:var(--teal)}
+.note.say p{font-style:normal}
+
+.noresult{display:none;font-family:var(--mono);font-size:13.5px;color:var(--ink-3);padding:40px 0}
+.noresult.show{display:block}
+.menubtn{display:none;position:fixed;top:12px;left:12px;z-index:60;background:var(--ink);color:#fff;border:none;font-family:var(--mono);font-size:12px;padding:9px 13px;border-radius:5px;cursor:pointer}
+.scrim{display:none;position:fixed;inset:0;background:rgba(20,22,28,.5);z-index:35}
+.scrim.show{display:block}
+
+@media (max-width:900px){
+  .menubtn{display:block}
+  .spine{transform:translateX(-100%);transition:transform .2s ease;width:286px}
+  .spine.open{transform:translateX(0)}
+  main{margin-left:0;padding:0 18px 100px}
+  .panes{flex-direction:column}
+  .pane1{width:auto;display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid #262A36;padding:6px}
+  .pane1 button{width:auto;border-left:none;border-bottom:2px solid transparent;padding:9px 13px;white-space:nowrap;border-radius:4px}
+  .pane1 button.on{border-left-color:transparent;border-bottom-color:var(--violet)}
+  .masthead{padding:62px 0 22px}
+  .masthead h1{font-size:23px}
+  .band h2{font-size:20px}
+  section{padding:28px 0 8px}
+  td:first-child{white-space:normal}
+  table{font-size:13px}
+}
+@media print{
+  .spine,.menubtn,.scrim{display:none}
+  main{margin:0;max-width:none;padding:0}
+  .entry{break-inside:avoid;border-color:#999}
+  pre{background:#fff;color:#000;border:1px solid #999}
+}
+</style>
+</head>
+<body>
+
+<button class="menubtn" id="menubtn" aria-label="Open index">☰ Index</button>
+<div class="scrim" id="scrim"></div>
+
+<aside class="spine" id="spine">
+  <div class="spine-head">
+    <span class="mark">Your Category</span>
+    <span class="name">Your Title</span>
+  </div>
+  <div class="searchwrap">
+    <input id="search" type="search" placeholder="Search…" autocomplete="off" aria-label="Search topics">
+    <div class="searchhint">Press / to search · Esc to clear</div>
+  </div>
+  <label class="hovertoggle" for="hovernav">
+    <input type="checkbox" id="hovernav" checked>
+    <span class="switch" aria-hidden="true"></span>
+    <span>Open on hover</span>
+  </label>
+
+  <div class="panes">
+    <nav class="pane1" id="pane1">
+      <button type="button" data-subj="docker" class="on">Docker</button>
+    </nav>
+    <nav class="pane2" id="pane2">
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Fundamentals</span>Core concepts</div>
+        <a href="#q-run-cmd-entrypoint">RUN vs CMD vs ENTRYPOINT</a>
+        <a href="#q-env-variables">Environment Variables</a>
+      </div>
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Optimization</span>Size &amp; speed</div>
+        <a href="#q-multistage">Multi-stage Builds</a>
+        <a href="#q-image-size">Optimize Image Size</a>
+        <a href="#q-reduce-2gb">Reduce 2GB Image</a>
+        <a href="#q-build-time">Build Time Optimization</a>
+        <a href="#q-multiple-services">Multiple Services Impact</a>
+      </div>
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Operations</span>Container lifecycle</div>
+        <a href="#q-view-logs">View Container Logs</a>
+        <a href="#q-stop-vs-kill">Stop vs Kill</a>
+        <a href="#q-graceful-shutdown">Graceful Shutdown</a>
+      </div>
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Configuration</span>Dev vs prod</div>
+        <a href="#q-app-config">Application Configuration</a>
+        <a href="#q-secrets">Handle Secrets</a>
+      </div>
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Security</span>Best practices</div>
+        <a href="#q-image-scanning">Image Scanning</a>
+        <a href="#q-non-root">Non-root Containers</a>
+        <a href="#q-least-privilege">Least Privilege</a>
+      </div>
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Registry</span>Images &amp; versioning</div>
+        <a href="#q-hub-vs-private">Hub vs Private Registry</a>
+        <a href="#q-tagging">Image Tagging</a>
+        <a href="#q-tagging-vs-versioning">Tagging vs Versioning</a>
+        <a href="#q-registry-cicd">Registry in CI/CD</a>
+        <a href="#q-retention">Image Retention</a>
+        <a href="#q-registry-scanning">Registry Scanning</a>
+      </div>
+      <div class="grp" data-subj="docker">
+        <div class="grph"><span class="gsubj">Scenarios</span>Production challenges</div>
+        <a href="#q-build-failing">Build Failing Intermittently</a>
+        <a href="#q-versioning-cicd">Versioning in CI/CD</a>
+        <a href="#q-db-migrations">Database Migrations</a>
+        <a href="#q-memory-leak">Memory Leak Diagnosis</a>
+      </div>
+    </nav>
+  </div>
+</aside>
+
+<main>
+  <header class="masthead">
+    <h1>Docker Interview Cheatsheet</h1>
+    <p>Essential Docker questions for interviews. Focus on fundamentals, optimization, security, and production scenarios. Read the question, think about your answer, then expand to see the talking points.</p>
+  </header>
+
+  <div class="noresult" id="noresult">Nothing found. Clear the search box.</div>
+
+  <!-- ═══════════ FUNDAMENTALS ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 01</span><h2>Fundamentals</h2></div>
+
+  <section id="q-run-cmd-entrypoint">
+    <span class="sec-num">Fundamentals</span>
+    <h3>What's the difference between RUN, CMD, and ENTRYPOINT?</h3>
+    <p class="intro">These three are often confused. RUN executes during build, CMD sets default command, ENTRYPOINT is what actually runs. Understanding this is critical for container execution.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Build vs runtime<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">RUN</div>
+          <ul>
+            <li>Executes during image build (not at runtime)</li>
+            <li>Creates a new layer</li>
+            <li>Example: RUN apt-get install -y nginx</li>
+            <li>Used for: installing packages, setting up environment</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">CMD</div>
+          <ul>
+            <li>Sets default command when container runs</li>
+            <li>Can be overridden by docker run arguments</li>
+            <li>Example: CMD ["python", "app.py"]</li>
+            <li>Used for: default behavior if no command specified</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ENTRYPOINT</div>
+          <ul>
+            <li>The main executable when container starts</li>
+            <li>Cannot be easily overridden</li>
+            <li>Example: ENTRYPOINT ["python", "app.py"]</li>
+            <li>Used for: making container behave like an executable</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Key Difference</div>
+          <ul>
+            <li>RUN: build time → creates layers</li>
+            <li>CMD: runtime → can be overridden</li>
+            <li>ENTRYPOINT: runtime → main process (PID 1)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "RUN executes during build and creates layers. CMD sets the default command at runtime but can be overridden by docker run. ENTRYPOINT is the main process that runs when container starts. I use ENTRYPOINT for the main app and CMD for default arguments."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-env-variables">
+    <span class="sec-num">Fundamentals</span>
+    <h3>How do you handle environment variables in Dockerfile?</h3>
+    <p class="intro">Environment variables configure containers for different environments. There are multiple ways to set them, each with tradeoffs.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>ENV, ARG, and runtime<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">ENV (Environment Variables)</div>
+          <ul>
+            <li>Set at build time, persists in container at runtime</li>
+            <li>Can be overridden with docker run -e</li>
+            <li>Example: ENV DATABASE_URL=localhost:5432</li>
+            <li>Used for: configuration that doesn't change per environment</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ARG (Build Arguments)</div>
+          <ul>
+            <li>Only available during build, not at runtime</li>
+            <li>Pass with: docker build --build-arg VERSION=1.0</li>
+            <li>Example: ARG VERSION=latest</li>
+            <li>Used for: build-specific settings (not runtime config)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Runtime Override</div>
+          <ul>
+            <li>docker run -e LOG_LEVEL=debug (override single var)</li>
+            <li>docker run --env-file .env (load from file)</li>
+            <li>Override ENV from Dockerfile at runtime</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use ENV for configuration that might differ per environment (dev vs prod). Use ARG for build-time settings only. At runtime, override with -e flag or --env-file. Never hardcode secrets in ENV — use external secret management instead."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ OPTIMIZATION ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 02</span><h2>Image Optimization</h2></div>
+
+  <section id="q-multistage">
+    <span class="sec-num">Optimization</span>
+    <h3>What's a multi-stage build? When do you use it?</h3>
+    <p class="intro">Multi-stage builds dramatically reduce image size by separating build dependencies from runtime. This is how production images should be built.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Build vs runtime stages<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What It Does</div>
+          <ul>
+            <li>Multiple FROM statements in one Dockerfile</li>
+            <li>Build dependencies in stage 1, only runtime artifacts in stage 2</li>
+            <li>Final image only contains what's needed to run</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example (Go app)</div>
+          <pre><code># Stage 1: Build
+FROM golang:1.20 AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o app
+
+# Stage 2: Runtime (minimal)
+FROM alpine:latest
+COPY --from=builder /app/app .
+CMD ["./app"]</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Size Reduction</div>
+          <ul>
+            <li>Without multi-stage: 800MB (includes Go compiler, build tools)</li>
+            <li>With multi-stage: 50MB (only the binary)</li>
+            <li>16x smaller image!</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">When to Use</div>
+          <ul>
+            <li>Always for compiled languages (Go, Java, Rust, C++)</li>
+            <li>When build dependencies != runtime dependencies</li>
+            <li>When you need to keep images small for fast deployment</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Multi-stage builds let me separate build dependencies from runtime. Builder stage has compilers and tools, final stage only has the binary. This reduces image size from 800MB to 50MB. I always use this for compiled languages."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-image-size">
+    <span class="sec-num">Optimization</span>
+    <h3>How do you optimize a Docker image for size?</h3>
+    <p class="intro">Smaller images mean faster deployments, less storage, faster pulls from registry. Multiple strategies to reduce bloat.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Practical techniques<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Start with Small Base Image</div>
+          <ul>
+            <li>alpine:latest (5MB) vs ubuntu:latest (77MB)</li>
+            <li>Use distroless images (Google) for production (20-50MB)</li>
+            <li>Example: gcr.io/distroless/base (just LIBC + app)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Layer Optimization</div>
+          <ul>
+            <li>Combine RUN commands to reduce layers: RUN apt update && apt install -y pkg1 pkg2 && apt clean</li>
+            <li>Clean up package managers: rm -rf /var/lib/apt/lists/*</li>
+            <li>Each layer adds overhead</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Multi-stage Builds</div>
+          <ul>
+            <li>Separate build stage from runtime stage</li>
+            <li>Build stage: includes compiler, build tools, dependencies</li>
+            <li>Runtime stage: only the final binary/artifacts</li>
+            <li>Copy only needed artifacts from builder to runtime: COPY --from=builder /app/app .</li>
+            <li>Biggest impact for compiled languages (Go, Java, Rust)</li>
+            <li>Can reduce 800MB image to 50MB</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">.dockerignore</div>
+          <ul>
+            <li>Exclude unnecessary files: .git, node_modules, tests, docs</li>
+            <li>Reduces build context size</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Start with alpine or distroless base images. Use multi-stage builds. Combine RUN commands to reduce layers. Clean up package managers. Use .dockerignore to exclude unnecessary files. These techniques together can reduce images by 80%."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-reduce-2gb">
+    <span class="sec-num">Optimization</span>
+    <h3>Your Docker image is 2GB. How do you reduce it?</h3>
+    <p class="intro">2GB is huge. This is a practical troubleshooting scenario where you need to find and eliminate bloat.</p>
+    <details class="entry">
+      <summary><span class="state warn">Scenario</span>Debugging oversized images<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Identify What's Taking Space</div>
+          <pre><code># Use docker inspect to see layers
+docker inspect --format='{{json .RootFS.Layers}}' image-name
+
+# Use dive tool for detailed layer analysis
+dive image-name
+
+# Manual investigation
+docker run --rm -it image-name bash
+du -sh /* | sort -h  # Find largest directories</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Common Culprits</div>
+          <ul>
+            <li>/var/cache (package manager cache) - 500MB+</li>
+            <li>/tmp (build artifacts left behind) - 300MB+</li>
+            <li>/root/.npm or /root/.m2 (dependency caches) - 400MB+</li>
+            <li>Multiple copies of files (COPY in multiple layers)</li>
+            <li>Unnecessary build tools in final image</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Fixes</div>
+          <ul>
+            <li>Clean package managers: apt clean && rm -rf /var/lib/apt/lists/*</li>
+            <li>Clear caches: rm -rf /tmp/* /root/.npm /root/.m2</li>
+            <li>Use multi-stage build to exclude build deps</li>
+            <li>Switch to alpine base image</li>
+            <li>Use .dockerignore to exclude large directories</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example Dockerfile Fix</div>
+          <pre><code>FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+COPY . .
+RUN rm -rf /tmp/* /var/log/* /var/cache/*
+# Result: 1GB → 400MB</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "First, I use 'dive' or docker inspect to find what's taking space. Usually it's package caches or build artifacts. I clean those up with rm -rf. Then I switch to alpine base, use multi-stage builds, and optimize layers. This usually gets 2GB down to 400-500MB."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-build-time">
+    <span class="sec-num">Optimization</span>
+    <h3>How do you optimize build time for Docker images?</h3>
+    <p class="intro">Slow builds block CI/CD pipelines. Multiple strategies to speed up builds.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Caching and parallelization<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Leverage Layer Caching</div>
+          <ul>
+            <li>Docker caches layers. If nothing changed, layer is reused.</li>
+            <li>Put frequently changing files last in Dockerfile</li>
+            <li>Example: Install deps first, then COPY source code</li>
+            <li>Bad: COPY . . then RUN npm install (cache bust on any file change)</li>
+            <li>Good: COPY package.json . then RUN npm install then COPY . .</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Buildkit (Docker BuildKit)</div>
+          <ul>
+            <li>docker buildx build (newer, parallel build stages)</li>
+            <li>Parallelizes independent layers</li>
+            <li>Faster cache lookups</li>
+            <li>Enable: export DOCKER_BUILDKIT=1</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">.dockerignore</div>
+          <ul>
+            <li>Exclude files so they don't get sent to docker daemon</li>
+            <li>Smaller build context = faster</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Multi-stage for Build Cache</div>
+          <ul>
+            <li>Builder stage caches dependencies</li>
+            <li>If source code changes, dependencies don't rebuild</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Order Dockerfile commands by change frequency: stable things first (OS updates, package installs), then dependencies (package.json), then source code. Use BuildKit for parallelization. Exclude unnecessary files with .dockerignore. These reduce build time from 10 minutes to 2 minutes."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-multiple-services">
+    <span class="sec-num">Optimization</span>
+    <h3>What's the impact of running multiple services in one container?</h3>
+    <p class="intro">One container = one process. Running multiple services violates Docker principles and causes operational headaches.</p>
+    <details class="entry">
+      <summary><span class="state fail">Anti-pattern</span>Why this is bad<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Problems with Multiple Services</div>
+          <ul>
+            <li><strong>No isolation:</strong> If one service crashes, whole container dies</li>
+            <li><strong>Hard to scale:</strong> Want to scale web server but not DB? Impossible in one container</li>
+            <li><strong>Complex logging:</strong> Logs from both services mixed together, hard to parse</li>
+            <li><strong>Resource management:</strong> Can't limit resources per service</li>
+            <li><strong>Startup order:</strong> Service A must start before B. Fragile.</li>
+            <li><strong>Health checks:</strong> Which service determines container health?</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example: Bad</div>
+          <pre><code>Dockerfile:
+# Runs both Nginx and Python app in one container!
+RUN apt install -y nginx python3
+ENTRYPOINT ["/bin/bash", "start.sh"]
+
+start.sh:
+service nginx start
+python app.py</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Example: Good</div>
+          <ul>
+            <li>One Dockerfile per service</li>
+            <li>One container per service (or pod in K8s)</li>
+            <li>Orchestrate with docker-compose or Kubernetes</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Exception: Sidecars</div>
+          <ul>
+            <li>In Kubernetes, pods can have multiple containers (sidecar pattern)</li>
+            <li>Main container (app) + sidecar (logging, monitoring)</li>
+            <li>Sidecars are lightweight, not full services</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "One service per container. If you need multiple services, use docker-compose or Kubernetes to orchestrate them. Multiple services in one container violates the principle of isolation, makes scaling hard, and complicates logging and health checks. Exception: sidecars in K8s are okay for lightweight helpers."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ OPERATIONS ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 03</span><h2>Container Operations</h2></div>
+
+  <section id="q-view-logs">
+    <span class="sec-num">Operations</span>
+    <h3>How do you view logs from a running container?</h3>
+    <p class="intro">Logs are your first tool for debugging. Know multiple ways to access them.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Debugging container output<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Basic Commands</div>
+          <ul>
+            <li>docker logs container-name (view all logs)</li>
+            <li>docker logs -f container-name (follow logs, like tail -f)</li>
+            <li>docker logs --tail 50 container-name (last 50 lines)</li>
+            <li>docker logs --since 2024-01-20 container-name (since timestamp)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Interactive Shell</div>
+          <ul>
+            <li>docker exec -it container-name bash (attach shell)</li>
+            <li>Then: tail -f /var/log/app.log (view logs from inside)</li>
+            <li>Or: cat /var/log/app.log | grep ERROR</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Production: Centralized Logging</div>
+          <ul>
+            <li>Don't rely on docker logs for production</li>
+            <li>Send logs to: ELK (Elasticsearch), Loki, Splunk</li>
+            <li>Container logs are lost when container is deleted</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use 'docker logs -f' to see real-time output. For debugging, docker exec into container and tail the log file. In production, send logs to a centralized system because docker logs are ephemeral—they're deleted when the container stops."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-stop-vs-kill">
+    <span class="sec-num">Operations</span>
+    <h3>How do you stop vs kill a container? What's the difference?</h3>
+    <p class="intro">Both stop containers, but they work very differently. Understanding this matters for graceful shutdowns.</p>
+    <details class="entry">
+      <summary><span class="state warn">Q&A</span>SIGTERM vs SIGKILL<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">docker stop (Graceful)</div>
+          <ul>
+            <li>Sends SIGTERM signal to main process (PID 1)</li>
+            <li>App has 10 seconds to shut down gracefully</li>
+            <li>Close DB connections, save state, clean up</li>
+            <li>After 10 seconds: forcefully kills if still running</li>
+            <li>Used for: normal shutdown</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">docker kill (Immediate)</div>
+          <ul>
+            <li>Sends SIGKILL signal (force kill, cannot be caught)</li>
+            <li>Process has zero chance to clean up</li>
+            <li>Connections abruptly closed, data might be lost</li>
+            <li>Used for: when stop doesn't work, emergency shutdown</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Timeline</div>
+          <ul>
+            <li>docker stop → SIGTERM → app cleans up (0-10s) → SIGKILL (if timeout)</li>
+            <li>docker kill → SIGKILL immediately</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Pro Tip: Handle SIGTERM in App</div>
+          <pre><code>import signal
+import sys
+
+def handle_sigterm(sig, frame):
+    print("Shutting down gracefully...")
+    # Close DB, save state
+    db.close()
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, handle_sigterm)</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "'docker stop' sends SIGTERM and waits 10 seconds for graceful shutdown. 'docker kill' sends SIGKILL immediately. Always use stop unless necessary. App should catch SIGTERM to clean up: close connections, save state, finish in-flight requests."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-graceful-shutdown">
+    <span class="sec-num">Operations</span>
+    <h3>How do you implement graceful shutdown in a containerized application?</h3>
+    <p class="intro">Graceful shutdown prevents data loss and ensures clean termination. Critical for production apps.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Signal handling &amp; cleanup<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Signal Handling</div>
+          <ul>
+            <li>Catch SIGTERM (docker stop sends this)</li>
+            <li>Stop accepting new requests</li>
+            <li>Wait for in-flight requests to complete</li>
+            <li>Close database connections</li>
+            <li>Flush caches, save state</li>
+            <li>Exit cleanly</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example (Node.js)</div>
+          <pre><code>const http = require('http');
+const server = http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('OK');
+});
+
+let isShuttingDown = false;
+
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, starting graceful shutdown');
+  isShuttingDown = true;
+
+  // Stop accepting new connections
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+
+  // Force exit after 30 seconds
+  setTimeout(() => process.exit(1), 30000);
+});
+
+server.listen(3000);</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Kubernetes Integration</div>
+          <ul>
+            <li>preStop hook: runs before SIGTERM sent</li>
+            <li>terminationGracePeriodSeconds: how long to wait (default 30s)</li>
+            <li>Example: preStop sleep 5s, then drain connections</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Load Balancer Integration</div>
+          <ul>
+            <li>Remove from LB immediately (no new traffic)</li>
+            <li>Finish existing requests (drain)</li>
+            <li>Close connections to DB</li>
+            <li>Exit after grace period</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Catch SIGTERM in the app. Stop accepting new requests immediately, then wait for in-flight requests to finish (up to grace period, e.g., 30s). Close DB connections cleanly. In Kubernetes, use preStop hook to remove from load balancer. This prevents data loss and ensures clean shutdown."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ CONFIGURATION ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 04</span><h2>Configuration</h2></div>
+
+  <section id="q-app-config">
+    <span class="sec-num">Configuration</span>
+    <h3>How do you handle application configuration in Docker (dev vs prod)?</h3>
+    <p class="intro">Different environments need different configs. The wrong approach leads to hardcoding and security issues.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Environment-specific configs<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Bad Approaches</div>
+          <ul>
+            <li>Hardcoding configs in code (never!)</li>
+            <li>Separate Dockerfiles per environment (duplicates)</li>
+            <li>Storing secrets in Dockerfile (HUGE security risk)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Good Approach: Environment Variables</div>
+          <ul>
+            <li>One Dockerfile for all environments</li>
+            <li>Use ENV in Dockerfile for defaults</li>
+            <li>Override at runtime with: docker run -e VAR=value</li>
+            <li>Example: ENV LOG_LEVEL=info (can override to debug)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Better: Config Files + Env Variables</div>
+          <ul>
+            <li>COPY config.yaml into image</li>
+            <li>App reads config.yaml, substitutes env vars</li>
+            <li>At runtime, mount different config.yaml for each env</li>
+            <li>Example: docker run -v prod-config.yaml:/app/config.yaml</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">In Kubernetes</div>
+          <ul>
+            <li>ConfigMaps for non-sensitive config</li>
+            <li>Secrets for passwords, API keys, tokens</li>
+            <li>Mounted as env vars or files into pod</li>
+            <li>Different ConfigMaps per environment (dev, staging, prod)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Single Dockerfile for all environments. Use environment variables to override defaults. Don't hardcode secrets—use external secret management (K8s Secrets, Vault). In Kubernetes, use ConfigMaps for settings and Secrets for sensitive data. Mount different configs per environment."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-secrets">
+    <span class="sec-num">Configuration</span>
+    <h3>How should you handle secrets in Docker containers? (Don't hardcode them!)</h3>
+    <p class="intro">Secrets are passwords, API keys, tokens. Hardcoding them is a critical security risk. Multiple safe approaches exist.</p>
+    <details class="entry">
+      <summary><span class="state fail">Security</span>Don't hardcode secrets!<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">NEVER Do This</div>
+          <ul>
+            <li>RUN export DATABASE_PASSWORD=mysecret123 (baked into image)</li>
+            <li>COPY secret.txt into image (visible in docker history)</li>
+            <li>Commit secrets to Git</li>
+            <li>Print secrets in logs</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Option 1: Environment Variables at Runtime</div>
+          <ul>
+            <li>docker run -e DB_PASSWORD=$(cat secret.txt) app</li>
+            <li>Secret not in image, only in running container</li>
+            <li>Still visible in docker inspect and logs (not ideal)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Option 2: Docker Secrets (Swarm Mode)</div>
+          <ul>
+            <li>docker secret create db_pass secret.txt</li>
+            <li>docker service create --secret db_pass app</li>
+            <li>Mounted as files in /run/secrets/db_pass</li>
+            <li>More secure than env vars</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Option 3: External Secret Management (Best)</div>
+          <ul>
+            <li>HashiCorp Vault, AWS Secrets Manager, Azure Key Vault</li>
+            <li>App fetches secrets at runtime from vault</li>
+            <li>Secret never stored in image or container</li>
+            <li>Can rotate without redeploying</li>
+            <li>Audit trail of who accessed what</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Option 4: Kubernetes Secrets</div>
+          <ul>
+            <li>kubectl create secret generic db-pass --from-literal=password=xxx</li>
+            <li>Mount as volume or env var in pod</li>
+            <li>Encrypted at rest (if configured)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Never hardcode or bake secrets into Docker images. Best practice: app fetches secrets from external vault (AWS Secrets Manager, Azure Key Vault) at runtime. In Kubernetes, use Secrets objects. In Docker Swarm, use docker secrets. Always rotate secrets regularly and audit access."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ SECURITY ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 05</span><h2>Security</h2></div>
+
+  <section id="q-image-scanning">
+    <span class="sec-num">Security</span>
+    <h3>Explain Docker image scanning. Why is it important?</h3>
+    <p class="intro">Image scanning finds vulnerabilities in dependencies before they reach production. Automated security defense.</p>
+    <details class="entry">
+      <summary><span class="state fail">Security</span>Vulnerability detection<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What It Does</div>
+          <ul>
+            <li>Scans all layers, finds installed packages</li>
+            <li>Compares against CVE database (NVD, Snyk, Trivy)</li>
+            <li>Reports known vulnerabilities with severity (critical, high, medium, low)</li>
+            <li>Blocks deployment if critical vulns found</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Why It Matters</div>
+          <ul>
+            <li>Dependencies have CVEs (Log4j, OpenSSL, etc.)</li>
+            <li>If image has vulnerable library, production is at risk</li>
+            <li>Automated scanning catches this before humans ship it</li>
+            <li>Can be enforced in CI/CD pipeline (fail build if critical CVE)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Tools</div>
+          <ul>
+            <li>Trivy (free, fast): trivy image myimage:latest</li>
+            <li>Snyk: online scanning, detailed reports</li>
+            <li>Grype: free vulnerability scanner</li>
+            <li>Docker Scout (built-in): docker scout cves myimage:latest</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">In CI/CD Pipeline</div>
+          <ul>
+            <li>After image build, scan it</li>
+            <li>If critical CVE found, fail the build</li>
+            <li>Developer fixes (update dependency, patch)</li>
+            <li>Rebuild and rescan</li>
+            <li>Example: trivy image --exit-code 1 --severity CRITICAL myimage</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I scan images with Trivy or Docker Scout to find vulnerable dependencies. Scanning happens in CI/CD—if critical CVE found, the build fails. Developer updates the dependency and rebuilds. This prevents vulnerable images from reaching production."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-non-root">
+    <span class="sec-num">Security</span>
+    <h3>What's the principle of running containers as non-root?</h3>
+    <p class="intro">Running as root means if container is compromised, attacker gets root access to host. Running as non-root limits blast radius.</p>
+    <details class="entry">
+      <summary><span class="state info">Security</span>Least privilege principle<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Why Not Root</div>
+          <ul>
+            <li>Root in container = root on host (in many setups)</li>
+            <li>If app is compromised, attacker has full control</li>
+            <li>Can modify files, install backdoors, escalate privileges</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">How to Run as Non-root</div>
+          <ul>
+            <li>In Dockerfile: RUN useradd -m appuser</li>
+            <li>Then: USER appuser</li>
+            <li>Container runs as appuser, not root</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example Dockerfile</div>
+          <pre><code>FROM python:3.10
+RUN useradd -m appuser
+WORKDIR /app
+COPY app.py .
+RUN chown -R appuser:appuser /app
+USER appuser  # Switch to non-root
+CMD ["python", "app.py"]</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">In Kubernetes</div>
+          <ul>
+            <li>securityContext.runAsNonRoot: true (enforces non-root)</li>
+            <li>securityContext.readOnlyRootFilesystem: true (extra hardening)</li>
+            <li>Pod won't start if image's USER is root</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Always run containers as non-root. Create a user in Dockerfile (useradd), then USER to switch. In Kubernetes, enforce with securityContext.runAsNonRoot: true. This limits damage if the container is compromised."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-least-privilege">
+    <span class="sec-num">Security</span>
+    <h3>How do you implement least privilege for container permissions?</h3>
+    <p class="intro">Least privilege: give containers only the permissions they need. Nothing more.</p>
+    <details class="entry">
+      <summary><span class="state ok">Security</span>Minimize blast radius<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">File System Permissions</div>
+          <ul>
+            <li>Read-only filesystem (except /tmp, /var/run)</li>
+            <li>Don't give write access to /</li>
+            <li>Specific mount points for write (volumes)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Capabilities (Linux Kernel)</div>
+          <ul>
+            <li>Containers run with subset of kernel capabilities</li>
+            <li>Default: NET_BIND_SERVICE, SYS_CHROOT, SETFCAP</li>
+            <li>Drop: CAP_SYS_ADMIN (can't change system settings)</li>
+            <li>Docker example: docker run --cap-drop=ALL --cap-add=NET_BIND_SERVICE</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Kubernetes securityContext</div>
+          <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    securityContext:
+      runAsNonRoot: true
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_BIND_SERVICE
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+  volumes:
+  - name: tmp
+    emptyDir: {}</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practices</div>
+          <ul>
+            <li>Run as non-root user</li>
+            <li>Read-only root filesystem</li>
+            <li>Drop all Linux capabilities, add back only what's needed</li>
+            <li>No privilege escalation</li>
+            <li>Regular user (no sudo)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I implement least privilege by: (1) running as non-root, (2) read-only root filesystem, (3) dropping all Linux capabilities and adding back only NET_BIND_SERVICE, (4) no privilege escalation. In K8s, this is enforced via securityContext. This limits damage if the container is compromised."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ REGISTRY ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 06</span><h2>Registry & Versioning</h2></div>
+
+  <section id="q-hub-vs-private">
+    <span class="sec-num">Registry</span>
+    <h3>Explain the difference between Docker Hub and private registries</h3>
+    <p class="intro">Docker Hub is public, free but not for production. Private registries are for enterprise security and compliance.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Public vs private storage<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Docker Hub</div>
+          <ul>
+            <li>Public registry (hub.docker.com)</li>
+            <li>Free to push (with limits)</li>
+            <li>Official images (nginx, postgres, python)</li>
+            <li>Community images (less vetted)</li>
+            <li>Issue: images publicly visible, rate limiting</li>
+            <li>Good for: learning, open-source projects</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Private Registries</div>
+          <ul>
+            <li>Azure Container Registry (ACR)</li>
+            <li>AWS Elastic Container Registry (ECR)</li>
+            <li>Harbor, Artifactory (self-hosted)</li>
+            <li>Images are private (not public)</li>
+            <li>Authentication required (credentials, RBAC)</li>
+            <li>Image scanning built-in</li>
+            <li>Good for: production, enterprise, compliance</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Comparison</div>
+          <table>
+            <thead>
+              <tr><th>Feature</th><th>Docker Hub</th><th>Private Registry</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Visibility</td><td>Public</td><td>Private</td></tr>
+              <tr><td>Authentication</td><td>Optional</td><td>Required</td></tr>
+              <tr><td>Rate limits</td><td>Yes</td><td>No</td></tr>
+              <tr><td>Scanning</td><td>Basic</td><td>Advanced</td></tr>
+              <tr><td>Cost</td><td>Free/Paid</td><td>Paid</td></tr>
+              <tr><td>RBAC</td><td>Limited</td><td>Full</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Docker Hub is public and good for learning. For production, use private registries (ACR, ECR) for security, compliance, and scanning. Private registries require authentication, have better RBAC, no rate limits, and built-in vulnerability scanning."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-tagging">
+    <span class="sec-num">Registry</span>
+    <h3>How do you tag Docker images? What's the naming convention?</h3>
+    <p class="intro">Tags identify image versions. Good tagging practices prevent confusion and enable rollbacks.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Versioning strategy<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Tag Format</div>
+          <ul>
+            <li>registry/repository:tag</li>
+            <li>Example: myregistry.azurecr.io/myapp:1.0.0</li>
+            <li>registry: where image is stored (Docker Hub, ACR, ECR)</li>
+            <li>repository: image name (myapp)</li>
+            <li>tag: version identifier (1.0.0, latest, dev-abc123)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Tagging Strategy</div>
+          <ul>
+            <li>Semantic versioning: 1.0.0 (major.minor.patch)</li>
+            <li>Git commit SHA: dev-a1b2c3d4 (unique per commit)</li>
+            <li>Timestamp: 2024-01-20T10:30:00Z</li>
+            <li>Branch name: main, develop, feature-x</li>
+            <li>latest: moving tag for current version (risky in prod!)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practice (Recommended)</div>
+          <ul>
+            <li>Commit SHA for CI/CD builds: myapp:a1b2c3d4</li>
+            <li>Also tag with semantic version: myapp:1.0.0</li>
+            <li>Also tag with branch: myapp:main, myapp:develop</li>
+            <li>latest only for known-good versions (not dev builds)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example in CI/CD</div>
+          <pre><code># Build image with commit SHA
+docker build -t myapp:$COMMIT_SHA .
+
+# Tag with semantic version
+docker tag myapp:$COMMIT_SHA myapp:1.0.0
+
+# Tag with branch
+docker tag myapp:$COMMIT_SHA myapp:main
+
+# Push all tags
+docker push myapp:$COMMIT_SHA
+docker push myapp:1.0.0
+docker push myapp:main</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Tag images with commit SHA for CI/CD (unique, traceable), also tag with semantic version (1.0.0) and branch name. Avoid 'latest' in production unless it's tested. This enables easy rollbacks: know exactly which commit is running."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-tagging-vs-versioning">
+    <span class="sec-num">Registry</span>
+    <h3>What's the difference between tagging and versioning?</h3>
+    <p class="intro">Tags and versions are different concepts; understanding the distinction prevents confusion.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Semantics matter<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Versioning</div>
+          <ul>
+            <li>Semantic version: 1.0.0, 2.1.3</li>
+            <li>Follows spec: MAJOR.MINOR.PATCH</li>
+            <li>MAJOR: breaking changes</li>
+            <li>MINOR: backward-compatible features</li>
+            <li>PATCH: bug fixes</li>
+            <li>Managed in source code (package.json, version.txt)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Tagging</div>
+          <ul>
+            <li>Identifier for image in registry</li>
+            <li>Can be: 1.0.0, main, a1b2c3d4, latest</li>
+            <li>Multiple tags can point to same image</li>
+            <li>Managed at build/deploy time</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <ul>
+            <li>Code version: 1.0.0 (in package.json)</li>
+            <li>Image tags: myapp:1.0.0, myapp:latest, myapp:a1b2c3d4</li>
+            <li>All three tags point to same image (built from version 1.0.0)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Versioning (1.0.0) describes the software release. Tagging (myapp:1.0.0) identifies the image in the registry. One version can have multiple tags (myapp:1.0.0, myapp:latest, myapp:main). Tags are pointers to images."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-registry-cicd">
+    <span class="sec-num">Registry</span>
+    <h3>How do you use Docker registries in a CI/CD pipeline?</h3>
+    <p class="intro">CI/CD pipelines build, push, and pull images from registries. Knowing the workflow is critical.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Build → Push → Deploy<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Typical CI/CD Pipeline</div>
+          <ul>
+            <li>1. Source code pushed to Git</li>
+            <li>2. CI triggers: build Docker image</li>
+            <li>3. Scan image for vulnerabilities</li>
+            <li>4. Push to private registry (ACR, ECR)</li>
+            <li>5. CD pulls image from registry</li>
+            <li>6. Deploy to Kubernetes/Docker Swarm</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example GitHub Actions Workflow</div>
+          <pre><code>name: Build and Push
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build image
+      run: docker build -t myapp:${{ github.sha }} .
+
+    - name: Scan image
+      run: trivy image myapp:${{ github.sha }}
+
+    - name: Login to registry
+      run: docker login -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASS }}
+
+    - name: Push image
+      run: docker push myapp:${{ github.sha }}</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Authentication</div>
+          <ul>
+            <li>Store registry credentials in CI/CD secrets</li>
+            <li>Never hardcode username/password</li>
+            <li>Use service principals or tokens (time-limited)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "CI/CD pipeline builds Docker image, scans it for vulns, pushes to private registry. Credentials stored as secrets (not hardcoded). CD stage pulls from registry and deploys. Use commit SHA for tagging to ensure traceability."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-retention">
+    <span class="sec-num">Registry</span>
+    <h3>Explain image retention policies. Why delete old images?</h3>
+    <p class="intro">Registries have storage costs. Old images pile up; retention policies keep things clean and cheap.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Cost and cleanup<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Why Delete Old Images</div>
+          <ul>
+            <li>Storage cost: every image layer costs money in registry</li>
+            <li>Security: old images have unpatched CVEs</li>
+            <li>Compliance: need to delete data after retention period</li>
+            <li>Clutter: hard to find relevant images</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Retention Policy Example</div>
+          <ul>
+            <li>Keep last 10 tagged releases (1.0.0, 1.0.1, etc.)</li>
+            <li>Keep last 30 days of dev builds (branch builds)</li>
+            <li>Delete untagged images older than 7 days</li>
+            <li>Always keep 'latest' tag (assumed to be current)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ACR Retention Policy Example</div>
+          <pre><code>az acr retention update \
+  --registry myregistry \
+  --status enabled \
+  --days 30 \
+  --untagged-only true
+
+# OR: Keep last 10 versions of each tag
+az acr retention update \
+  --registry myregistry \
+  --status enabled \
+  --keep 10 \
+  --filters "tag=v*"</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practices</div>
+          <ul>
+            <li>Automate retention policy (don't manual delete)</li>
+            <li>Archive critical images before deletion</li>
+            <li>Log what was deleted (audit trail)</li>
+            <li>Keep releases longer than dev builds</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Set automated retention policies: keep releases (1.0.0, 1.0.1) indefinitely or for years, delete dev builds after 30 days, delete untagged images after 7 days. This saves storage costs and reduces security surface by removing old, unpatched images."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-registry-scanning">
+    <span class="sec-num">Registry</span>
+    <h3>How do you implement image scanning in a registry?</h3>
+    <p class="intro">Registry-level scanning catches vulnerabilities across all stored images, not just new ones.</p>
+    <details class="entry">
+      <summary><span class="state fail">Security</span>Continuous vulnerability detection<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Registry Scanning (vs CI/CD Scanning)</div>
+          <ul>
+            <li>CI/CD scanning: scans before push (prevents bad images)</li>
+            <li>Registry scanning: scans all images continuously (catches new CVEs)</li>
+            <li>Example: vulnerability published today for library in your 3-month-old image</li>
+            <li>Registry scanning detects this retroactively</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ACR Scanning Setup</div>
+          <ul>
+            <li>Enable Defender for Container Registries (Azure Security Center)</li>
+            <li>Automatic scan on push</li>
+            <li>Daily rescans of all images</li>
+            <li>Reports vulnerabilities in portal</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ECR Scanning Setup (AWS)</div>
+          <ul>
+            <li>Enable Basic image scanning</li>
+            <li>Scans automatically on push</li>
+            <li>Reports in ECR console</li>
+            <li>Enhanced scanning with Inspector (continuous)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Alerts & Policies</div>
+          <ul>
+            <li>Alert on new critical CVE in existing image</li>
+            <li>Policy: delete or quarantine image if critical vuln found</li>
+            <li>Block deployment if image failed scanning</li>
+            <li>Audit trail: who deployed what, when</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Enable registry-level scanning to continuously monitor all images. New CVEs are discovered daily—your 3-month-old image might have a vuln published last week. Registry scanning catches this. Set policies to alert or block deployment if critical vuln found."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ PRODUCTION SCENARIOS ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 07</span><h2>Production Scenarios</h2></div>
+
+  <section id="q-build-failing">
+    <span class="sec-num">Scenarios</span>
+    <h3>A Docker build is failing intermittently. How do you debug it?</h3>
+    <p class="intro">Intermittent failures are the worst. Could be network, caching, resource exhaustion, or race conditions.</p>
+    <details class="entry">
+      <summary><span class="state warn">Scenario</span>Troubleshooting build issues<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">First: Reproduce Locally</div>
+          <ul>
+            <li>docker build . (multiple times, see if it fails)</li>
+            <li>Add --progress=plain to see detailed output</li>
+            <li>Enable BuildKit: DOCKER_BUILDKIT=1 docker build .</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Common Causes</div>
+          <ul>
+            <li><strong>Network flakiness:</strong> apt-get fails to reach package mirror</li>
+            <li><strong>Layer caching:</strong> Docker cached a bad layer</li>
+            <li><strong>Resource exhaustion:</strong> Docker daemon out of memory</li>
+            <li><strong>Intermittent dependency:</strong> npm install fails to fetch package occasionally</li>
+            <li><strong>Race condition:</strong> Concurrent downloads conflict</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Debugging Steps</div>
+          <ul>
+            <li>1. Force rebuild: docker build --no-cache .</li>
+            <li>2. Check output: add -v flag for verbose</li>
+            <li>3. Isolate: comment out suspicious RUN commands</li>
+            <li>4. Retry: run 5 times in a row, see if it fails consistently</li>
+            <li>5. Check logs: docker system events during build</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Specific Fixes</div>
+          <ul>
+            <li><strong>apt-get failing:</strong> Add apt-get update && apt-get install together (single layer)</li>
+            <li><strong>npm failing:</strong> npm ci (deterministic, better than npm install)</li>
+            <li><strong>Resource issues:</strong> Increase Docker memory limit</li>
+            <li><strong>Caching issues:</strong> Use --cache-from to reuse layers</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example Fix</div>
+          <pre><code># Bad: separate layers, apt-get cached, might fail on retry
+RUN apt-get update
+RUN apt-get install -y python3
+
+# Good: combined layer, deterministic
+RUN apt-get update && apt-get install -y python3 && apt-get clean</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Reproduce locally first. If intermittent, likely network flakiness (apt-get, npm) or Docker caching. Force rebuild with --no-cache to rule out caching. Combine package updates and installs in one RUN command. Use npm ci instead of npm install for determinism."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-versioning-cicd">
+    <span class="sec-num">Scenarios</span>
+    <h3>Explain your approach to Docker image versioning in a CI/CD pipeline</h3>
+    <p class="intro">Version strategy affects deployability, rollback capability, and production safety.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Strategy and traceability<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">My Approach</div>
+          <ul>
+            <li>1. Increment version in code (package.json, version.txt): 1.2.3</li>
+            <li>2. Build image with commit SHA: myapp:a1b2c3d4</li>
+            <li>3. Tag with version: docker tag myapp:a1b2c3d4 myapp:1.2.3</li>
+            <li>4. Tag with branch: docker tag myapp:a1b2c3d4 myapp:main</li>
+            <li>5. Push all tags</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Benefits</div>
+          <ul>
+            <li>Commit SHA: unique, traceable to exact code</li>
+            <li>Version (1.2.3): semantic, easy to read</li>
+            <li>Branch tag: latest from main, develop, etc.</li>
+            <li>Can rollback by SHA: docker pull myapp:a1b2c3d4</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example CI Pipeline</div>
+          <pre><code>#!/bin/bash
+VERSION=$(cat package.json | grep '"version"' | cut -d'"' -f4)
+COMMIT_SHA=$(git rev-parse --short HEAD)
+REGISTRY=myregistry.azurecr.io
+
+docker build -t $REGISTRY/myapp:$COMMIT_SHA .
+docker tag $REGISTRY/myapp:$COMMIT_SHA $REGISTRY/myapp:$VERSION
+docker tag $REGISTRY/myapp:$COMMIT_SHA $REGISTRY/myapp:${{ github.ref_name }}
+
+docker push $REGISTRY/myapp:$COMMIT_SHA
+docker push $REGISTRY/myapp:$VERSION
+docker push $REGISTRY/myapp:${{ github.ref_name }}</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I version images with: (1) commit SHA for traceability, (2) semantic version (1.2.3) from source code, (3) branch name for convenience. All point to same image. This enables rollbacks: if 1.2.4 breaks, deploy 1.2.3 or the specific SHA."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-db-migrations">
+    <span class="sec-num">Scenarios</span>
+    <h3>How do you handle database migrations in containerized applications?</h3>
+    <p class="intro">Migrations must run before or alongside app startup. Timing and coordination are critical.</p>
+    <details class="entry">
+      <summary><span class="state info">Scenario</span>Schema and data changes<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Approaches</div>
+          <ul>
+            <li><strong>Option 1: Init container (K8s):</strong> runs migration before app starts</li>
+            <li><strong>Option 2: sidecar:</strong> migration container alongside app</li>
+            <li><strong>Option 3: entrypoint:</strong> migration runs in app container before app starts</li>
+            <li><strong>Option 4: separate job:</strong> K8s Job runs migrations, then app Deployment</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practice: Init Container (K8s)</div>
+          <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: migrations
+        image: myapp:1.0.0
+        command: ["./migrate.sh"]
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: url
+
+      containers:
+      - name: app
+        image: myapp:1.0.0
+        command: ["python", "app.py"]
+        # App starts only after init container completes</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Or: Separate Job (safer)</div>
+          <ul>
+            <li>K8s Job runs migrations to completion</li>
+            <li>Then Deployment starts (assumes DB is ready)</li>
+            <li>Good for: complex migrations, rollback safety</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Entrypoint Approach (simpler, riskier)</div>
+          <pre><code>#!/bin/bash
+# entrypoint.sh
+set -e
+
+if [ "$RUN_MIGRATIONS" = "true" ]; then
+  ./migrate.sh
+fi
+
+exec python app.py</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Key Principles</div>
+          <ul>
+            <li>Migrations must complete before app starts</li>
+            <li>Rollback capability: can downgrade schema if needed</li>
+            <li>Idempotent: safe to run multiple times</li>
+            <li>Monitor migration logs separately</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I use K8s init containers for migrations: migration runs to completion before app starts. Makes rollbacks clean. Alternatively, run migrations as a separate K8s Job before deploying the app. Always make migrations idempotent (safe to run multiple times)."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-memory-leak">
+    <span class="sec-num">Scenarios</span>
+    <h3>A container is leaking memory. How do you diagnose and fix it?</h3>
+    <p class="intro">Memory leaks cause OOMKilled containers. Diagnosis requires tools; fixes require code changes.</p>
+    <details class="entry">
+      <summary><span class="state fail">Scenario</span>Debugging memory issues<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Confirm Leak</div>
+          <ul>
+            <li>docker stats (view memory usage over time)</li>
+            <li>Memory constantly increases? = leak</li>
+            <li>Memory usage plateaus? = normal</li>
+            <li>In K8s: kubectl top pod (view current memory)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: Identify the App</div>
+          <ul>
+            <li>docker exec -it container-name bash</li>
+            <li>ps aux (list running processes)</li>
+            <li>Which process is using memory? (Python, Java, Node?)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 3: Capture Memory Profile</div>
+          <ul>
+            <li><strong>Python:</strong> memory_profiler, objgraph</li>
+            <li><strong>Node:</strong> heapdump, clinic.js</li>
+            <li><strong>Java:</strong> jdump, YourKit profiler</li>
+            <li>Take heap dump during leak, analyze in IDE</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example (Python)</div>
+          <pre><code>pip install memory_profiler
+
+@profile
+def process_data():
+    large_list = []
+    for i in range(1000000):
+        large_list.append(i)  # Memory leak: list never freed
+    return len(large_list)
+
+# Run: python -m memory_profiler script.py
+# Shows memory usage per line</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Common Causes & Fixes</div>
+          <ul>
+            <li><strong>Global caches:</strong> Remove or size-limit them</li>
+            <li><strong>Circular references:</strong> Use weakref</li>
+            <li><strong>Unclosed connections:</strong> db.close() in finally block</li>
+            <li><strong>Event listeners never removed:</strong> Always unsubscribe</li>
+            <li><strong>Dependency version:</strong> Upgrade library (might have leak fix)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Prevent in Future</div>
+          <ul>
+            <li>Set memory limits: docker run -m 512m (kills if exceeds)</li>
+            <li>Monitor: Prometheus scrape memory_bytes metric</li>
+            <li>Alert: Alert if memory grows past baseline</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use docker stats to confirm leak (memory increasing over time). Profile the app with memory_profiler (Python) or equivalent. Common causes: unclosed connections, unbounded caches, circular references. Fix the code leak, set memory limits to prevent OOMKilled, monitor in production."
+        </div>
+      </div>
+    </details>
+  </section>
+
+</main>
+
+</main>
+
+<script>
+(function(){
+  var pane1=document.getElementById('pane1');
+  var pane2=document.getElementById('pane2');
+  var subjBtns=[].slice.call(pane1.querySelectorAll('button'));
+  var grps=[].slice.call(pane2.querySelectorAll('.grp'));
+  var links=[].slice.call(pane2.querySelectorAll('a'));
+  var sections=[].slice.call(document.querySelectorAll('main section'));
+  var bands=[].slice.call(document.querySelectorAll('main .band'));
+  var search=document.getElementById('search');
+  var noresult=document.getElementById('noresult');
+  var spine=document.getElementById('spine');
+  var scrim=document.getElementById('scrim');
+  var menubtn=document.getElementById('menubtn');
+  var hoverToggle=document.getElementById('hovernav');
+  var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var current=subjBtns[0].dataset.subj;
+  var subjTimer=null, linkTimer=null;
+  var navLock=false, navTimer=null;
+  var sidebarHot=false;
+
+  spine.addEventListener('mouseenter',function(){sidebarHot=true;});
+  spine.addEventListener('mouseleave',function(){sidebarHot=false;});
+
+  function closeDrawer(){spine.classList.remove('open');scrim.classList.remove('show');}
+  menubtn.addEventListener('click',function(){
+    spine.classList.toggle('open');
+    scrim.classList.toggle('show',spine.classList.contains('open'));
+  });
+  scrim.addEventListener('click',closeDrawer);
+
+  function setSubject(s,scrollTop){
+    if(s===current&&scrollTop!==true) return;
+    current=s;
+    subjBtns.forEach(function(b){b.classList.toggle('on',b.dataset.subj===s);});
+    apply();
+    pane2.scrollTop=0;
+  }
+  subjBtns.forEach(function(b){
+    b.addEventListener('mouseenter',function(){
+      clearTimeout(subjTimer);
+      subjTimer=setTimeout(function(){
+        if(search.value){ search.value=''; }
+        setSubject(b.dataset.subj);
+      },110);
+    });
+    b.addEventListener('mouseleave',function(){clearTimeout(subjTimer);});
+    b.addEventListener('click',function(){
+      clearTimeout(subjTimer);
+      if(search.value){ search.value=''; }
+      setSubject(b.dataset.subj,true);
+    });
+    b.addEventListener('focus',function(){ setSubject(b.dataset.subj); });
+  });
+
+  function apply(){
+    var q=search.value.trim().toLowerCase();
+    var hits=0;
+    sections.forEach(function(sec){
+      var show=!q||sec.textContent.toLowerCase().indexOf(q)>-1;
+      sec.classList.toggle('hidden',!show);
+      if(show){
+        hits++;
+        if(q){var d=sec.querySelector('details'); if(d) d.open=true;}
+      }
+    });
+    bands.forEach(function(b){
+      var n=b.nextElementSibling,any=false;
+      while(n&&n.tagName==='SECTION'){ if(!n.classList.contains('hidden')) any=true; n=n.nextElementSibling; }
+      b.classList.toggle('hidden',!any);
+    });
+    links.forEach(function(a){
+      var t=document.querySelector(a.getAttribute('href'));
+      a.classList.toggle('hidden',!!t&&t.classList.contains('hidden'));
+    });
+    var perSubj={};
+    grps.forEach(function(g){
+      var any=[].slice.call(g.querySelectorAll('a')).some(function(a){return !a.classList.contains('hidden');});
+      var subjOK=q?true:(g.dataset.subj===current);
+      g.classList.toggle('hidden',!(any&&subjOK));
+      if(any) perSubj[g.dataset.subj]=true;
+    });
+    document.body.classList.toggle('searching',!!q);
+    subjBtns.forEach(function(b){ b.classList.toggle('dim',!!q&&!perSubj[b.dataset.subj]); });
+    noresult.classList.toggle('show',hits===0);
+  }
+  search.addEventListener('input',apply);
+
+  function goTo(hash){
+    var el=document.querySelector(hash);
+    if(!el||el.classList.contains('hidden')) return;
+    var d=el.querySelector('details');
+    if(d) d.open=true;
+    navLock=true;
+    clearTimeout(navTimer);
+    navTimer=setTimeout(function(){navLock=false;},900);
+    el.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
+    links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')===hash);});
+  }
+  links.forEach(function(a){
+    var hash=a.getAttribute('href');
+    a.addEventListener('mouseenter',function(){
+      if(!hoverToggle.checked) return;
+      clearTimeout(linkTimer);
+      linkTimer=setTimeout(function(){goTo(hash);},170);
+    });
+    a.addEventListener('mouseleave',function(){clearTimeout(linkTimer);});
+    a.addEventListener('focus',function(){ if(hoverToggle.checked) goTo(hash); });
+    a.addEventListener('click',function(e){ e.preventDefault(); clearTimeout(linkTimer); goTo(hash); closeDrawer(); });
+  });
+  hoverToggle.addEventListener('change',function(){ clearTimeout(linkTimer); });
+
+  var spy=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var hash='#'+e.target.id;
+      var link=links.filter(function(a){return a.getAttribute('href')===hash;})[0];
+      if(!link) return;
+      var subj=link.closest('.grp').dataset.subj;
+      if(!navLock&&!sidebarHot&&!search.value&&subj!==current) setSubject(subj);
+      links.forEach(function(a){a.classList.toggle('active',a===link);});
+    });
+  },{rootMargin:'-10% 0px -75% 0px',threshold:0});
+  sections.forEach(function(sec){spy.observe(sec);});
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&document.activeElement!==search){e.preventDefault();search.focus();search.select();}
+    if(e.key==='Escape'&&document.activeElement===search){search.value='';apply();search.blur();}
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

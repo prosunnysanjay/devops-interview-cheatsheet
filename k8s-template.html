@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kubernetes Interview Cheatsheet</title>
+<style>
+:root{
+  --ink:#14161C; --ink-2:#3D4351; --ink-3:#6B7183;
+  --paper:#EEF0F5; --surface:#FFFFFF;
+  --line:#D6DAE4; --line-soft:#E6E9F0;
+  --violet:#4B3FD6; --violet-soft:#EDEBFC;
+  --red:#B4321F; --red-soft:#FBEDEA;
+  --amber:#9A6100; --amber-soft:#FCF3E2;
+  --teal:#0D6E66; --teal-soft:#E6F3F1;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --spine:272px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.spine{position:fixed;top:0;left:0;bottom:0;width:var(--spine);background:var(--ink);color:#B7BCCB;display:flex;flex-direction:column;z-index:40}
+.spine-head{padding:20px 18px 14px;border-bottom:1px solid #262A36}
+.spine-head .mark{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:#6B7183;display:block;margin-bottom:5px}
+.spine-head .name{font-family:var(--mono);font-size:15px;font-weight:600;color:#F4F6FA}
+.searchwrap{padding:12px 16px}
+#search{width:100%;background:#1D212B;border:1px solid #2E3341;color:#E8EBF2;font-family:var(--mono);font-size:12.5px;padding:9px 10px;border-radius:5px;outline:none}
+#search::placeholder{color:#5C6274}
+#search:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(75,63,214,.28)}
+.searchhint{font-family:var(--mono);font-size:9.5px;color:#565C6D;margin-top:7px;letter-spacing:.04em}
+.hovertoggle{display:flex;align-items:center;gap:9px;padding:9px 16px 12px;border-bottom:1px solid #262A36;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#6B7183;cursor:pointer;user-select:none}
+.hovertoggle:hover{color:#AEB4C4}
+.hovertoggle input{position:absolute;opacity:0;pointer-events:none}
+.switch{width:26px;height:15px;border-radius:8px;background:#2E3341;position:relative;flex:none;transition:background .15s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#6B7183;transition:transform .15s,background .15s}
+.hovertoggle input:checked + .switch{background:var(--violet)}
+.hovertoggle input:checked + .switch::after{transform:translateX(11px);background:#fff}
+.hovertoggle input:focus-visible + .switch{box-shadow:0 0 0 3px rgba(75,63,214,.45)}
+.panes{flex:1;display:flex;min-height:0;border-top:1px solid #262A36}
+.pane1{width:94px;flex:none;border-right:1px solid #262A36;overflow-y:auto;padding:8px 0;background:#101218}
+.pane1 button{display:block;width:100%;text-align:left;background:none;border:none;border-left:2px solid transparent;color:#868D9F;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:12px 10px;cursor:pointer;line-height:1.3}
+.pane1 button:hover{color:#fff;background:#1B1F29}
+.pane1 button.on{color:#fff;background:var(--ink);border-left-color:var(--violet)}
+.pane1 button.dim{opacity:.35}
+.pane1 button:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.pane2{flex:1;overflow-y:auto;padding:0 0 40px;min-width:0}
+.grph{position:sticky;top:0;z-index:2;background:var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:#5F6577;padding:13px 14px 6px;border-bottom:1px solid #1F222B}
+.gsubj{display:none}
+body.searching .gsubj{display:inline;color:var(--violet)}
+body.searching .gsubj::after{content:" · "}
+.pane2 a{display:block;padding:6px 14px;color:#AEB4C4;text-decoration:none;font-size:13px;line-height:1.35;border-left:2px solid transparent}
+.pane2 a:hover{color:#fff;background:#1B1F29}
+.pane2 a.active{color:#fff;border-left-color:var(--violet);background:#1B1F29}
+.pane2 a:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.hidden{display:none!important}
+main{margin-left:var(--spine);padding:0 44px 140px;max-width:940px}
+.masthead{padding:52px 0 26px}
+.masthead h1{font-family:var(--mono);font-size:29px;font-weight:600;letter-spacing:-.02em;margin:0 0 9px}
+.masthead p{margin:0;color:var(--ink-3);font-size:14.5px;max-width:58ch}
+.band{padding:32px 0 4px;border-top:2px solid var(--ink);margin-top:20px}
+.band .eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);display:block;margin:12px 0 6px}
+.band h2{font-family:var(--mono);font-size:25px;font-weight:600;letter-spacing:-.02em;margin:0}
+section{padding:34px 0 8px;border-bottom:1px solid var(--line);scroll-margin-top:20px}
+.sec-num{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--violet);text-transform:uppercase;display:block;margin-bottom:8px}
+section > h3{font-family:var(--sans);font-size:22px;font-weight:700;letter-spacing:0em;color:var(--violet);margin:0 0 12px;line-height:1.35}
+.sec-sub{color:var(--ink-3);font-size:14px;margin:0 0 20px;max-width:64ch;font-weight:500;line-height:1.5}
+.intro{background:rgba(75,63,214,0.06);border-left:3px solid var(--violet);padding:10px 14px;margin:0 0 18px;border-radius:0 4px 4px 0;font-size:14px;color:var(--ink-2);line-height:1.5;font-weight:500}
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:7px;margin-bottom:16px;overflow:hidden}
+.entry > summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:13.5px;font-weight:600}
+.entry > summary::-webkit-details-marker{display:none}
+.entry > summary:hover{background:#FAFBFD}
+.entry > summary:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.chev{margin-left:auto;color:var(--ink-3);font-family:var(--mono);font-size:11px;flex:none;transition:transform .15s ease;display:inline-block}
+.entry[open] > summary{border-bottom:1px solid var(--line-soft)}
+.entry[open] .chev{transform:rotate(90deg)}
+.state{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:3px;flex:none;font-weight:600}
+.state.fail{background:var(--red-soft);color:var(--red)}
+.state.warn{background:var(--amber-soft);color:var(--amber)}
+.state.ok{background:var(--teal-soft);color:var(--teal)}
+.state.info{background:var(--violet-soft);color:var(--violet)}
+.entry-body{padding:16px}
+.step{margin-bottom:16px}
+.step:last-child{margin-bottom:0}
+.step-label{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--violet);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.step-label::after{content:"";height:1px;background:var(--line-soft);flex:1}
+ul,ol{margin:0;padding-left:19px}
+li{margin-bottom:5px}
+li:last-child{margin-bottom:0}
+p{margin:0 0 10px}
+p:last-child{margin-bottom:0}
+strong{font-weight:650}
+code{font-family:var(--mono);font-size:12.5px;background:#F1F3F8;border:1px solid var(--line-soft);padding:1px 4px;border-radius:3px;white-space:nowrap}
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.7;background:var(--ink);color:#DDE1EA;padding:13px 15px;border-radius:5px;overflow-x:auto;margin:0}
+pre code{background:none;border:none;padding:0;white-space:pre;font-size:inherit;color:inherit}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:0 0 4px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:0 12px 7px 0;border-bottom:1px solid var(--line)}
+td{padding:9px 12px 9px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:600;white-space:nowrap;padding-right:20px}
+td.wrap:first-child{white-space:normal}
+.note{border-left:2px solid var(--violet);background:var(--violet-soft);padding:11px 14px;border-radius:0 5px 5px 0;font-size:13.5px;margin:14px 0 0}
+.note .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--violet);display:block;margin-bottom:4px;font-weight:600}
+.note.amber{border-left-color:var(--amber);background:var(--amber-soft)}
+.note.amber .tag{color:var(--amber)}
+.note.say{border-left-color:var(--teal);background:var(--teal-soft)}
+.note.say .tag{color:var(--teal)}
+.note.say p{font-style:normal}
+.noresult{display:none;font-family:var(--mono);font-size:13.5px;color:var(--ink-3);padding:40px 0}
+.noresult.show{display:block}
+.menubtn{display:none;position:fixed;top:12px;left:12px;z-index:60;background:var(--ink);color:#fff;border:none;font-family:var(--mono);font-size:12px;padding:9px 13px;border-radius:5px;cursor:pointer}
+.scrim{display:none;position:fixed;inset:0;background:rgba(20,22,28,.5);z-index:35}
+.scrim.show{display:block}
+@media (max-width:900px){
+  .menubtn{display:block}
+  .spine{transform:translateX(-100%);transition:transform .2s ease;width:286px}
+  .spine.open{transform:translateX(0)}
+  main{margin-left:0;padding:0 18px 100px}
+  .panes{flex-direction:column}
+  .pane1{width:auto;display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid #262A36;padding:6px}
+  .pane1 button{width:auto;border-left:none;border-bottom:2px solid transparent;padding:9px 13px;white-space:nowrap;border-radius:4px}
+  .pane1 button.on{border-left-color:transparent;border-bottom-color:var(--violet)}
+  .masthead{padding:62px 0 22px}
+  .masthead h1{font-size:23px}
+  .band h2{font-size:20px}
+  section{padding:28px 0 8px}
+  td:first-child{white-space:normal}
+  table{font-size:13px}
+}
+@media print{
+  .spine,.menubtn,.scrim{display:none}
+  main{margin:0;max-width:none;padding:0}
+  .entry{break-inside:avoid;border-color:#999}
+  pre{background:#fff;color:#000;border:1px solid #999}
+}
+</style>
+</head>
+<body>
+
+<button class="menubtn" id="menubtn" aria-label="Open index">☰ Index</button>
+<div class="scrim" id="scrim"></div>
+
+<aside class="spine" id="spine">
+  <div class="spine-head">
+    <span class="mark">Container Orchestration</span>
+    <span class="name">Kubernetes</span>
+  </div>
+  <div class="searchwrap">
+    <input id="search" type="search" placeholder="Search…" autocomplete="off" aria-label="Search topics">
+    <div class="searchhint">Press / to search · Esc to clear</div>
+  </div>
+  <label class="hovertoggle" for="hovernav">
+    <input type="checkbox" id="hovernav" checked>
+    <span class="switch" aria-hidden="true"></span>
+    <span>Open on hover</span>
+  </label>
+
+  <div class="panes">
+    <nav class="pane1" id="pane1">
+      <button type="button" data-subj="k8s" class="on">Kubernetes</button>
+    </nav>
+    <nav class="pane2" id="pane2">
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Core Concepts</span>Fundamentals</div>
+        <a href="#q-deployments-statefulsets">Deployments, StatefulSets, DaemonSets</a>
+        <a href="#q-services">Services & Types</a>
+        <a href="#q-ingress">Ingress Controllers</a>
+        <a href="#q-traffic-flow">Traffic Flow</a>
+        <a href="#q-configmap-secret">ConfigMap vs Secret</a>
+      </div>
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Storage</span>Persistence</div>
+        <a href="#q-mount-secrets">Mount Secrets/ConfigMaps</a>
+        <a href="#q-storage-class">Storage Class</a>
+        <a href="#q-backup-restore">Backup & Restore</a>
+      </div>
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Networking</span>Communication</div>
+        <a href="#q-pod-networking">Pod Networking</a>
+        <a href="#q-network-policy">Network Policies</a>
+        <a href="#q-dns-discovery">DNS & Service Discovery</a>
+        <a href="#q-service-mesh">Service Mesh</a>
+        <a href="#q-cni-plugins">CNI Plugins</a>
+        <a href="#q-ingress-routing">Ingress Routing</a>
+      </div>
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Security</span>Access & Compliance</div>
+        <a href="#q-pod-security">Pod Security Standards</a>
+        <a href="#q-serviceaccount">ServiceAccount vs User</a>
+        <a href="#q-least-privilege">Least Privilege</a>
+        <a href="#q-secret-management">Secret Management</a>
+        <a href="#q-zero-trust">Network Segmentation</a>
+        <a href="#q-workload-identity">Workload Identity</a>
+        <a href="#q-image-scanning">Image Scanning</a>
+      </div>
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Monitoring</span>Observability</div>
+        <a href="#q-probes">Liveness/Readiness Probes</a>
+        <a href="#q-logging">Log Collection</a>
+        <a href="#q-sli-slo-sla">SLI/SLO/SLA</a>
+        <a href="#q-tracing">Distributed Tracing</a>
+      </div>
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Troubleshooting</span>Operations</div>
+        <a href="#q-pod-wont-start">Pod Won't Start</a>
+        <a href="#q-pod-failure-states">Pod Failure States</a>
+        <a href="#q-service-troubleshoot">Service Troubleshooting</a>
+        <a href="#q-resource-exhaustion">Resource Exhaustion</a>
+        <a href="#q-affinity">Node/Pod Affinity</a>
+        <a href="#q-zero-downtime">Zero-downtime Deployments</a>
+        <a href="#q-taints">Taints & Tolerations</a>
+        <a href="#q-graceful-termination">Graceful Pod Termination</a>
+      </div>
+      <div class="grp" data-subj="k8s">
+        <div class="grph"><span class="gsubj">Advanced</span>Patterns</div>
+        <a href="#q-gitops">GitOps & ArgoCD</a>
+        <a href="#q-deployments">Canary & Blue-green</a>
+        <a href="#q-ha-dr">HA & Disaster Recovery</a>
+        <a href="#q-helm">Helm Charts</a>
+        <a href="#q-multi-cluster">Multi-cluster Management</a>
+        <a href="#q-multi-tenancy">Multi-tenancy & Isolation</a>
+      </div>
+    </nav>
+  </div>
+</aside>
+
+<main>
+  <div class="masthead">
+    <h1>Kubernetes Interview Cheatsheet</h1>
+    <p>32 essential Kubernetes interview questions covering core concepts, networking, security, troubleshooting, and advanced patterns.</p>
+  </div>
+
+  <!-- ═══════════ CORE CONCEPTS ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 01</span><h2>Core Concepts</h2></div>
+
+  <section id="q-services">
+    <span class="sec-num">Core Concepts</span>
+    <h3>Explain Services and the different service types</h3>
+    <p class="intro">Services provide stable network endpoints to pods. Different types expose applications differently to enable external access.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Service types<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">ClusterIP (Default)</div>
+          <ul>
+            <li>Internal-only service, accessible within cluster</li>
+            <li>Assigns stable IP (10.0.0.1 or similar)</li>
+            <li>DNS: my-service.default.svc.cluster.local</li>
+            <li>Use for: pod-to-pod communication</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">NodePort</div>
+          <ul>
+            <li>Exposes on every node's port (30000-32767)</li>
+            <li>External clients access: node-ip:30001</li>
+            <li>Also has ClusterIP internally</li>
+            <li>Use for: external access without load balancer</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">LoadBalancer</div>
+          <ul>
+            <li>Creates cloud load balancer (AWS ELB, Azure LB)</li>
+            <li>Assigns external IP automatically</li>
+            <li>Use for: exposing apps to internet</li>
+            <li>Cost: expensive if many services</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ExternalName</div>
+          <ul>
+            <li>DNS CNAME alias to external service</li>
+            <li>No load balancing, just DNS redirection</li>
+            <li>Use for: integrating external services</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "ClusterIP for internal communication. NodePort for basic external access. LoadBalancer for production. For multiple services, use Ingress instead—it's cheaper and better."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-deployments-statefulsets">
+    <span class="sec-num">Core Concepts</span>
+    <h3>What's the difference between Deployments, StatefulSets, and DaemonSets?</h3>
+    <p class="intro">These are three different workload types for different use cases. Understanding when to use each one is critical for production deployments.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Workload types<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Deployments</div>
+          <ul>
+            <li>Stateless applications (web servers, APIs)</li>
+            <li>Pods are interchangeable and replaceable</li>
+            <li>ReplicaSet manages desired number of replicas</li>
+            <li>Rolling updates: gradually replace old pods with new ones</li>
+            <li>No guaranteed pod ordering or unique identity</li>
+            <li>Example: nginx web server, Python API</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">StatefulSets</div>
+          <ul>
+            <li>Stateful applications (databases, message queues)</li>
+            <li>Pods have stable, unique identity (pod-0, pod-1, pod-2)</li>
+            <li>Stable hostname: mysql-0.mysql-svc.default.svc.cluster.local</li>
+            <li>Pods are ordered and launched sequentially</li>
+            <li>Each pod has persistent storage (PVC)</li>
+            <li>Example: MySQL, Elasticsearch, Kafka</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">DaemonSets</div>
+          <ul>
+            <li>Runs one pod per node (or subset of nodes)</li>
+            <li>Always present on target nodes</li>
+            <li>No replicas to manage; K8s handles placement</li>
+            <li>Good for: monitoring agents, logging, networking</li>
+            <li>Example: Prometheus node-exporter, Fluentd logging agent</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Deployments for stateless apps like web servers. StatefulSets for stateful apps like databases—pods get stable names and hostnames. DaemonSets run one pod per node for monitoring agents."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-ingress">
+    <span class="sec-num">Core Concepts</span>
+    <h3>What's an Ingress controller? How does it differ from LoadBalancer?</h3>
+    <p class="intro">Ingress is the preferred way to expose multiple services externally. One Ingress replaces many LoadBalancers.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>HTTP/HTTPS routing<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">LoadBalancer vs Ingress</div>
+          <ul>
+            <li>LoadBalancer: One service = one cloud LB = one IP</li>
+            <li>Ingress: Multiple services = one LB = one IP</li>
+            <li>Ingress is cheaper and better for routing</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Ingress Controller</div>
+          <ul>
+            <li>Software that reads Ingress resources and configures routing</li>
+            <li>Popular: Nginx, HAPROXY, Traefik, Kong</li>
+            <li>Runs as pod in cluster</li>
+            <li>Watches Ingress resources and updates configuration</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Traffic Flow</div>
+          <ul>
+            <li>Client → DNS → Ingress Service (LB) → Ingress Controller Pod → Service → Pod</li>
+            <li>Controller reads: hostname, path, TLS cert</li>
+            <li>Routes to correct backend service</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Ingress is a single entry point for multiple services. One controller replaces many LoadBalancers. I define routing by hostname and path. Cheaper and more maintainable."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-traffic-flow">
+    <span class="sec-num">Core Concepts</span>
+    <h3>Explain traffic flow from external client to pod through Ingress</h3>
+    <p class="intro">Understanding the request journey is critical for debugging network issues.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Request path<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Flow Steps</div>
+          <ul>
+            <li>1. DNS resolves hostname to Ingress IP</li>
+            <li>2. Client sends HTTP request to Ingress IP</li>
+            <li>3. Cloud LB forwards to Ingress controller pod</li>
+            <li>4. Controller reads hostname and path</li>
+            <li>5. Controller forwards to correct Service (ClusterIP)</li>
+            <li>6. Service load balances to available pods</li>
+            <li>7. Pod processes request and responds</li>
+            <li>8. Response flows back through same chain</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Debugging</div>
+          <ul>
+            <li>DNS not resolving? Check DNS provider</li>
+            <li>Connection refused? Controller pod running?</li>
+            <li>Wrong backend? Check Ingress routing rules</li>
+            <li>Timeout? Check service endpoints: kubectl get endpoints</li>
+            <li>Pod not responding? kubectl logs pod-name</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "DNS → Ingress IP → LB → Controller → Service → Pod. If broken, I check each step: DNS, LB, controller pod, service endpoints, pod logs."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-configmap-secret">
+    <span class="sec-num">Core Concepts</span>
+    <h3>What's the purpose of ConfigMap vs Secret?</h3>
+    <p class="intro">Both pass data to pods, but for different types of data. ConfigMap for config, Secret for sensitive data.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Configuration management<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">ConfigMap</div>
+          <ul>
+            <li>Non-sensitive configuration data</li>
+            <li>Stored as plain text (NOT encrypted)</li>
+            <li>Key-value pairs or files</li>
+            <li>Example: log-level=debug, app-mode=production</li>
+            <li>Size limit: 1MB per ConfigMap</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Secret</div>
+          <ul>
+            <li>Sensitive data (passwords, API keys, tokens)</li>
+            <li>Base64 encoded by default (NOT encrypted unless configured)</li>
+            <li>Can enable encryption at rest in etcd</li>
+            <li>Example: passwords, JWT tokens, TLS certs</li>
+            <li>Size limit: 1MB per Secret</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Usage</div>
+          <ul>
+            <li>Inject as env vars: valueFrom.configMapKeyRef / secretKeyRef</li>
+            <li>Mount as files: volumes and volumeMounts</li>
+            <li>ConfigMap for app settings, Secret for credentials</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "ConfigMap for non-sensitive settings like log levels. Secret for passwords and API keys. Both can be env vars or volume mounts. Important: enable encryption at rest in etcd for production."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ NETWORKING ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 03</span><h2>Networking</h2></div>
+
+  <section id="q-pod-networking">
+    <span class="sec-num">Networking</span>
+    <h3>Explain how networking works in Kubernetes (pod-to-pod, pod-to-service, external traffic)</h3>
+    <p class="intro">K8s networking is complex but logical. Every pod gets its own IP and can talk to other pods directly.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Network model<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Pod-to-Pod Communication</div>
+          <ul>
+            <li>Every pod gets unique IP (from pod CIDR range)</li>
+            <li>Pods on same node: communicate directly via veth pairs</li>
+            <li>Pods on different nodes: CNI plugin routes traffic (Flannel, Calico, Weave)</li>
+            <li>No NAT or translation: direct IP-to-IP</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Pod-to-Service Communication</div>
+          <ul>
+            <li>Service has stable IP (ClusterIP: 10.0.0.5)</li>
+            <li>kube-proxy on each node creates iptables rules</li>
+            <li>Traffic to Service IP redirected to pod IP</li>
+            <li>Load balanced across all matching pods</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">External Traffic</div>
+          <ul>
+            <li>LoadBalancer Service: cloud LB → node:port → service → pod</li>
+            <li>NodePort: client:node-port → service → pod</li>
+            <li>Ingress: DNS → LB → ingress controller → service → pod</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Every pod has unique IP. Pods talk directly (no NAT). CNI plugin routes between nodes. Service IP is stable but virtual—kube-proxy redirects traffic. LoadBalancer/Ingress expose to external traffic."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-network-policy">
+    <span class="sec-num">Networking</span>
+    <h3>What's a Network Policy? How do you implement network segmentation?</h3>
+    <p class="intro">Network Policies are K8s firewalls. Default: all pods can talk to all pods. NetworkPolicy restricts this.</p>
+    <details class="entry">
+      <summary><span class="state warn">Q&A</span>Micro-segmentation<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Default Behavior</div>
+          <ul>
+            <li>All pods can communicate with all pods (no restrictions)</li>
+            <li>Risky for security (lateral movement if pod compromised)</li>
+            <li>Need to explicitly allow traffic with NetworkPolicy</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">NetworkPolicy Example</div>
+          <pre><code>apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-frontend-to-database
+spec:
+  podSelector:
+    matchLabels:
+      tier: database
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          tier: backend
+    ports:
+    - protocol: TCP
+      port: 5432
+
+# Result: Only backend pods can reach database
+# Frontend pods blocked</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practices</div>
+          <ul>
+            <li>Deny all ingress by default, allow specific traffic</li>
+            <li>Separate namespaces for different apps (tenant isolation)</li>
+            <li>Allow ingress only from known sources</li>
+            <li>Allow egress to known destinations (internal services, external APIs)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "NetworkPolicies are K8s firewalls. Default allows all traffic. I create policies to deny unnecessary traffic: frontend can't reach database, frontend can't reach admin, etc. Essential for multi-tenant clusters."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-dns-discovery">
+    <span class="sec-num">Networking</span>
+    <h3>How does DNS work in Kubernetes? Explain service discovery</h3>
+    <p class="intro">K8s includes built-in DNS. Services get DNS names automatically. This enables service discovery without external tools.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Service discovery<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">DNS Components</div>
+          <ul>
+            <li>CoreDNS pod runs in kube-system namespace</li>
+            <li>Watches Service resources and creates DNS records</li>
+            <li>kubelet configures pods to use CoreDNS</li>
+            <li>Pods query CoreDNS for service IPs</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Service DNS Names</div>
+          <ul>
+            <li>Format: service-name.namespace.svc.cluster.local</li>
+            <li>Example: mysql.default.svc.cluster.local → 10.0.0.5</li>
+            <li>Short form within namespace: mysql (CoreDNS expands to full name)</li>
+            <li>Each service gets A record pointing to ClusterIP</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Service Discovery Flow</div>
+          <ul>
+            <li>1. Pod app.yaml needs to connect to database</li>
+            <li>2. App queries DNS: mysql.default.svc.cluster.local</li>
+            <li>3. CoreDNS responds: 10.0.0.5 (mysql service IP)</li>
+            <li>4. App connects to 10.0.0.5:5432</li>
+            <li>5. kube-proxy redirects to actual database pod</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "K8s automatically creates DNS records for services. Apps query CoreDNS to discover services by name. No manual service registry needed. Short names work within namespace."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-service-mesh">
+    <span class="sec-num">Networking</span>
+    <h3>What's a service mesh (Istio, Linkerd)? When would you use one?</h3>
+    <p class="intro">Service mesh adds advanced networking features: traffic management, security policies, observability.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Advanced traffic management<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What It Does</div>
+          <ul>
+            <li>Injects sidecar proxies into every pod</li>
+            <li>Proxies intercept all network traffic</li>
+            <li>Provides: traffic routing, load balancing, circuit breaking, retries</li>
+            <li>Also: mTLS encryption, rate limiting, distributed tracing</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">When to Use</div>
+          <ul>
+            <li>Large, complex microservices architectures</li>
+            <li>Need for advanced traffic management (canary, A/B testing)</li>
+            <li>Security: enforce mTLS between all services</li>
+            <li>Observability: automatic metrics and tracing</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">When NOT to Use</div>
+          <ul>
+            <li>Small, simple clusters (overhead not worth it)</li>
+            <li>Performance-critical: adds latency (sidecar proxies)</li>
+            <li>Learning cluster: too much complexity</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Popular Options</div>
+          <ul>
+            <li>Istio: most feature-rich, complex</li>
+            <li>Linkerd: lightweight, easy to operate</li>
+            <li>Consul: service mesh + service registry</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Service mesh adds sophisticated traffic management: canary deployments, automatic retries, circuit breaking. Enables mTLS between services. Adds observability. But adds complexity and latency. Use only for large, complex clusters."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-cni-plugins">
+    <span class="sec-num">Networking</span>
+    <h3>What's the difference between CNI plugins? Which have you used?</h3>
+    <p class="intro">CNI plugins provide pod-to-pod networking. Different plugins have different capabilities and performance.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Networking implementations<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Popular CNI Plugins</div>
+          <ul>
+            <li><strong>Flannel:</strong> Simple overlay, encapsulates traffic (VXLAN)</li>
+            <li><strong>Calico:</strong> Advanced policies, BGP routing, performance-focused</li>
+            <li><strong>Weave:</strong> Mesh networking, encrypted by default</li>
+            <li><strong>Azure CNI:</strong> Uses Azure VNet, better performance</li>
+            <li><strong>AWS VPC CNI:</strong> Native VPC networking</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Flannel</div>
+          <ul>
+            <li>Simple, easy to setup</li>
+            <li>Overlay network (encapsulates traffic)</li>
+            <li>Lower performance (extra packet overhead)</li>
+            <li>Good for: learning, small clusters</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Calico</div>
+          <ul>
+            <li>Advanced, production-ready</li>
+            <li>Native routing (no overlay)</li>
+            <li>Integrates with network policies</li>
+            <li>Better performance than Flannel</li>
+            <li>Good for: large, performance-sensitive clusters</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Cloud-Native (Azure CNI, AWS VPC CNI)</div>
+          <ul>
+            <li>Use cloud provider's network infrastructure</li>
+            <li>Pod gets real cloud VNet IP (not overlay)</li>
+            <li>Best performance</li>
+            <li>Only works on that cloud provider</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Flannel is simple but slow (overlay). Calico is fast and feature-rich. Cloud-native CNIs (Azure, AWS) are fastest because pods use real VNet IPs. I choose based on: performance needs, multi-cloud vs single-cloud, policy requirements."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-ingress-routing">
+    <span class="sec-num">Networking</span>
+    <h3>How do you route traffic based on hostnames and paths with Ingress?</h3>
+    <p class="intro">Ingress enables sophisticated routing without multiple load balancers.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>HTTP routing<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Hostname-based Routing</div>
+          <ul>
+            <li>Route to different services based on Host header</li>
+            <li>api.example.com → API service</li>
+            <li>admin.example.com → Admin service</li>
+            <li>One IP, multiple domains</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Path-based Routing</div>
+          <ul>
+            <li>Route based on URL path</li>
+            <li>/api → API service</li>
+            <li>/static → Static files service</li>
+            <li>Same hostname, different paths</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Ingress Example</div>
+          <pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: multi-host
+spec:
+  rules:
+  # Hostname routing
+  - host: api.example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 8080
+
+  # Path routing
+  - host: example.com
+    http:
+      paths:
+      - path: /api
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 8080
+      - path: /static
+        backend:
+          service:
+            name: static-service
+            port:
+              number: 80</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Ingress routes by hostname and path. Host header determines which domain → which service. Path determines which endpoint → which service. One Ingress can route to many services."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ STORAGE ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 02</span><h2>Storage Management</h2></div>
+
+  <section id="q-mount-secrets">
+    <span class="sec-num">Storage</span>
+    <h3>How do you mount Secrets and ConfigMaps as volumes vs environment variables?</h3>
+    <p class="intro">Two different ways to inject data. Each has tradeoffs for updates, visibility, and file-based configs.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Injection methods<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Environment Variables</div>
+          <ul>
+            <li>Injected at pod startup, static after that</li>
+            <li>Changes to ConfigMap/Secret require pod restart</li>
+            <li>Good for: small values, simple configuration</li>
+            <li>Bad for: large files, dynamic updates</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Volume Mounts</div>
+          <ul>
+            <li>Mounted as files in container filesystem</li>
+            <li>Updates to ConfigMap/Secret reflected within seconds</li>
+            <li>Good for: configuration files, dynamic updates</li>
+            <li>Bad for: binary data, very large files</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+
+    # Method 1: Environment variables
+    env:
+    - name: LOG_LEVEL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: log-level
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: db-secret
+          key: password
+
+    # Method 2: Volume mount
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+    - name: secret-volume
+      mountPath: /etc/secrets
+
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
+  - name: secret-volume
+    secret:
+      secretName: db-secret</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use env vars for simple values. Use volume mounts for configuration files and when you need dynamic updates. Volume mounts auto-update when ConfigMap/Secret changes; env vars don't."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-storage-class">
+    <span class="sec-num">Storage</span>
+    <h3>What's storage class and how does it relate to dynamic provisioning?</h3>
+    <p class="intro">StorageClass enables automatic volume creation with specific properties. No manual PV creation needed.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Dynamic volumes<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Without StorageClass (Manual)</div>
+          <ul>
+            <li>Admin creates PersistentVolume (PV) manually</li>
+            <li>User creates PersistentVolumeClaim (PVC) requesting it</li>
+            <li>Matching PV and PVC bound together</li>
+            <li>Slow and tedious at scale</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">With StorageClass (Dynamic)</div>
+          <ul>
+            <li>StorageClass defines volume properties (type, performance, encryption)</li>
+            <li>User creates PVC specifying StorageClass</li>
+            <li>K8s automatically creates PV from that class</li>
+            <li>No manual PV creation needed</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <pre><code># StorageClass definition
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+provisioner: azure.com/disk
+parameters:
+  type: Premium_LRS
+  cachingmode: ReadWrite
+
+# PVC using StorageClass
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 100Gi
+
+# PV is automatically created from StorageClass</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "StorageClass automates PV creation. Define StorageClass with volume properties (SSD, encryption, performance). User creates PVC specifying the class. K8s provisions the volume automatically."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ SECURITY ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 04</span><h2>Security & Access Control</h2></div>
+
+  <section id="q-pod-security">
+    <span class="sec-num">Security</span>
+    <h3>How do you enforce Pod Security Standards/Policies?</h3>
+    <p class="intro">Pod Security Standards restrict what containers can do. Essential for multi-tenant clusters and compliance.</p>
+    <details class="entry" open>
+      <summary><span class="state fail">Security</span>Pod hardening<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Three Levels</div>
+          <ul>
+            <li><strong>Privileged:</strong> No restrictions (dangerous)</li>
+            <li><strong>Baseline:</strong> Minimum security, prevents escalation</li>
+            <li><strong>Restricted:</strong> Strict, production-grade security</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Enforcing Standards</div>
+          <ul>
+            <li>Label namespace: pod-security.kubernetes.io/enforce=restricted</li>
+            <li>Pods must comply or fail to create</li>
+            <li>Also: audit mode (log violations), warn mode (warn but allow)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Restricted Standards Require</div>
+          <ul>
+            <li>runAsNonRoot: true (no root user)</li>
+            <li>readOnlyRootFilesystem: true (no write access)</li>
+            <li>allowPrivilegeEscalation: false</li>
+            <li>Drop all Linux capabilities</li>
+            <li>No hostNetwork or hostPID</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Enforce Pod Security Standards at namespace level. Use 'restricted' for production. Prevents privilege escalation, root access, excessive capabilities. Audit mode for testing, enforce mode for production."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-serviceaccount">
+    <span class="sec-num">Security</span>
+    <h3>What's the difference between ServiceAccount and User authentication?</h3>
+    <p class="intro">ServiceAccounts authenticate pods; Users authenticate people. Two different credential systems.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Authentication types<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">ServiceAccount (Pods)</div>
+          <ul>
+            <li>Used by pods to authenticate to API server</li>
+            <li>Token mounted at /var/run/secrets/kubernetes.io/serviceaccount/token</li>
+            <li>Automatic per-pod credential</li>
+            <li>Scoped to namespace</li>
+            <li>Used with RBAC for access control</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">User (Kubectl/Humans)</div>
+          <ul>
+            <li>Used by people running kubectl</li>
+            <li>Authenticated via: certificates, OAuth, OIDC, static tokens</li>
+            <li>Configured in kubeconfig file</li>
+            <li>Cluster-wide (not scoped to namespace)</li>
+            <li>Also controlled by RBAC</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Use Cases</div>
+          <ul>
+            <li>ServiceAccount: app needs to query K8s API (check services, get secrets)</li>
+            <li>User: DevOps engineer needs to deploy apps, check pods, etc.</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "ServiceAccounts for pods, Users for humans. Each pod gets a ServiceAccount token automatically. Both are controlled by RBAC. ServiceAccounts are namespace-scoped, Users are cluster-wide."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-least-privilege">
+    <span class="sec-num">Security</span>
+    <h3>How do you implement least privilege for pods?</h3>
+    <p class="intro">Least privilege minimizes damage if a pod is compromised.</p>
+    <details class="entry">
+      <summary><span class="state warn">Security</span>Minimize blast radius<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Linux Capabilities</div>
+          <ul>
+            <li>Drop ALL capabilities: - ALL</li>
+            <li>Add back only what's needed: NET_BIND_SERVICE</li>
+            <li>Prevents container from: changing system settings, raw socket access</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Filesystem</div>
+          <ul>
+            <li>readOnlyRootFilesystem: true</li>
+            <li>Container can't modify /</li>
+            <li>Allow /tmp and /var/run (emptyDir volumes)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">User & Privileges</div>
+          <ul>
+            <li>runAsNonRoot: true (no root access)</li>
+            <li>allowPrivilegeEscalation: false (can't gain privileges)</li>
+            <li>runAsUser: 1000 (specific non-root user)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example Pod</div>
+          <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_BIND_SERVICE
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+  volumes:
+  - name: tmp
+    emptyDir: {}</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Non-root user, read-only filesystem, drop all capabilities, no privilege escalation. Pod can't modify system, can't gain root, minimal blast radius if compromised."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-secret-management">
+    <span class="sec-num">Security</span>
+    <h3>How do you manage secrets securely? (encryption, external managers)</h3>
+    <p class="intro">Secrets in etcd are base64 encoded by default (NOT encrypted). Production needs real encryption and external managers.</p>
+    <details class="entry">
+      <summary><span class="state fail">Security</span>Secret protection<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Problem</div>
+          <ul>
+            <li>K8s Secrets are base64 encoded, not encrypted</li>
+            <li>Base64 is easily decoded (not secure)</li>
+            <li>Anyone with etcd access can read secrets</li>
+            <li>Secrets visible in kubectl logs</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Solutions</div>
+          <ul>
+            <li><strong>Encryption at rest:</strong> Enable in API server config</li>
+            <li><strong>External secret manager:</strong> AWS Secrets Manager, Azure Key Vault, HashiCorp Vault</li>
+            <li><strong>External Secrets Operator:</strong> Syncs external secrets to K8s Secrets</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Best Practice: External Manager</div>
+          <ul>
+            <li>Store secrets in vault (AWS, Azure, Vault)</li>
+            <li>Pod fetches secret at runtime (not stored in etcd)</li>
+            <li>Secret never in K8s Secrets</li>
+            <li>Rotate secrets in vault, pod gets new one on restart</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">RBAC for Secrets</div>
+          <ul>
+            <li>Restrict who can read Secrets</li>
+            <li>Default: anyone with pod access can read mounted secrets</li>
+            <li>Use ServiceAccount RBAC to limit secret access</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Never rely on K8s Secrets alone. Enable encryption at rest. Better: use external vault (AWS, Azure, Vault). Pod fetches secret at runtime. Rotate secrets regularly. RBAC to limit who can access."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-zero-trust">
+    <span class="sec-num">Security</span>
+    <h3>Explain network segmentation and zero-trust in Kubernetes</h3>
+    <p class="intro">Zero-trust: never trust traffic by default. Explicitly allow only necessary communication.</p>
+    <details class="entry">
+      <summary><span class="state warn">Security</span>Least-privilege networking<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Zero-Trust Principles</div>
+          <ul>
+            <li>Deny all by default (ingress and egress)</li>
+            <li>Explicitly allow necessary traffic only</li>
+            <li>Verify every connection (mTLS)</li>
+            <li>Segment by namespace, pod labels</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">NetworkPolicy Strategy</div>
+          <ul>
+            <li>1. Deny all ingress: kind: NetworkPolicy with empty 'from'</li>
+            <li>2. Allow frontend from load balancer</li>
+            <li>3. Allow backend from frontend</li>
+            <li>4. Allow database from backend</li>
+            <li>5. Explicit egress: only to required services</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">mTLS (Mutual TLS)</div>
+          <ul>
+            <li>Both pod certificates validated (not just server)</li>
+            <li>Encrypt all inter-pod traffic</li>
+            <li>Implemented via service mesh (Istio, Linkerd)</li>
+            <li>Prevents man-in-the-middle attacks</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Zero-trust: deny all, allow only necessary. Use NetworkPolicies for network segmentation. Implement mTLS between services. Segment by namespace and pod labels. Verify all connections."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-workload-identity">
+    <span class="sec-num">Security</span>
+    <h3>What's Workload Identity Federation and how does it work?</h3>
+    <p class="intro">Workload Identity lets pods use cloud credentials without storing secrets in K8s.</p>
+    <details class="entry">
+      <summary><span class="state ok">Security</span>Pod cloud auth<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Problem</div>
+          <ul>
+            <li>Pod needs AWS/Azure credentials to access cloud resources</li>
+            <li>Storing credentials as K8s Secrets is risky</li>
+            <li>Credentials might leak or be exposed</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Solution: Workload Identity</div>
+          <ul>
+            <li>Link K8s ServiceAccount to cloud IAM role</li>
+            <li>Pod uses ServiceAccount token to assume IAM role</li>
+            <li>Pod gets temporary AWS/Azure credentials (no secrets stored)</li>
+            <li>Credentials auto-refresh</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Azure Workload Identity Example</div>
+          <ul>
+            <li>1. Create Azure AD application</li>
+            <li>2. Create K8s ServiceAccount</li>
+            <li>3. Link ServiceAccount to AD app (federated identity)</li>
+            <li>4. Pod uses ServiceAccount token to authenticate</li>
+            <li>5. Pod assumes Azure role, gets credentials</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Benefits</div>
+          <ul>
+            <li>No secrets stored in K8s (secure)</li>
+            <li>Automatic credential rotation</li>
+            <li>Granular RBAC per pod/ServiceAccount</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Workload Identity removes secrets from K8s. Pod uses ServiceAccount token to assume cloud IAM role. Credentials temporary and auto-rotated. More secure than storing secrets."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-image-scanning">
+    <span class="sec-num">Security</span>
+    <h3>How do you scan container images for vulnerabilities in K8s?</h3>
+    <p class="intro">Image scanning catches vulnerable dependencies before deployment.</p>
+    <details class="entry">
+      <summary><span class="state fail">Security</span>Vulnerability detection<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Scanning Points</div>
+          <ul>
+            <li><strong>CI/CD:</strong> Before image build (fail if vulnerabilities)</li>
+            <li><strong>Registry:</strong> Continuous scanning of stored images</li>
+            <li><strong>Admission controller:</strong> Block deployment of vulnerable images</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Scanning Tools</div>
+          <ul>
+            <li>Trivy: Fast, free, accurate</li>
+            <li>Snyk: Online, detailed reports</li>
+            <li>Grype: Free, community-supported</li>
+            <li>Docker Scout: Built-in, easy to use</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Enforcement</div>
+          <ul>
+            <li>CI/CD: fail build if critical CVE detected</li>
+            <li>Registry: tag images with scan results</li>
+            <li>Admission webhook: reject pod if image has critical CVE</li>
+            <li>Policy Engine (OPA): enforce image scan requirements</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Scan images in CI/CD (fail build if critical CVE). Scan images in registry continuously. Use admission controller to block vulnerable images. Trivy or Snyk for scanning."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ MONITORING ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 05</span><h2>Monitoring & Observability</h2></div>
+
+  <section id="q-probes">
+    <span class="sec-num">Monitoring</span>
+    <h3>Explain liveness probes, readiness probes, and startup probes</h3>
+    <p class="intro">Probes tell K8s when pods are healthy. Essential for automatic recovery and deployment safety.</p>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Health checks<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Readiness Probe</div>
+          <ul>
+            <li>Is the pod ready to receive traffic?</li>
+            <li>Fails: pod removed from service (no traffic)</li>
+            <li>When to fail: app warming up, dependencies unavailable, degraded</li>
+            <li>Example: HTTP GET /health, should return 200</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Liveness Probe</div>
+          <ul>
+            <li>Is the pod still alive? Or is it hung?</li>
+            <li>Fails: pod is restarted</li>
+            <li>When to fail: deadlock, infinite loop, memory exhaustion</li>
+            <li>Example: HTTP GET /status, heartbeat check</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Startup Probe</div>
+          <ul>
+            <li>Has the app finished starting up?</li>
+            <li>Liveness/readiness only checked after startup succeeds</li>
+            <li>When to use: slow startup time (databases, compiling)</li>
+            <li>Prevents pod restart during startup</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+spec:
+  containers:
+  - name: app
+    image: myapp:latest
+
+    # App takes time to start
+    startupProbe:
+      httpGet:
+        path: /startup
+        port: 8080
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      failureThreshold: 30  # 300 seconds max
+
+    # Is app ready for traffic?
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+
+    # Is app alive?
+    livenessProbe:
+      httpGet:
+        path: /alive
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Readiness: is pod ready for traffic? Liveness: is pod alive? Startup: is pod finished starting? Implement all three. Readiness prevents traffic to unavailable pods. Liveness restarts dead pods. Startup prevents restart during slow startup."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-logging">
+    <span class="sec-num">Monitoring</span>
+    <h3>How do you collect and analyze logs from Kubernetes pods?</h3>
+    <p class="intro">Pod logs are ephemeral (deleted with pod). Need centralized logging for production.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Log aggregation<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Pod Logs (Temporary)</div>
+          <ul>
+            <li>kubectl logs pod-name (last 100 lines)</li>
+            <li>kubectl logs -f pod-name (follow logs)</li>
+            <li>Logs deleted when pod deleted</li>
+            <li>Not searchable or analyzable at scale</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Centralized Logging Stack</div>
+          <ul>
+            <li><strong>Fluent Bit/Fluentd:</strong> Collect logs from pods</li>
+            <li><strong>Elasticsearch:</strong> Store and index logs</li>
+            <li><strong>Kibana:</strong> Search and visualize logs</li>
+            <li>Or: Loki (simpler), Splunk, ELK stack</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Log Collection</div>
+          <ul>
+            <li>1. Fluent Bit DaemonSet on every node</li>
+            <li>2. Reads /var/log/pods/*/*.log (pod logs)</li>
+            <li>3. Enriches with pod metadata (labels, namespace)</li>
+            <li>4. Sends to Elasticsearch/Loki</li>
+            <li>5. Searchable via Kibana/Grafana</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "kubectl logs for quick debugging. Centralized logging for production (ELK, Loki, Splunk). Fluent Bit collects logs and sends to central store. Logs enriched with pod metadata (namespace, labels). Searchable and analyzable."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-sli-slo-sla">
+    <span class="sec-num">Monitoring</span>
+    <h3>What are SLI, SLO, and SLA? How do you define them for Kubernetes apps?</h3>
+    <p class="intro">SLI/SLO/SLA define reliability expectations and budgets.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Reliability targets<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Definitions</div>
+          <ul>
+            <li><strong>SLI (Service Level Indicator):</strong> Metric (e.g., 99.5% requests successful)</li>
+            <li><strong>SLO (Service Level Objective):</strong> Target SLI (e.g., aim for 99.5%)</li>
+            <li><strong>SLA (Service Level Agreement):</strong> Legal contract, penalties if missed</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Common SLIs</div>
+          <ul>
+            <li>Availability: % of time service is up</li>
+            <li>Latency: p99 request time (&lt;100ms)</li>
+            <li>Error rate: % of requests that fail (&lt;0.5%)</li>
+            <li>Throughput: requests per second</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Error Budget</div>
+          <ul>
+            <li>If SLO is 99.5%, error budget = 0.5% per month</li>
+            <li>Can use budget for maintenance (planned downtime)</li>
+            <li>Once budget exhausted, must prioritize reliability</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Implementation</div>
+          <ul>
+            <li>1. Define SLOs (e.g., 99.5% availability)</li>
+            <li>2. Measure SLIs with Prometheus/Grafana</li>
+            <li>3. Monitor error budget burn rate</li>
+            <li>4. Alert if burning too fast</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "SLI is the metric, SLO is the target. Define SLOs: 99.5% availability, &lt;100ms p99 latency, &lt;0.5% error rate. Measure with Prometheus. Track error budget—if burning fast, prioritize reliability over features."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-tracing">
+    <span class="sec-num">Monitoring</span>
+    <h3>How do you set up distributed tracing in Kubernetes?</h3>
+    <p class="intro">Distributed tracing shows request flow across microservices. Essential for debugging in complex systems.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Request tracing<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Problem</div>
+          <ul>
+            <li>Microservices: request touches frontend → backend → database → cache</li>
+            <li>One slow service affects everything</li>
+            <li>Hard to find bottleneck without distributed tracing</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Solution: Distributed Tracing</div>
+          <ul>
+            <li>Trace ID assigned to request at entry</li>
+            <li>Trace ID passed through all services (headers, metadata)</li>
+            <li>Each service reports spans (start/end of operation)</li>
+            <li>Jaeger/Zipkin collect and visualize traces</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Implementation</div>
+          <ul>
+            <li><strong>Instrumentation:</strong> App adds tracing SDK (OpenTelemetry)</li>
+            <li><strong>Collector:</strong> OpenTelemetry collector on DaemonSet</li>
+            <li><strong>Backend:</strong> Jaeger (self-hosted) or Datadog/NewRelic (SaaS)</li>
+            <li><strong>Service mesh:</strong> Istio/Linkerd auto-instruments traffic</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use OpenTelemetry for instrumentation. Jaeger or Datadog as backend. Service mesh (Istio) can auto-trace. See request flow across services, find bottlenecks, debug latency."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-backup-restore">
+  <!-- ═══════════ TROUBLESHOOTING ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 06</span><h2>Troubleshooting & Operations</h2></div>
+
+  <section id="q-pod-wont-start">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>Walk me through debugging a pod that won't start</h3>
+    <p class="intro">Systematic approach to troubleshooting pod failures.</p>
+    <details class="entry" open>
+      <summary><span class="state warn">Scenario</span>Debugging pod issues<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Check Pod Status</div>
+          <pre><code>kubectl describe pod pod-name
+# Look at: Status, ContainerStatuses, Events section</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: Check Pod Events</div>
+          <ul>
+            <li>kubectl describe shows recent events</li>
+            <li>ImagePullBackOff: can't pull image</li>
+            <li>CrashLoopBackOff: app crashes on start</li>
+            <li>Pending: waiting for resources/node</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 3: Check Container Logs</div>
+          <pre><code>kubectl logs pod-name
+kubectl logs pod-name --previous  # if crashed
+# Look for errors, stack traces, configuration issues</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 4: Check Resources</div>
+          <pre><code>kubectl describe node
+# Check: allocatable, allocated, pressure
+# If node full, pod stays Pending</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 5: Check YAML</div>
+          <ul>
+            <li>Wrong image tag?</li>
+            <li>Resources requests too high?</li>
+            <li>NodeSelector/affinity preventing scheduling?</li>
+            <li>Probes failing immediately?</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "kubectl describe pod to see status and events. kubectl logs to see app errors. Check node resources. Review YAML for configuration issues. Check image availability and pull secrets."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-pod-failure-states">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>Understand pod failure states and debugging</h3>
+    <p class="intro">Different failure states indicate different problems. Knowing each state helps diagnosis.</p>
+    <details class="entry">
+      <summary><span class="state fail">Q&A</span>Failure diagnosis<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Pending</div>
+          <ul>
+            <li>Pod waiting to be scheduled</li>
+            <li>Causes: no resources, NodeSelector mismatch, image not pulled yet</li>
+            <li>kubectl describe: check Events and Node status</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ImagePullBackOff</div>
+          <ul>
+            <li>Can't pull image from registry</li>
+            <li>Causes: wrong image name, image doesn't exist, no pull credentials</li>
+            <li>Fix: check image URL, add imagePullSecrets</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">CrashLoopBackOff</div>
+          <ul>
+            <li>App crashes on startup, K8s restarts it, crashes again (loop)</li>
+            <li>Causes: app error, missing dependencies, bad config</li>
+            <li>kubectl logs --previous to see crash logs</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Init:Error</div>
+          <ul>
+            <li>Init container failed</li>
+            <li>Causes: init container logic error, missing volume, failed command</li>
+            <li>kubectl logs -c init-container-name</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">CreateContainerConfigError</div>
+          <ul>
+            <li>Container config invalid</li>
+            <li>Causes: bad volume mount, missing ConfigMap/Secret, bad command</li>
+            <li>kubectl describe: check Events for details</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Evicted</div>
+          <ul>
+            <li>Pod removed from node (node out of resources)</li>
+            <li>Causes: memory/disk pressure, node cordoned</li>
+            <li>kubectl describe: shows eviction reason</li>
+            <li>Fix: free resources or add nodes</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Terminating (stuck)</div>
+          <ul>
+            <li>Pod waiting to terminate (finalizers, graceful shutdown)</li>
+            <li>Causes: finalizers waiting, long gracePeriod</li>
+            <li>Force delete: kubectl delete pod --grace-period=0 --force</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Exit Codes</div>
+          <ul>
+            <li>Exit 0: success (normal termination)</li>
+            <li>Exit 1-128: app error</li>
+            <li>Exit 137: OOMKilled (memory limit exceeded)</li>
+            <li>Exit 143: SIGTERM (graceful shutdown)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Pending = resource/scheduling issue. ImagePullBackOff = image problem. CrashLoopBackOff = app error. Init:Error = init container failed. Evicted = node out of resources. Each state has specific causes and fixes."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-service-troubleshoot">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>A service can't reach a pod. How do you troubleshoot?</h3>
+    <p class="intro">Service → Pod communication broken? Systematic debugging.</p>
+    <details class="entry">
+      <summary><span class="state warn">Scenario</span>Connectivity issues<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Check Service Endpoints</div>
+          <pre><code>kubectl get endpoints service-name
+# Should show: NAME       ENDPOINTS
+# If empty: pods not matching selector</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: Check Pod Labels</div>
+          <pre><code>kubectl get pods --show-labels
+# Check: do pods have labels matching service selector?
+kubectl get service service-name -o yaml
+# Check: spec.selector matches pod labels</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 3: Check Pod Network</div>
+          <pre><code>kubectl exec pod-name -- netstat -tlnp
+# Check: pod listening on correct port?
+
+kubectl exec pod-name -- nc -zv service-ip service-port
+# Test connectivity from pod perspective</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 4: Check Service</div>
+          <pre><code>kubectl get svc service-name -o yaml
+# Check: ports, targetPort, selector, type</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 5: Check NetworkPolicy</div>
+          <ul>
+            <li>kubectl get networkpolicy</li>
+            <li>Does policy allow traffic to pod?</li>
+            <li>Temporarily remove policy to test</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "1. Endpoints should show pod IPs. 2. Pod labels must match service selector. 3. Pod listening on correct port. 4. Service config correct. 5. NetworkPolicy not blocking."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-resource-exhaustion">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>How do you handle resource exhaustion (CPU, memory)?</h3>
+    <p class="intro">Out of resources = evictions, performance degradation. Prevention and remediation.</p>
+    <details class="entry">
+      <summary><span class="state warn">Scenario</span>Resource management<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Symptoms</div>
+          <ul>
+            <li>Pods evicted from node</li>
+            <li>Apps slow, latency increasing</li>
+            <li>OOMKilled (memory), CPU throttled</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Diagnosis</div>
+          <ul>
+            <li>kubectl describe node: check memory/CPU pressure</li>
+            <li>kubectl top nodes: actual usage</li>
+            <li>kubectl top pods: per-pod usage</li>
+            <li>Prometheus/Grafana: historical trends</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Immediate Fixes</div>
+          <ul>
+            <li>Add nodes (scale cluster up)</li>
+            <li>Cordon problematic node (prevent new pods)</li>
+            <li>Evict least important pods (if needed)</li>
+            <li>Reduce replica count temporarily</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Long-term Fixes</div>
+          <ul>
+            <li>Set resource requests/limits (enforce right-sizing)</li>
+            <li>HPA: horizontal pod autoscaling</li>
+            <li>Cluster autoscaler: add nodes when needed</li>
+            <li>Optimize apps: reduce resource usage</li>
+            <li>Upgrade node types (bigger machines)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Add nodes immediately to handle load. Then set resource requests/limits for accurate scheduling. HPA for scaling pods, cluster autoscaler for nodes. Monitor and optimize app resource usage."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-affinity">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>Explain node affinity and pod affinity. When do you use them?</h3>
+    <p class="intro">Control where pods are scheduled. Affinity = prefer, anti-affinity = avoid.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Pod placement<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Node Affinity</div>
+          <ul>
+            <li>Schedule pod on specific nodes</li>
+            <li>Example: GPU nodes, high-memory nodes</li>
+            <li>requiredDuringSchedulingIgnoredDuringExecution: must match</li>
+            <li>preferredDuringSchedulingIgnoredDuringExecution: nice to have</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Pod Affinity</div>
+          <ul>
+            <li>Schedule pods together or apart</li>
+            <li>Example: database + cache same node (performance)</li>
+            <li>Example: replicas on different nodes (HA)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Pod Anti-Affinity</div>
+          <ul>
+            <li>Keep pods apart (avoid same node)</li>
+            <li>Example: multiple replicas on different nodes</li>
+            <li>Improves availability (node failure doesn't kill all replicas)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Use Cases</div>
+          <ul>
+            <li>Node affinity: GPU tasks, memory-intensive, specific hardware</li>
+            <li>Pod affinity: latency-sensitive (keep together)</li>
+            <li>Pod anti-affinity: availability (spread replicas)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Node affinity to schedule on specific nodes (GPU, high-memory). Pod anti-affinity to spread replicas across nodes (HA). Pod affinity to colocate related pods (performance)."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-zero-downtime">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>How do you perform zero-downtime deployments?</h3>
+    <p class="intro">Update apps without dropping traffic. Multiple strategies.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Deployment strategies<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Rolling Update (Default)</div>
+          <ul>
+            <li>Gradually replace old pods with new ones</li>
+            <li>maxSurge: max new pods (e.g., 1)</li>
+            <li>maxUnavailable: max pods down (e.g., 0)</li>
+            <li>Always has healthy pods running</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Key Requirements</div>
+          <ul>
+            <li>Pod readiness probe: new pod marked ready before receiving traffic</li>
+            <li>Pod preStop hook: time to gracefully shut down</li>
+            <li>terminationGracePeriodSeconds: wait time before force kill</li>
+            <li>Multiple replicas: don't deploy 1-pod app (no HA)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 3  # Multiple replicas for HA
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  template:
+    spec:
+      containers:
+      - name: app
+        image: app:v2
+
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]  # Time to drain
+
+      terminationGracePeriodSeconds: 30</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Rolling update: gradually replace pods. Set maxUnavailable=0 (always have pods). Use readiness probe to ensure new pod ready. preStop hook for graceful shutdown. Multiple replicas for HA."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-taints">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>What's a taint and toleration? When do you use them?</h3>
+    <p class="intro">Taints repel pods; tolerations allow pods on tainted nodes. For node exclusion and workload isolation.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Node scheduling control<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Taint</div>
+          <ul>
+            <li>Mark node: "no pods allowed unless they tolerate me"</li>
+            <li>Format: kubectl taint nodes node-name key=value:effect</li>
+            <li>Effect: NoSchedule (no new pods), NoExecute (evict existing)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Toleration</div>
+          <ul>
+            <li>Pod says: "I can tolerate this taint"</li>
+            <li>Allows pod to schedule on tainted node</li>
+            <li>Defined in pod spec</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Use Cases</div>
+          <ul>
+            <li>GPU nodes: taint with gpu=true, only ML jobs tolerate</li>
+            <li>Dedicated nodes: taint with workload=special, only special jobs run there</li>
+            <li>Maintenance: taint node, evict non-critical pods, update safely</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <pre><code># Taint GPU node
+kubectl taint nodes gpu-node gpu=true:NoSchedule
+
+# Pod toleration
+tolerations:
+- key: gpu
+  operator: Equal
+  value: "true"
+  effect: NoSchedule</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Taints keep pods off nodes. Tolerations allow specific pods on tainted nodes. Use for: GPU nodes, dedicated workloads, maintenance windows."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-graceful-termination">
+    <span class="sec-num">Troubleshooting</span>
+    <h3>How do you handle graceful pod termination?</h3>
+    <p class="intro">Pod termination needs time for cleanup. Improper termination causes data loss.</p>
+    <details class="entry">
+      <summary><span class="state warn">Q&A</span>Shutdown handling<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Termination Flow</div>
+          <ul>
+            <li>1. SIGTERM sent to main process</li>
+            <li>2. Pod stops accepting new traffic (removed from service)</li>
+            <li>3. preStop hook runs (if defined)</li>
+            <li>4. App handles SIGTERM, closes connections, saves state</li>
+            <li>5. terminationGracePeriodSeconds wait (default 30s)</li>
+            <li>6. If still running after grace period: SIGKILL (force kill)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Implementation</div>
+          <ul>
+            <li>App catches SIGTERM signal</li>
+            <li>Stop accepting requests</li>
+            <li>Finish in-flight requests (with timeout)</li>
+            <li>Close database connections</li>
+            <li>Flush caches, save state</li>
+            <li>Exit cleanly</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Pod Config</div>
+          <pre><code>spec:
+  terminationGracePeriodSeconds: 30  # Wait time before SIGKILL
+
+  containers:
+  - name: app
+    lifecycle:
+      preStop:
+        exec:
+          command: ["/bin/sh", "-c", "sleep 5"]  # Time to drain requests</code></pre>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "App must catch SIGTERM. Stop accepting traffic, finish in-flight requests, close connections. Set terminationGracePeriodSeconds to allow time (default 30s). preStop hook for additional cleanup."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ ADVANCED ═══════════ -->
+  <div class="band"><span class="eyebrow">Section 07</span><h2>Advanced Patterns</h2></div>
+
+  <section id="q-gitops">
+    <span class="sec-num">Advanced</span>
+    <h3>What's GitOps and how does it apply to Kubernetes? (ArgoCD)</h3>
+    <p class="intro">GitOps: Git as source of truth. Declarative, version-controlled infrastructure.</p>
+    <details class="entry" open>
+      <summary><span class="state ok">Q&A</span>Declarative operations<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">GitOps Principles</div>
+          <ul>
+            <li>Git repo contains desired state (YAML, Helm, Kustomize)</li>
+            <li>GitOps operator (ArgoCD, Flux) syncs Git → Cluster</li>
+            <li>If cluster drifts, operator pulls it back to Git state</li>
+            <li>All changes tracked in Git (audit trail, rollback)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">ArgoCD Workflow</div>
+          <ul>
+            <li>1. Developer commits YAML to Git (app v1.2.3)</li>
+            <li>2. ArgoCD detects change</li>
+            <li>3. ArgoCD pulls latest YAML from Git</li>
+            <li>4. ArgoCD applies to K8s cluster</li>
+            <li>5. Everything tracked: who, when, what changed</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Benefits</div>
+          <ul>
+            <li>Version control: rollback any deployment</li>
+            <li>Audit trail: see exactly what changed and when</li>
+            <li>Declarative: apply once, sync continuous</li>
+            <li>Multi-cluster: manage multiple K8s clusters from Git</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Git is source of truth. ArgoCD syncs Git to cluster continuously. Commit YAML, push to Git, ArgoCD deploys. Entire history in Git, easy rollbacks, audit trail."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-deployments">
+    <span class="sec-num">Advanced</span>
+    <h3>Explain canary deployments and blue-green deployments</h3>
+    <p class="intro">Advanced deployment strategies for safe releases. Minimize blast radius of bad deployments.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Safe rollouts<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Canary Deployment</div>
+          <ul>
+            <li>Roll out to small % of traffic first (5%)</li>
+            <li>Monitor for errors</li>
+            <li>If good, gradually increase (5% → 25% → 50% → 100%)</li>
+            <li>If bad, rollback immediately</li>
+            <li>Implemented with: service mesh or Flagger</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Blue-Green Deployment</div>
+          <ul>
+            <li>Blue: old version (current production)</li>
+            <li>Green: new version (staging)</li>
+            <li>Run both in parallel</li>
+            <li>Switch traffic from blue to green (fast, atomic)</li>
+            <li>Rollback easy: switch back to blue</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Comparison</div>
+          <ul>
+            <li>Canary: gradual, detect issues early, longer deployment</li>
+            <li>Blue-green: atomic switch, faster, needs double resources</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Canary: send 5% traffic to new version, monitor, gradually increase. Blue-green: run both versions, instantly switch traffic. Canary safer for large changes, blue-green faster but needs 2x resources."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-ha-dr">
+    <span class="sec-num">Advanced</span>
+    <h3>How do you implement high availability and disaster recovery for Kubernetes?</h3>
+    <p class="intro">HA = no single point of failure. DR = recovery from disaster.</p>
+    <details class="entry">
+      <summary><span class="state warn">Q&A</span>Resilience<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">HA (High Availability)</div>
+          <ul>
+            <li>Multi-node cluster (3+ control plane nodes)</li>
+            <li>Multiple replicas per app (never 1 replica)</li>
+            <li>Pod anti-affinity: spread replicas across nodes</li>
+            <li>Node failures don't cause downtime</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">DR (Disaster Recovery)</div>
+          <ul>
+            <li>RTO: how fast to recover (target recovery time)</li>
+            <li>RPO: how much data loss acceptable (recovery point)</li>
+            <li>Backups: Velero for cluster backups</li>
+            <li>Multi-region: replicate cluster to different region</li>
+            <li>Restore procedures: test regularly</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Implementation</div>
+          <ul>
+            <li>3 control plane nodes (distributed, different zones)</li>
+            <li>3+ worker nodes (distributed)</li>
+            <li>etcd replicated across zones</li>
+            <li>Persistent data: replicated storage</li>
+            <li>Backups to separate region/cloud</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "HA: multiple control plane nodes, multiple replicas, spread across zones. DR: regular backups (Velero), secondary cluster, test recovery procedures. Define RTO/RPO targets."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-helm">
+    <span class="sec-num">Advanced</span>
+    <h3>What's a Helm chart? When would you use Helm vs plain YAML?</h3>
+    <p class="intro">Helm = package manager for K8s. Reduces duplication and enables reuse.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Helm charts<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Plain YAML Problems</div>
+          <ul>
+            <li>Duplication: same config for dev/staging/prod, only values differ</li>
+            <li>No templating: copy-paste errors</li>
+            <li>No rollback: manual version management</li>
+            <li>Dependencies: hard to manage related charts</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Helm Chart</div>
+          <ul>
+            <li>Template YAML with variables ({{.Values.image.tag}})</li>
+            <li>values.yaml: define variables per environment</li>
+            <li>helm install: render template, apply to cluster</li>
+            <li>helm upgrade: update chart, seamless rollback</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">When to Use</div>
+          <ul>
+            <li>Helm: complex apps with many YAML files, multi-environment</li>
+            <li>Plain YAML: simple apps, single deployment</li>
+            <li>Kustomize: alternative to Helm (simpler)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Helm reduces duplication with templating. One chart, multiple environments (values-dev.yaml, values-prod.yaml). Seamless rollback with version history. Use for complex apps."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-multi-cluster">
+    <span class="sec-num">Advanced</span>
+    <h3>How do you manage multiple Kubernetes clusters?</h3>
+    <p class="intro">Multiple clusters = higher availability and vendor independence.</p>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Multi-cluster operations<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Multi-cluster Challenges</div>
+          <ul>
+            <li>Different configs per cluster (env vars, secrets)</li>
+            <li>Deployment coordination: deploy to all clusters</li>
+            <li>Service discovery: find services across clusters</li>
+            <li>Monitoring: aggregate metrics from all clusters</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Solutions</div>
+          <ul>
+            <li><strong>ArgoCD:</strong> multi-cluster GitOps (GitHub → all clusters)</li>
+            <li><strong>Rancher:</strong> multi-cluster management UI</li>
+            <li><strong>Service mesh:</strong> Istio federated (multi-cluster networking)</li>
+            <li><strong>GitOps with Kustomize:</strong> per-cluster overlays</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Common Patterns</div>
+          <ul>
+            <li>Each cluster has kubeconfig, managed separately</li>
+            <li>ArgoCD deployment template per cluster</li>
+            <li>Federated service mesh for cross-cluster networking</li>
+            <li>Central monitoring (Prometheus scrapes all clusters)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use ArgoCD or Rancher to manage multiple clusters. Git repo branches or directories per cluster. Service mesh for cross-cluster communication. Centralized monitoring."
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="q-multi-tenancy">
+    <span class="sec-num">Advanced</span>
+    <h3>Multi-tenancy & Tenant Isolation in Kubernetes</h3>
+    <p class="intro">Isolate tenants so they can't interfere with each other. Critical for SaaS.</p>
+    <details class="entry">
+      <summary><span class="state info">Q&A</span>Isolation strategies<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Isolation Levels</div>
+          <ul>
+            <li><strong>Namespace:</strong> separate namespaces per tenant (logical)</li>
+            <li><strong>RBAC:</strong> tenant ServiceAccount can only access their namespace</li>
+            <li><strong>Network Policies:</strong> tenants can't reach each other</li>
+            <li><strong>Resource Quotas:</strong> limit CPU/memory per tenant</li>
+            <li><strong>Dedicated nodes:</strong> tenant pods on isolated nodes (strongest)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Implementation</div>
+          <ul>
+            <li>1. Create namespace per tenant: tenant-a, tenant-b</li>
+            <li>2. Create ServiceAccount per tenant</li>
+            <li>3. RBAC: ServiceAccount can access only its namespace</li>
+            <li>4. NetworkPolicy: deny all, allow within namespace</li>
+            <li>5. ResourceQuota: limit 10 CPU, 20GB RAM per tenant</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Challenges</div>
+          <ul>
+            <li>Control plane shared (risk if compromised)</li>
+            <li>etcd shared (encrypt secrets, limit access)</li>
+            <li>Noisy neighbor: one tenant's load affects others (use quotas)</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Namespace per tenant, RBAC restricts access, NetworkPolicy prevents cross-tenant traffic, ResourceQuota limits resources. Combines logical and resource isolation for security."
+        </div>
+      </div>
+    </details>
+  </section>
+
+</main>
+<script>
+const pane1 = document.getElementById('pane1');
+const pane2 = document.getElementById('pane2');
+const search = document.getElementById('search');
+const menubtn = document.getElementById('menubtn');
+const scrim = document.getElementById('scrim');
+const spine = document.getElementById('spine');
+
+pane1.addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  pane1.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+  e.target.classList.add('on');
+  const subj = e.target.dataset.subj;
+  pane2.querySelectorAll('.grp').forEach(g => g.classList.toggle('hidden', g.dataset.subj !== subj));
+  pane2.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+});
+
+search.addEventListener('input', () => {
+  const term = search.value.toLowerCase();
+  const hasResults = term.length > 0;
+  document.body.classList.toggle('searching', hasResults);
+  pane2.querySelectorAll('a').forEach(a => {
+    const match = a.textContent.toLowerCase().includes(term);
+    a.classList.toggle('hidden', !match);
+  });
+});
+
+search.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { search.value = ''; search.dispatchEvent(new Event('input')); }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && e.target === document.body) { e.preventDefault(); search.focus(); }
+});
+
+menubtn.addEventListener('click', () => spine.classList.add('open'));
+scrim.addEventListener('click', () => spine.classList.remove('open'));
+document.addEventListener('click', e => {
+  if (!spine.contains(e.target) && e.target !== menubtn) spine.classList.remove('open');
+});
+</script>
+</body>
+</html>
+    <p class="intro">Persistent data needs protection. Multiple strategies depending on volume type and application.</p>
+    <details class="entry">
+      <summary><span class="state warn">Q&A</span>Data protection<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Backup Approaches</div>
+          <ul>
+            <li><strong>Cloud snapshots:</strong> Azure snapshots, AWS EBS snapshots (point-in-time)</li>
+            <li><strong>Velero:</strong> Backup entire K8s cluster including volumes</li>
+            <li><strong>App-level backups:</strong> Database dump (mysqldump, pg_dump)</li>
+            <li><strong>Persistent replication:</strong> Database replicas in another region</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Velero Backup</div>
+          <ul>
+            <li>Backs up K8s resources AND persistent volumes</li>
+            <li>Can backup entire namespace or cluster</li>
+            <li>Restores to same or different cluster</li>
+            <li>Scheduled backups or manual</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Restore Strategy</div>
+          <ul>
+            <li>RTO (Recovery Time Objective): How fast to restore?</li>
+            <li>RPO (Recovery Point Objective): How much data loss acceptable?</li>
+            <li>Backup location: different region (protection from zone failure)</li>
+            <li>Test restores regularly: backups are useless if they don't work</li>
+          </ul>
+        </div>
+        <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Use Velero for cluster backups including volumes. Or cloud snapshots for individual volumes. Define RTO and RPO. Store backups in different region. Test restores monthly. For databases, also use replication for HA."
+        </div>
+      </div>
+    </details>
+  </section>
