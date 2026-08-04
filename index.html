@@ -169,6 +169,7 @@ td.wrap:first-child{white-space:normal}
       <button type="button" data-subj="flows">Flow Diagrams</button>
       <button type="button" data-subj="platform">Platform Eng</button>
       <button type="button" data-subj="concepts">Important Concepts</button>
+      <button type="button" data-subj="behavioral">Behavioral</button>
     </nav>
     <nav class="pane2" id="pane2">
       <!-- DOCKER SECTIONS -->
@@ -255,7 +256,7 @@ td.wrap:first-child{white-space:normal}
       </div>
       <div class="grp" data-subj="k8s">
         <div class="grph"><span class="gsubj">Kubernetes</span>Monitoring</div>
-        <a href="#k-probes">Liveness/Readiness Probes</a>
+        <a href="#k-probes">Probes & Init Containers</a>
         <a href="#k-logging">Log Collection</a>
         <a href="#k-sli-slo-sla">SLI/SLO/SLA</a>
         <a href="#k-tracing">Distributed Tracing</a>
@@ -604,7 +605,10 @@ td.wrap:first-child{white-space:normal}
         <div class="grph"><span class="gsubj">Landing Zone</span>Fundamentals</div>
         <a href="#alz-real-world-intro">Real-World Implementation (Terraform)</a>
         <a href="#alz-what-is">What is Azure Landing Zone?</a>
+        <a href="#alz-caf">CAF: Cloud Adoption Framework</a>
         <a href="#alz-architecture">Three-Layer Architecture</a>
+        <a href="#alz-design-approach">How to Start Designing an ALZ</a>
+        <a href="#alz-lz-types">Landing Zone Types: Platform vs Application</a>
       </div>
       <div class="grp" data-subj="alz">
         <div class="grph"><span class="gsubj">Landing Zone</span>Account & Subscriptions</div>
@@ -707,6 +711,28 @@ td.wrap:first-child{white-space:normal}
         <a href="#migration-strategy">Migration: On-Prem → Azure</a>
         <a href="#aks-cluster-upgrade">Cluster Upgrade Steps</a>
         <a href="#deployment-strategies">Canary & Blue-Green Implementation</a>
+      </div>
+      <div class="grp" data-subj="concepts">
+        <div class="grph"><span class="gsubj">Important Concepts</span>Identity & Access</div>
+        <a href="#concept-identity-overview">The Full Picture: Entra ID, RBAC, MI, SP, OAuth2/OIDC</a>
+        <a href="#concept-identity-flows">CI/CD & AKS Access Flows</a>
+      </div>
+      <div class="grp" data-subj="concepts">
+        <div class="grph"><span class="gsubj">Important Concepts</span>CI/CD</div>
+        <a href="#concept-cicd-access">Pipeline Access & Credentials</a>
+      </div>
+
+      <!-- BEHAVIORAL SECTIONS -->
+      <div class="grp" data-subj="behavioral">
+        <div class="grph"><span class="gsubj">Behavioral</span>STAR Stories</div>
+        <a href="#behavioral-waf-story">Story 1: WAF — Protecting the API Layer</a>
+        <a href="#behavioral-waf-followup">Story 1: Follow-Up Q&A</a>
+        <a href="#behavioral-incident-story">Story 2: 🔴 Production Incident Under Pressure</a>
+        <a href="#behavioral-cost-story">Story 3: 💰 Cloud Cost Reduction</a>
+        <a href="#behavioral-security-story">Story 4: 🔒 Security / Compliance Enforcement</a>
+        <a href="#behavioral-automation-story">Story 5: ⚙️ Automation That Saved Time</a>
+        <a href="#behavioral-disagreement-story">Story 6: 🤝 Disagreement with Team/Manager</a>
+        <a href="#behavioral-reliability-story">Story 7: 🛠️ Infrastructure Reliability Improvement</a>
       </div>
     </nav>
   </div>
@@ -2039,7 +2065,7 @@ exec python app.py</code></pre>
             <li>RBAC to limit access</li>
           </ul>
         </div>
-        
+
       </div>
     </details>
   </section>
@@ -2621,40 +2647,54 @@ exec python app.py</code></pre>
 
   <section id="k-probes">
     <span class="sec-num">Kubernetes Monitoring</span>
-    <h3>Explain liveness probes, readiness probes, and startup probes</h3>
-    <p class="intro">Probes tell K8s when pods are healthy. Essential for automatic recovery and deployment safety.</p>
+    <h3>Explain liveness, readiness, startup probes, and Init Containers</h3>
+    <p class="intro">Readiness controls traffic, liveness/startup control restarts, and Init Containers control what runs before the app even starts. None of them replace the Pod.</p>
     <div class="note say">
           <span class="tag">Say this in interview</span>
-          "Readiness: ready for traffic? Liveness: alive? Startup: finished starting? Implement all three. Readiness prevents traffic to unavailable pods. Liveness restarts dead pods."
+          "Readiness: pod keeps running, just pulled from traffic until it passes again. Liveness: container restarted in the same Pod, same name and IP. Startup: delays the other two until a slow app finishes booting; on failure it restarts like liveness. Init Containers run before the app even starts — if one fails, the app never starts and the Pod shows Init:Error, it's stuck at init, not restarting the app. A Pod is only replaced — new name, new IP — when the ReplicaSet recreates it after deletion, eviction, or node failure. None of these four ever do that on their own."
         </div>
-    <details class="entry">
-      <summary><span class="state info">Q&A</span>Health checks<span class="chev">›</span></summary>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Health checks & Init Containers<span class="chev">›</span></summary>
       <div class="entry-body">
         <div class="step">
           <div class="step-label">Readiness Probe</div>
           <ul>
-            <li>Is pod ready to receive traffic?</li>
-            <li>Fails: pod removed from service (no traffic)</li>
-            <li>When to fail: app warming up, dependencies unavailable</li>
+            <li>Checks if the app is ready to receive traffic. If it fails, Kubernetes removes it from Service traffic but does not restart it.</li>
+            <li>Use for: warm-up, temporary overload</li>
           </ul>
         </div>
         <div class="step">
           <div class="step-label">Liveness Probe</div>
           <ul>
-            <li>Is pod still alive? Or is it hung?</li>
-            <li>Fails: pod is restarted</li>
-            <li>When to fail: deadlock, infinite loop</li>
+            <li>Checks if the app is alive. If it fails, Kubernetes restarts the container.</li>
+            <li>Use for: deadlocks, hangs</li>
           </ul>
         </div>
         <div class="step">
           <div class="step-label">Startup Probe</div>
           <ul>
-            <li>Has app finished starting up?</li>
-            <li>Liveness/readiness checked only after startup succeeds</li>
-            <li>When to use: slow startup time</li>
+            <li>Checks if the app has finished starting up. It gives slow apps more time before liveness/readiness start acting. If it fails repeatedly, Kubernetes restarts the container.</li>
+            <li>Use for: slow-starting apps</li>
           </ul>
         </div>
-        
+        <div class="step">
+          <div class="step-label">Init Containers</div>
+          <ul>
+            <li>Run before the app container, in order, under <code>initContainers:</code>. Each must exit 0 before the next starts; app starts only after all succeed.</li>
+            <li>Fail → Pod shows <code>Init:Error</code>/<code>Init:CrashLoopBackOff</code>, retried per restartPolicy. App container never starts — this is not the app "restarting".</li>
+            <li>Use for: migrations, waiting on dependencies, prepping config/volumes</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Restarted vs Replaced</div>
+          <table>
+            <tr><th>Event</th><th>What happens</th><th>Pod name/IP</th></tr>
+            <tr><td>Readiness fails</td><td>Removed from endpoints, keeps running</td><td>Unchanged</td></tr>
+            <tr><td>Liveness/startup fails</td><td>Container restarted in place</td><td>Unchanged</td></tr>
+            <tr><td>Init container fails</td><td>App container never starts, Pod stuck at Init</td><td>Unchanged</td></tr>
+            <tr><td>Pod replaced</td><td>Old Pod deleted, new one scheduled</td><td>New name/IP</td></tr>
+          </table>
+        </div>
       </div>
     </details>
   </section>
@@ -4268,7 +4308,7 @@ resource "azurerm_storage_account" "my_storage" {
         </div>
         <div class="step">
           <div class="step-label">How to Call Child Module</div>
-          <pre><code">module "vnet" {
+          <pre><code>module "vnet" {
   source = "./modules/vnet"
   rg_name  = azurerm_resource_group.rg.name
   location = azurerm_resource_group.rg.location
@@ -4596,7 +4636,7 @@ terraform {
         </div>
         <div class="step">
           <div class="step-label">.gitignore Example</div>
-          <pre><code"># Local .terraform directories
+          <pre><code># Local .terraform directories
 **/.terraform/*
 
 # .tfstate files
@@ -5541,7 +5581,7 @@ terraform plan  # Should show no changes if import successful</code></pre>
         </div>
         <div class="step">
           <div class="step-label">Solution: terraform state mv</div>
-          <pre><code"># Before: resource "azurerm_linux_virtual_machine" "web"
+          <pre><code># Before: resource "azurerm_linux_virtual_machine" "web"
 terraform state mv azurerm_linux_virtual_machine.web azurerm_linux_virtual_machine.frontend
 
 # Update code:
@@ -12912,7 +12952,33 @@ Backup: daily snapshots to Azure Blob Storage</pre>
             <li><strong>Operations:</strong> Monitoring, alerting, disaster recovery all pre-configured</li>
           </ul>
         </div>
-        
+
+      </div>
+    </details>
+  </section>
+
+  <section id="alz-caf">
+    <span class="sec-num">Fundamentals</span>
+    <h3>CAF: Cloud Adoption Framework</h3>
+    <p class="intro">CAF is the framework Landing Zones come from — a quick note on where the term fits.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "CAF (Cloud Adoption Framework) is Microsoft's end-to-end guidance for adopting Azure — it covers strategy, planning, readiness, governance, and management. Landing Zones live in the 'Ready' phase: they're the actual technical environment CAF tells you to build before you migrate or deploy any workload. When people say 'landing zone,' they mean the CAF-compliant foundation, not just a VNet."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Where Landing Zones fit in CAF<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">CAF's Phases</div>
+          <ul>
+            <li><strong>Strategy:</strong> Why move to the cloud — business justification</li>
+            <li><strong>Plan:</strong> What to move, timeline, skills readiness</li>
+            <li><strong>Ready:</strong> Build the landing zone — this is where Landing Zones live</li>
+            <li><strong>Adopt:</strong> Migrate or build new workloads onto the landing zone</li>
+            <li><strong>Govern:</strong> Ongoing policy, cost, and compliance management</li>
+            <li><strong>Manage:</strong> Day-2 operations — monitoring, backup, support</li>
+          </ul>
+        </div>
       </div>
     </details>
   </section>
@@ -12957,7 +13023,7 @@ Backup: daily snapshots to Azure Blob Storage</pre>
    git push origin feat/alz-multi-region-networking
 
 4. Create Pull Request
-   └─ Description: What changed, why, which subscriptions affected
+   └─ Description: What changed, why, which subscriptions affected</pre>
         </div>
         <div class="step">
           <div class="step-label">CI Pipeline: Validation & Security Scanning</div>
@@ -12997,7 +13063,7 @@ Result: PR shows:
   ✓ Validation: OK
   ✓ Linting: OK
   ✓ Security: OK (0 violations)
-  ✓ Plan: 3 resources added, 1 modified, 0 destroyed
+  ✓ Plan: 3 resources added, 1 modified, 0 destroyed</pre>
         </div>
         <div class="step">
           <div class="step-label">Code Review & Approval Process</div>
@@ -13022,7 +13088,7 @@ Approval Checklist:
   ☑ Plan reviewed and understood
   ☑ Tests passed (if applicable)
 
-Result: All checks pass → Ready to merge
+Result: All checks pass → Ready to merge</pre>
         </div>
         <div class="step">
           <div class="step-label">Merge & Trigger CD Pipeline</div>
@@ -13058,7 +13124,7 @@ Result: All checks pass → Ready to merge
    ├─ Send notification: "Deployment successful"
    └─ Update documentation
 
-Result: Landing zone live in production
+Result: Landing zone live in production</pre>
         </div>
         <div class="step">
           <div class="step-label">Terraform State Management (Critical)</div>
@@ -13120,6 +13186,19 @@ Result: Landing zone live in production
       <summary><span class="state info">Q&A</span>Architecture layers<span class="chev">›</span></summary>
       <div class="entry-body">
         <div class="step">
+          <div class="step-label">Three-Layer Architecture at a Glance</div>
+          <pre>Management (Governance Layer)
+├─ Policies, RBAC, Audit — enforced on everything below
+│
+Platform (Central Layer)
+├─ Hub VNet, Firewall, Identity, Shared Services
+│
+└─ Landing Zones (Workload Layer)
+   ├─ Landing Zone A — Spoke VNet, Team A subscription
+   ├─ Landing Zone B — Spoke VNet, Team B subscription
+   └─ Landing Zone C — Spoke VNet, Team C subscription</pre>
+        </div>
+        <div class="step">
           <div class="step-label">Layer 1: Platform (Central, Shared)</div>
           <ul>
             <li><strong>Hub VNet:</strong> Central network, houses firewall, VPN gateway, load balancer</li>
@@ -13160,7 +13239,92 @@ Result: Landing zone live in production
             <li>6. Firewall routes traffic: VM → Hub Firewall → on-premises or internet</li>
           </ul>
         </div>
-        
+
+      </div>
+    </details>
+  </section>
+
+  <section id="alz-design-approach">
+    <span class="sec-num">Fundamentals</span>
+    <h3>How Do You Start Designing an Azure Landing Zone?</h3>
+    <p class="intro">A step-by-step approach to designing an ALZ from scratch, mapped to Microsoft's 8 official design areas.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I start with requirements, not architecture — compliance needs, criticality, RTO/RPO, budget. Then identity, because it's the primary security boundary everything else depends on — you can't design RBAC or subscriptions without it. From there: subscription/management group hierarchy, network topology, governance, monitoring. Everything gets built as Terraform modules, piloted on one low-risk workload first, then rolled out."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Design areas & design order<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The 8 Design Areas (Microsoft CAF)</div>
+          <p>They split into two groups: Environment areas (what you build) and Compliance areas (how you keep it safe and consistent).</p>
+          <pre>ENVIRONMENT (what you build)              COMPLIANCE (how you keep it safe)
+────────────────────────────             ──────────────────────────────
+Billing & Entra ID Tenant                 Security
+Identity & Access Management              Management
+Resource Organization                     Governance
+Network Topology & Connectivity           Platform Automation & DevOps
+
+4 Environment areas + 4 Compliance areas = 8 design areas total</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Practical Design Order</div>
+          <ul>
+            <li>1. Gather requirements — compliance, criticality, RTO/RPO, budget, expected number of workloads/teams</li>
+            <li>2. Identity foundation — Entra ID tenant, hybrid identity sync if needed, break-glass accounts, PIM. Everything else depends on this being decided first.</li>
+            <li>3. Subscription & management group hierarchy</li>
+            <li>4. Network topology — hub-spoke, IP ranges, connectivity to on-prem</li>
+            <li>5. Governance — Azure Policies, RBAC roles, naming/tagging standards</li>
+            <li>6. Monitoring & logging — central Log Analytics workspace, alerting</li>
+            <li>7. Build it as Infrastructure as Code — reusable Terraform modules, not manual clicks</li>
+            <li>8. Pilot on one workload — validate the pattern works, then roll out to remaining teams</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Interview One-Liner</div>
+          <p>"If asked what to design first — identity, because it's the primary security boundary everything else depends on."</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="alz-lz-types">
+    <span class="sec-num">Fundamentals</span>
+    <h3>Landing Zone Types: Platform vs Application, Corp vs Online</h3>
+    <p class="intro">Microsoft's Cloud Adoption Framework splits landing zones into two categories, and application landing zones further split into two archetypes — these are the exact terms interviewers expect.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "CAF splits landing zones into Platform landing zones — Identity, Management, and Connectivity subscriptions, owned centrally — and Application landing zones, where workloads actually run. Application landing zones come in two flavors: Corp, which connects to the hub and on-prem network with stricter policies, used for internal/regulated apps; and Online, which is internet-facing, has no direct on-prem connectivity, and is used for public-facing apps like websites or APIs. Choosing Corp vs Online per workload is one of the first decisions in the design process."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Landing zone categories<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Platform Landing Zones (Central, Shared)</div>
+          <ul>
+            <li><strong>Identity subscription:</strong> Domain controllers, identity services (if hybrid)</li>
+            <li><strong>Management subscription:</strong> Central logging, monitoring, automation</li>
+            <li><strong>Connectivity subscription:</strong> Hub VNet, ExpressRoute/VPN gateways, firewall</li>
+            <li>Owned by the platform team, shared across all workloads</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Application Landing Zones (Workloads)</div>
+          <ul>
+            <li>Where actual applications and workloads are deployed</li>
+            <li>Owned by workload teams, but constrained by platform policies</li>
+            <li>Split into two archetypes: Corp and Online</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Corp vs Online</div>
+          <table>
+            <tr><th>Aspect</th><th>Corp</th><th>Online</th></tr>
+            <tr><td>Connectivity</td><td>Connected to hub & on-prem network</td><td>Internet-facing, no direct on-prem link</td></tr>
+            <tr><td>Network policy</td><td>Stricter — routed through hub firewall</td><td>Looser — public-facing by design</td></tr>
+            <tr><td>Typical use</td><td>Internal apps, regulated workloads</td><td>Public websites, APIs, customer-facing apps</td></tr>
+          </table>
+        </div>
       </div>
     </details>
   </section>
@@ -14123,7 +14287,7 @@ SecurityEvent
 Result:
 Computer      | Account        | IPAddress       | AttemptsCount
 laptop-prod-1 | user@company   | 192.168.1.50   | 45
-vm-app-02     | admin          | 10.1.2.100     | 3
+vm-app-02     | admin          | 10.1.2.100     | 3</pre>
         </div>
         <div class="step">
           <div class="step-label">Best Practices</div>
@@ -14458,7 +14622,7 @@ Network:
 Redundancy: Single VM (no HA)
 Failover: None (acceptable for non-critical)
 Cost: Low
-Suitable for: Startup, MVP, non-critical apps
+Suitable for: Startup, MVP, non-critical apps</pre>
         </div>
         <div class="step">
           <div class="step-label">Pattern 2: Mission-Critical Multi-Region HA</div>
@@ -14474,7 +14638,7 @@ High Availability:
   ├─ Traffic Manager (failover)
   └─ RTO/RPO < 5 min
 Cost: High (multi-region duplication)
-Suitable for: Enterprise, mission-critical, SLA 99.99%
+Suitable for: Enterprise, mission-critical, SLA 99.99%</pre>
         </div>
         <div class="step">
           <div class="step-label">Pattern 3: Regulated Workload (Banking/Healthcare)</div>
@@ -14491,14 +14655,14 @@ Security:
   ├─ Advanced threat protection: enabled
   └─ Penetration testing: approved by security
 Cost: Very high (enhanced security)
-Suitable for: Banking, healthcare, compliance-heavy industries
+Suitable for: Banking, healthcare, compliance-heavy industries</pre>
         </div>
         <div class="step">
           <div class="step-label">Pattern Selection Flowchart</div>
           <pre>Workload requirements?
 ├─ Simple, non-critical? → Pattern 1 (single-region, cheap)
 ├─ Critical, 99.99% SLA? → Pattern 2 (multi-region HA)
-└─ Regulated (HIPAA/PCI)? → Pattern 3 (isolated, encryption-heavy)
+└─ Regulated (HIPAA/PCI)? → Pattern 3 (isolated, encryption-heavy)</pre>
         </div>
         
       </div>
@@ -14554,7 +14718,7 @@ Failover Triggers
 ├─ Primary region unavailable (health check fails)
 ├─ Database sync replication lag > threshold
 ├─ Automated failover via Traffic Manager/Front Door
-└─ Manual verification before bringing secondary live
+└─ Manual verification before bringing secondary live</pre>
         </div>
         
       </div>
@@ -17967,7 +18131,7 @@ No manual:
 └─ Git = source of truth
 
 RESULT: Code in git → instantly live in production
-          </p>
+          </pre>
         </div>
 
         <div class="step">
@@ -18158,7 +18322,727 @@ CANARY: E-Commerce New Payment System (CRITICAL)
         
       </div>
     </details>
-  </details>
+  </section>
+
+  <section id="concept-identity-overview">
+    <span class="sec-num">Important Concepts</span>
+    <h3>Identity & Access: The Full Picture</h3>
+    <p class="intro">Entra ID, RBAC, Service Principal, Managed Identity, OAuth 2.0, OIDC, Workload Identity, Kubernetes Service Account — how they all connect.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Entra ID is the identity source for everything — users, groups, service principals, managed identities, and federated identities all get an Entra ID identity, then RBAC assigns them a role at a scope. OAuth 2.0 is the protocol that issues the access token; OIDC is a thin layer on top that adds 'who is this,' which is what lets external systems federate without storing secrets. Managed Identity is the Azure-native version of a Service Principal — same purpose, but Azure manages the credential for you."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>How identity and access fit together<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Big Picture</div>
+          <pre>Entra ID (the Tenant) — source of truth for every identity
+   ├─ Human User
+   ├─ Group
+   ├─ Service Principal (SP)        — has stored credentials
+   ├─ Managed Identity (MI)         — Azure-managed, no stored credentials
+   └─ Federated Identity (OIDC)     — GitHub Actions, AKS Workload Identity
+
+        │  every identity above gets assigned a role via RBAC
+        ▼
+   RBAC Role Assignment  (role + scope: Mgmt Group / Subscription / RG / Resource)
+
+        │
+        ▼
+   Access granted to the Azure resource (Storage, Key Vault, ACR, AKS API...)
+
+Underneath it all: OAuth 2.0 issues the access token.
+OIDC is a thin layer on top of OAuth 2.0 that adds "who is this" (an ID token) —
+that's the piece that lets external systems federate without storing secrets.</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Core Building Blocks</div>
+          <table>
+            <tr><th>Concept</th><th>What It Is</th><th>Solves</th></tr>
+            <tr><td>Entra ID</td><td>Azure's identity provider (tenant/directory) holding users, groups, apps</td><td>"Who are you?" — source of truth for every identity</td></tr>
+            <tr><td>RBAC</td><td>Authorization model — assigns roles to an identity on a scope</td><td>"What are you allowed to do?"</td></tr>
+            <tr><td>Service Principal (SP)</td><td>An app's identity in Entra ID, with credentials you create and manage</td><td>Lets an app/pipeline authenticate when it can't use Managed Identity (e.g. runs outside Azure)</td></tr>
+            <tr><td>Managed Identity (MI)</td><td>An Entra ID identity Azure auto-creates and rotates, tied to an Azure resource</td><td>Same job as SP, but no credentials to store or rotate yourself</td></tr>
+            <tr><td>OAuth 2.0</td><td>The protocol that issues access tokens for "can this app call this API"</td><td>The mechanism access tokens travel through</td></tr>
+            <tr><td>OIDC</td><td>A thin identity layer on top of OAuth 2.0 that adds "who is this" (ID token)</td><td>Lets external systems federate identity without stored secrets</td></tr>
+            <tr><td>Workload Identity</td><td>AKS feature: federates a Kubernetes Service Account with an Entra ID Managed Identity via OIDC</td><td>Lets a pod call Azure APIs without any stored secret</td></tr>
+            <tr><td>Kubernetes Service Account</td><td>The pod's identity within the cluster (not Azure)</td><td>"What can this pod do to the K8s API" — a separate system from Azure RBAC</td></tr>
+          </table>
+        </div>
+        <div class="step">
+          <div class="step-label">Commonly Confused Pairs</div>
+          <table>
+            <tr><th>Pair</th><th>Key Difference</th></tr>
+            <tr><td>Managed Identity vs Service Principal</td><td>MI: Azure creates & rotates the credential for you, tied to a specific resource. SP: you create it and manage its secret/cert yourself — needed when the caller isn't an Azure resource (e.g. GitHub Actions, Jenkins)</td></tr>
+            <tr><td>OAuth 2.0 vs OIDC</td><td>OAuth 2.0 only answers "can this app do this action" (authorization). OIDC adds "who is this" (authentication) as a layer on top — OIDC doesn't exist without OAuth 2.0 underneath it</td></tr>
+            <tr><td>Kubernetes Service Account vs Workload Identity</td><td>K8s Service Account controls what a pod can do to the Kubernetes API only. Workload Identity federates that same Service Account with an Entra ID Managed Identity, so the pod can also call Azure APIs — no secret stored either way</td></tr>
+          </table>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="concept-identity-flows">
+    <span class="sec-num">Important Concepts</span>
+    <h3>How CI/CD and AKS Actually Get Access</h3>
+    <p class="intro">Three concrete flows: a pipeline reaching Azure, a pod reaching Azure, and a pod reaching the Kubernetes API — none of them use a stored secret.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "A CI/CD pipeline like GitHub Actions gets an OIDC token from its own provider, presents it to Entra ID which trusts that issuer via a federated credential, and gets back a short-lived Azure token — no stored secret. AKS pods do the same thing through Workload Identity: their Kubernetes Service Account token gets federated with a Managed Identity via AKS's own OIDC issuer. That's separate from Kubernetes RBAC, which controls what the Service Account can do inside the cluster itself, not in Azure — that's why ArgoCD doesn't need Azure credentials to manage the cluster it's running in."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>Access flows, step by step<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Flow 1: CI/CD Pipeline → Azure</div>
+          <pre>GitHub Actions workflow runs
+        │
+        ▼
+Requests an OIDC token from GitHub's own OIDC provider
+        │
+        ▼
+Presents that token to Entra ID, which trusts GitHub's OIDC issuer
+(federated credential configured on a Service Principal or Managed Identity)
+        │
+        ▼
+Entra ID validates it, issues a short-lived Azure access token (OAuth 2.0)
+        │
+        ▼
+Pipeline uses that token to call Azure (ACR push, AKS deploy, etc.)
+        │
+        ▼
+RBAC on the target resource checks: does this identity have the role for this scope?
+        │
+        ▼
+Allowed / Denied — no long-lived secret stored in GitHub at any point</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Flow 2: AKS Pod → Azure Resource (Workload Identity)</div>
+          <pre>Pod starts, uses a Kubernetes Service Account
+        │
+        ▼
+AKS's built-in OIDC issuer signs a token for that Service Account
+        │
+        ▼
+Entra ID trusts AKS's OIDC issuer (federated credential on a Managed Identity)
+        │
+        ▼
+Pod exchanges its K8s Service Account token for an Azure access token (OAuth 2.0)
+        │
+        ▼
+RBAC on the target Azure resource (Key Vault, Storage, etc.) checks the role
+        │
+        ▼
+Allowed / Denied — again, no secret stored in the cluster</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Flow 3: AKS Pod → Kubernetes API (contrast)</div>
+          <pre>Same pod's Service Account is also used for a completely separate purpose:
+talking to the Kubernetes API Server itself (kubectl-style actions)
+        │
+        ▼
+Kubernetes RBAC (Roles/ClusterRoles + RoleBindings) — NOT Azure RBAC —
+checks what this Service Account can do inside the cluster
+        │
+        ▼
+Allowed / Denied
+
+This is why ArgoCD, running inside AKS, doesn't need any Azure credentials
+to manage cluster resources — its Service Account + Kubernetes RBAC is enough.</pre>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="concept-cicd-access">
+    <span class="sec-num">Important Concepts</span>
+    <h3>Pipeline Access & Credentials</h3>
+    <p class="intro">How CI/CD pipelines authenticate to Azure, AKS, and other services without hardcoding passwords.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "We never use personal accounts for CI/CD. We create a dedicated Service Principal or Kubernetes Service Account, scoped with least-privilege RBAC, and store credentials in GitHub Secrets, Jenkins Credentials, or Azure DevOps Service Connections. We prefer Managed Identity when the pipeline runs inside Azure since it needs no stored secrets; for external runners like GitHub Actions or Jenkins we use a Service Principal instead. ArgoCD is a special case — since it runs inside AKS, it talks to the API Server directly via its own Service Account and RBAC, no external credentials needed."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q&A</span>How does the pipeline access everything?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Answer</div>
+          <p>We never use a personal user account for CI/CD. We create a dedicated Service Principal in Azure or a Service Account in Kubernetes and grant it only the required permissions using RBAC. The credentials are stored securely in GitHub Secrets, Jenkins Credentials, or Azure DevOps Service Connections. During pipeline execution, the pipeline uses these credentials to authenticate and access Azure, AKS, Azure Container Registry, or other services.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Note: Managed Identity vs Service Principal</div>
+          <p>We prefer Managed Identity (MI) whenever possible because it is more secure and doesn't require storing secrets. However, if the CI/CD pipeline is running outside Azure, such as GitHub Actions or Jenkins, we usually use a Service Principal (SP) because those tools need an identity to authenticate with Azure.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry">
+      <summary><span class="state warn">Q&A</span>Where are the passwords stored?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Answer</div>
+          <p>We never hardcode passwords in the pipeline. We store them securely.</p>
+          <ul>
+            <li><strong>GitHub Actions →</strong> GitHub Secrets</li>
+            <li><strong>Jenkins →</strong> Jenkins Credentials</li>
+            <li><strong>Azure DevOps →</strong> Library Secrets or Azure Key Vault</li>
+          </ul>
+          <p>The pipeline reads these secrets during execution.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry">
+      <summary><span class="state ok">Q&A</span>Does ArgoCD need access to AKS?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Answer</div>
+          <p>Yes, but here's the important point: since ArgoCD is already running inside the AKS cluster, it can communicate directly with the Kubernetes API Server using its Service Account and RBAC permissions.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ BEHAVIORAL ═══════════ -->
+  <div class="band"><span class="eyebrow">Behavioral 01</span><h2>STAR Stories</h2></div>
+
+  <section id="behavioral-waf-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 1: WAF — Protecting the API Layer</h3>
+    <p class="intro">A real incident: unvalidated inputs and aggressive scraping were crashing backend services. This is the full STAR story for the WAF rollout that fixed it.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Our API gateway was getting hit with malformed requests and a competitor's scraper, and the ops team was manually blocking IPs reactively. I deployed Application Gateway WAF in Detection mode first, streamed logs to Log Analytics, used KQL to find attack patterns and false positives, tuned exclusion rules, then switched to Prevention mode. Result: 87% of malicious traffic blocked, response time during attacks went from 2-3 seconds to under 500ms, and false positives stayed under 0.5%."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state warn">Story</span>Situation<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What Was Happening</div>
+          <p>Our API gateway was receiving a spike in 4xx and 5xx errors. The development team thought it was a backend bug, but after investigation, we found that unvalidated user inputs were causing backend crashes. Malformed JSON payloads and oversized requests were hitting our microservices directly, causing resource exhaustion and timeouts.</p>
+          <p>We also discovered that a competitor's crawler was scraping our pricing API aggressively — thousands of requests/sec from the same IP. We had no visibility into what traffic patterns were normal vs. anomalous, and the ops team was manually blocking IPs reactively instead of proactively.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Story</span>Task<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What I Was Responsible For</div>
+          <ul>
+            <li>Protect the API layer and give the team real-time visibility into traffic patterns, to distinguish legitimate API calls from noise and attacks</li>
+            <li>Protect the application layer without breaking legitimate traffic or adding latency</li>
+            <li>Provide the security and ops teams with measurable data on attacks</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>Action<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Deploy WAF in Detection Mode</div>
+          <ul>
+            <li>Placed Azure Application Gateway with WAF in front of the app</li>
+            <li>Configured OWASP Core Rule Set (CRS 3.1) to detect SQL injection, XSS, DDoS patterns</li>
+            <li>Set to Detection mode (log, don't block) for a 2-week observation period</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: Stream Logs to Log Analytics</div>
+          <ul>
+            <li>Enabled diagnostics on Application Gateway → sent to a central Log Analytics Workspace</li>
+            <li>All WAF logs now flow through Azure Monitor into a single pane of glass</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 3: Analyze with KQL</div>
+          <p>Wrote KQL queries to answer key questions:</p>
+          <pre><code>-- Top attack sources
+AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| summarize Count = count() by clientIP_s
+| top 10 by Count desc
+
+-- Most triggered OWASP rules
+AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| summarize Count = count() by ruleId_s, message_s
+| top 10 by Count desc
+
+-- Blocked vs detected over time
+AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| summarize Blocked = countif(action_s == "Blocked"),
+            Detected = countif(action_s == "Detected") by bin(TimeGenerated, 1h)
+| render timechart</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 4: Identify False Positives</div>
+          <ul>
+            <li>Found that legitimate API calls to /api/payment were triggering rule 942440 (SQL injection detection)</li>
+            <li>These were false positives — the payload looked like SQL but wasn't</li>
+            <li>Created a WAF exclusion rule for that specific path and rule ID</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 5: Create Alerts & Dashboards</div>
+          <ul>
+            <li>Set up an Azure Monitor alert: if blocked requests exceed 500/min, page the on-call engineer</li>
+            <li>Built a Grafana dashboard showing real-time attack trends, top sources, and rule triggers</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 6: Move to Prevention Mode</div>
+          <ul>
+            <li>After 2 weeks of tuning, switched WAF from Detection to Prevention mode</li>
+            <li>Monitored closely for the next week to catch any new false positives</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Story</span>Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Before vs After</div>
+          <table>
+            <tr><th>Metric</th><th>Before</th><th>After</th></tr>
+            <tr><td>Malicious traffic reaching backend</td><td>100%</td><td>13% (87% blocked)</td></tr>
+            <tr><td>App response time during attacks</td><td>2-3 sec (degraded)</td><td>&lt;500ms (stable)</td></tr>
+            <tr><td>False positives (legitimate blocked)</td><td>0% (not monitored)</td><td>&lt;0.5% (tuned)</td></tr>
+            <tr><td>Security visibility</td><td>None</td><td>Real-time dashboard + alerts</td></tr>
+          </table>
+        </div>
+        <div class="step">
+          <div class="step-label">Business Impact</div>
+          <ul>
+            <li>Reduced backend load → lower compute costs</li>
+            <li>Better user experience — no slowness from bot attacks</li>
+            <li>Security team has an audit trail and can respond to threats in real-time</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-waf-followup">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 1: Follow-Up Q&A</h3>
+    <p class="intro">Likely interviewer follow-up questions for the WAF story, with full answers.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Interviewers dig into WAF stories because it's easy to fake. Know the specific rule IDs, the KQL you'd actually write, the difference between Detection and Prevention mode, and how WAF relates to DDoS Protection Standard — those are the questions that separate someone who did this from someone who read about it."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Q1</span>Why start in Detection mode instead of Prevention?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>Detection mode lets you observe real traffic patterns without risk. Jumping straight to Prevention risks blocking legitimate users and causing a business incident. By logging first, analyzing with KQL, and tuning, you move to Prevention with confidence — it's the safe way.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q2</span>How did you identify false positives?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>Ran a KQL query to find requests that were matched but should have been allowed:</p>
+          <pre><code>AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| where action_s == "Detected" OR action_s == "Blocked"
+| where requestUri_s contains "/api/"
+| summarize Count = count() by requestUri_s, ruleId_s, action_s</code></pre>
+          <p>Then manually tested those paths — if they were legitimate business APIs, added a WAF exclusion for that rule + path combo.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q3</span>What's an example of a WAF rule you tuned?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>Rule 942440 (SQL injection). The /api/payment endpoint has a query parameter with SQL-like syntax for legitimate filtering (e.g. <code>query=amount &gt; 100</code>). The rule thought it was SQL injection. Created an exclusion:</p>
+          <pre>Exclusion Rule:
+  Match Variable: RequestArguments
+  Selector: query
+  Operator: Equals
+  Rule ID: 942440
+  Path: /api/payment/*</pre>
+          <p>Now that rule doesn't fire on /api/payment requests, but still fires on other paths.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q4</span>How did you integrate with Azure Monitor and create alerts?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Setup</div>
+          <ul>
+            <li>Enabled diagnostics on the Application Gateway → Diagnostics settings → selected the Log Analytics Workspace</li>
+            <li>Checked "Application Gateway Access Log" and "Application Gateway Firewall Log"</li>
+            <li>Created an alert rule in Azure Monitor on the Log Analytics data</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Alert Query</div>
+          <pre><code>AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| where action_s == "Blocked"
+| summarize BlockedCount = count() by bin(TimeGenerated, 1m)
+| where BlockedCount &gt; 500</code></pre>
+          <p>Alert triggers if blocked requests exceed 500/min. On-call engineer gets paged.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q5</span>What KQL queries did you use day-to-day?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Real-Time Attack Dashboard</div>
+          <pre><code>AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| summarize Blocked = countif(action_s == "Blocked"),
+            Detected = countif(action_s == "Detected") by bin(TimeGenerated, 5m)
+| render timechart</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Top Attack Sources (IPs)</div>
+          <pre><code>AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| where action_s == "Blocked"
+| summarize Count = count() by clientIP_s
+| top 10 by Count desc</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Most Triggered Rules (prioritizes tuning)</div>
+          <pre><code>AzureDiagnostics
+| where Category == "ApplicationGatewayFirewallLog"
+| summarize Count = count() by ruleId_s, message_s, action_s
+| top 15 by Count desc</code></pre>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q6</span>What metrics did you monitor after going live in Prevention mode?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <ul>
+            <li><strong>Blocked request rate</strong> — should stay constant (attack baseline)</li>
+            <li><strong>Backend error rate (5xx)</strong> — watch for sudden spikes, a sign of over-blocking</li>
+            <li><strong>Request latency</strong> — WAF adds ~10-20ms, but shouldn't spike further</li>
+            <li><strong>False positive rate</strong> — track complaints from users</li>
+          </ul>
+          <p>If any metric went wrong, I'd immediately review the latest WAF rules triggered and add exclusions if needed.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q7</span>Did you document this for the team?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <ul>
+            <li><strong>Runbook:</strong> how to check WAF status, read logs, create new exclusions</li>
+            <li><strong>KQL query library:</strong> saved queries in Log Analytics for common scenarios</li>
+            <li><strong>On-call guide:</strong> what alerts mean, how to respond (e.g. block an IP range if DDoS detected)</li>
+          </ul>
+          <p>New team members could onboard in a day using these docs.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q8</span>What if you had false negatives — real attacks getting through?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <ul>
+            <li>Check the WAF log to see which rule should have caught it but didn't</li>
+            <li>Review that rule's configuration — the pattern may be too strict or too narrow</li>
+            <li>Test the fix with a non-production rule first, in Detection mode</li>
+            <li>Enable it in Prevention mode once it's verified to work</li>
+          </ul>
+          <p>Would also file a ticket with Microsoft if the OWASP CRS rule itself was too weak.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q9</span>How did you handle DDoS that bypassed WAF?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>WAF protects Layer 7 (application), not Layer 3-4 (network). For volumetric DDoS, also enabled Azure DDoS Protection Standard — two layers of defense:</p>
+          <ul>
+            <li><strong>DDoS Protection Standard:</strong> blocks network-level floods</li>
+            <li><strong>WAF:</strong> blocks application-level attacks (malformed requests, injection)</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Q10</span>What would you do differently next time?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>Set up Azure Sentinel integration from day one. Instead of just Log Analytics, correlate WAF logs with other security signals (failed logins, suspicious API patterns) to detect coordinated attacks faster. Also automate rule tuning using machine learning (Sentinel anomaly detection) rather than manual KQL queries.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-incident-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 2: 🔴 Production Incident Under Pressure</h3>
+    <p class="intro">An on-call incident: a payment API pod hitting OOMKilled at 2am, and the fix that both restored service and prevented a repeat.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Payment API on AKS started returning 503s at 2am from OOMKilled pods — memory limit was too low for a traffic spike. I checked Grafana and kubectl describe pod to confirm root cause, patched memory limits and raised the HPA minimum replicas, and pods recovered in 8 minutes. Afterward I added memory alerting in Prometheus so we'd catch it before it hits production next time, not after."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state fail">Story</span>Situation → Task → Action → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Situation</div>
+          <p>Our AKS-hosted payment API started returning 503 errors at 2am. Business impact was high — transactions were failing.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Task</div>
+          <p>I was on-call. Had to identify root cause and restore service fast.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Checked Grafana dashboards → saw pod OOMKilled events</li>
+            <li>Memory limit was too low for the traffic spike</li>
+            <li>Patched the deployment: increased memory limits, set HPA min replicas higher</li>
+            <li>Pods recovered in 8 minutes</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>Service restored. Added memory alerting in Prometheus so we catch it before it hits production next time.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>How did you find the cause?</strong> Grafana + kubectl describe pod</li>
+            <li><strong>What did you change?</strong> Memory limits + HPA</li>
+            <li><strong>What did you learn?</strong> Always set alerts before go-live, not after</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-cost-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 3: 💰 Cloud Cost Reduction</h3>
+    <p class="intro">A 30%-over-budget Azure bill and the audit that cut it by ~AED 18,000/month without touching performance.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Azure spend was 30% over budget. I used Azure Cost Analysis to find idle VMs and oversized App Service plans, rightsized 12 VMs from D4 to D2 based on actual utilization, moved dev/test to auto-shutdown schedules, and converted 3 stable workloads to 1-year Reserved Instances. Cut monthly spend by about AED 18,000 with no performance impact, and put a tagging policy in place so every resource has a cost center going forward."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state ok">Story</span>Situation → Task → Action → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Situation</div>
+          <p>Our Azure bill was 30% over budget. Management asked engineering to investigate.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Task</div>
+          <p>I was asked to audit and reduce cost without impacting performance.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Used Azure Cost Analysis → identified idle VMs and oversized App Service plans</li>
+            <li>Rightsized 12 VMs (Standard D4 → D2)</li>
+            <li>Moved dev/test workloads to auto-shutdown schedules</li>
+            <li>Converted 3 static workloads to Reserved Instances (1-year)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>Reduced monthly spend by ~AED 18,000. Created a tagging policy so every resource has a cost center tag for future accountability.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>How did you identify waste?</strong> Azure Cost Analysis + tags</li>
+            <li><strong>Did it affect performance?</strong> No — rightsizing was based on actual utilization metrics</li>
+            <li><strong>What did you put in place long-term?</strong> Tagging policy + monthly cost review</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-security-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 4: 🔒 Security / Compliance Enforcement</h3>
+    <p class="intro">A security audit found secrets sitting in pipeline variables and app config files — the Key Vault migration that fixed it across every team.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "A security audit found secrets stored in pipeline variables and app config files across several teams. I implemented Azure Key Vault as the single source for secrets, used the AKV CSI Driver so AKS workloads mount secrets as volumes instead of env vars, updated Azure DevOps pipelines to pull from Key Vault via service connection, and backed it with an Azure Policy that denies plain-text secrets in app settings — so it's enforced, not just requested. All secrets migrated in 2 weeks, zero secrets left in code or pipeline variables, and we passed the next audit clean."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>Situation → Task → Action → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Situation</div>
+          <p>Security audit found that several workload teams were storing secrets in pipeline variables and app config files.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Task</div>
+          <p>I had to enforce proper secret management across all teams without breaking their pipelines.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Proposed and implemented Azure Key Vault for all secrets</li>
+            <li>Used the AKV CSI Driver for AKS workloads (secrets mounted as volumes)</li>
+            <li>Updated Azure DevOps pipelines to pull secrets from AKV via Service Connection</li>
+            <li>Added an Azure Policy to deny storage of secrets in plain-text app settings</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>All secrets migrated in 2 weeks. Zero secrets in code or pipeline variables. Passed the next security audit clean.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>How did you get teams to adopt it?</strong> Showed them a working pipeline example — minimal change on their side</li>
+            <li><strong>What if a team resisted?</strong> Policy enforced it automatically — not optional</li>
+            <li><strong>What tool did you use in AKS?</strong> AKV CSI Driver</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-automation-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 5: ⚙️ Automation That Saved Time</h3>
+    <p class="intro">New projects were waiting 2-3 days for infra to be ready — the Terraform landing zone module that cut it to 20 minutes.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Every new project needed a landing zone — VNet, subnets, NSGs, RBAC, policies — and teams were waiting 2-3 days for it. I built a reusable Terraform module covering all of that, wired it into an Azure DevOps pipeline triggered by a per-project config file, so a workload team just fills in one YAML file and the pipeline does the rest. Provisioning time dropped from 3 days to 20 minutes, it's now reused across 6 projects, and there've been zero manual network config errors since."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>Situation → Task → Action → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Situation</div>
+          <p>Every new project needed a landing zone: VNet, subnets, NSGs, RBAC, policies — teams were waiting 2-3 days for infra to be ready.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Task</div>
+          <p>I had to reduce provisioning time and make it repeatable.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Built a Terraform module for the landing zone (VNet, subnets, NSGs, diagnostic settings, RBAC, tags)</li>
+            <li>Added it to an Azure DevOps pipeline — triggered by a config file per project</li>
+            <li>Workload teams fill in one YAML file, the pipeline does the rest</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>Provisioning time dropped from 3 days to 20 minutes. Reused across 6 projects. Zero manual errors in network config.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>How did you handle different environments?</strong> Terraform workspaces + variable files per environment</li>
+            <li><strong>What if the config file had wrong values?</strong> A terraform plan step in the pipeline shows the diff before apply</li>
+            <li><strong>Was it adopted by others?</strong> Yes — it became the standard template across the team</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-disagreement-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 6: 🤝 Disagreement with Team/Manager</h3>
+    <p class="intro">The team wanted full Contributor access to production for faster deployments — how I pushed back with a working alternative instead of just an objection.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "The team wanted to give developers full Contributor access to the production subscription for faster deployments. I disagreed — it violated least-privilege and widened the blast radius if any one dev account was compromised. Instead of just objecting, I proposed the CI/CD pipeline handle all production deployments via Managed Identity, with developers getting Reader access only, and demoed it working in staging. The manager agreed, we rolled it out, and the dev team didn't actually slow down — the pipeline deploys faster than a manual process anyway."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state warn">Story</span>Situation → Task → Action → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Situation</div>
+          <p>Team wanted to give developers full Contributor access to the production subscription for faster deployments.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Task</div>
+          <p>I disagreed — this violated least-privilege and was a security risk.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Raised the concern in the team meeting calmly — explained the blast radius if a dev account is compromised</li>
+            <li>Proposed an alternative: CI/CD pipeline with Managed Identity handles all production deployments; developers get Reader access only</li>
+            <li>Showed a working example in staging</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>Manager agreed. We implemented pipeline-only deployments to production. Dev team still moves fast, but no human has write access to prod.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>How did you handle pushback?</strong> Came with a solution, not just a complaint</li>
+            <li><strong>What if the manager still insisted?</strong> I'd document my concern formally and escalate to the security team</li>
+            <li><strong>What was the outcome for devs?</strong> No slowdown — the pipeline deploys faster than manual anyway</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-reliability-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 7: 🛠️ Infrastructure Reliability Improvement</h3>
+    <p class="intro">A single VM with manual SSH deployments and 25-30 minutes of downtime per release — the migration to zero-downtime blue-green deployments.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "The app ran on a single Azure VM with manual SSH deployments — no redundancy, no CI/CD, no observability, and 25-30 minutes of downtime per release. I built Terraform modules for a 2-VM setup behind a Load Balancer with an Availability Set, added an Azure DevOps CI/CD pipeline doing blue-green deployment, and enabled Azure Monitor with KQL alerts on CPU/memory. Ran a parallel migration for 2 weeks, shifting traffic 20% → 50% → 100% before decommissioning the old VM. Deployment downtime dropped to zero, VM failures now auto-recover in about 30 seconds, and release frequency went from weekly to daily."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state ok">Story</span>Situation → Task → Action → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Situation</div>
+          <p>Our application ran on a single Azure VM with manual SSH deployments. Every release meant 25-30 minutes of downtime. No redundancy, no CI/CD, no observability.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Task</div>
+          <p>Modernize infrastructure to eliminate manual deployments and improve availability without downtime.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Built Terraform modules for a 2-VM setup with Load Balancer and Availability Set</li>
+            <li>Created an Azure DevOps CI/CD pipeline with blue-green deployment (deploy to one VM, health check, shift traffic, repeat)</li>
+            <li>Enabled Azure Monitor + Log Analytics with KQL alerts for CPU/memory</li>
+            <li>Ran a parallel migration for 2 weeks — gradually shifted traffic (20% → 50% → 100%) before decommissioning the old VM</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>Deployment downtime dropped from 25 min to zero. VM failure now auto-recovers via Load Balancer (~30 sec). Release frequency increased from weekly to daily. Infrastructure now version-controlled in Terraform.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>Most challenging part?</strong> Running the parallel migration without impacting users — had to monitor closely at each traffic shift step</li>
+            <li><strong>Why not AKS?</strong> The app had OS dependencies and the team had no container knowledge — fixed the burning fire first, planned containerization as phase 2</li>
+            <li><strong>Rollback plan?</strong> Load Balancer rules let us shift traffic back instantly; Terraform state meant a clean recreate if needed</li>
+          </ul>
+        </div>
+      </div>
+    </details>
   </section>
 
 </main>
