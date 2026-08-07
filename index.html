@@ -169,6 +169,7 @@ td.wrap:first-child{white-space:normal}
       <button type="button" data-subj="flows">Flow Diagrams</button>
       <button type="button" data-subj="platform">Platform Eng</button>
       <button type="button" data-subj="concepts">Important Concepts</button>
+      <button type="button" data-subj="dns">DNS</button>
       <button type="button" data-subj="behavioral">Behavioral</button>
     </nav>
     <nav class="pane2" id="pane2">
@@ -722,17 +723,55 @@ td.wrap:first-child{white-space:normal}
         <a href="#concept-cicd-access">Pipeline Access & Credentials</a>
       </div>
 
+      <!-- DNS SECTIONS -->
+      <div class="grp" data-subj="dns">
+        <div class="grph"><span class="gsubj">DNS</span>What Happens When You Type a URL</div>
+        <a href="#dns-big-picture">The Big Picture: All Steps Together</a>
+        <a href="#dns-resolution">Phase 1: DNS Resolution</a>
+        <a href="#dns-tcp">Phase 2: TCP — Opening the Connection</a>
+        <a href="#dns-tls">Phase 3: TLS Handshake</a>
+        <a href="#dns-http">Phase 4: HTTP Request & Response</a>
+        <a href="#dns-end-to-end">Complete End-to-End Journey</a>
+      </div>
+      <div class="grp" data-subj="dns">
+        <div class="grph"><span class="gsubj">DNS</span>Fundamentals & Records</div>
+        <a href="#dns-basics">What is DNS? The Absolute Basics</a>
+        <a href="#dns-record-types">DNS Record Types</a>
+        <a href="#dns-public-private">Public DNS vs Private DNS</a>
+      </div>
+      <div class="grp" data-subj="dns">
+        <div class="grph"><span class="gsubj">DNS</span>Azure DNS</div>
+        <a href="#dns-azure-private-zones">Azure Private DNS Zones</a>
+        <a href="#dns-custom-servers">Custom DNS Servers (VNet & AKS)</a>
+        <a href="#dns-split-horizon">Split-Horizon DNS</a>
+      </div>
+      <div class="grp" data-subj="dns">
+        <div class="grph"><span class="gsubj">DNS</span>Operations</div>
+        <a href="#dns-ttl">TTL (Time To Live)</a>
+        <a href="#dns-reverse">Reverse DNS (PTR Records)</a>
+        <a href="#dns-conditional-forwarding">Conditional Forwarding</a>
+        <a href="#dns-cheat-sheet">Interview Cheat Sheet</a>
+      </div>
+
       <!-- BEHAVIORAL SECTIONS -->
       <div class="grp" data-subj="behavioral">
         <div class="grph"><span class="gsubj">Behavioral</span>STAR Stories</div>
         <a href="#behavioral-waf-story">Story 1: WAF — Protecting the API Layer</a>
         <a href="#behavioral-waf-followup">Story 1: Follow-Up Q&A</a>
+        <a href="#behavioral-platform-story">Story 1.1: 🏆 Most Impactful Contribution — The Azure Platform</a>
+        <a href="#behavioral-failure-story">Story 1.2: ⚠️ Failure / Risk That Didn't Go as Planned</a>
         <a href="#behavioral-incident-story">Story 2: 🔴 Production Incident Under Pressure</a>
+        <a href="#behavioral-aks-502-story">Story 2.1: 🚨 Hardest Incident — The AKS 502 Outage</a>
         <a href="#behavioral-cost-story">Story 3: 💰 Cloud Cost Reduction</a>
         <a href="#behavioral-security-story">Story 4: 🔒 Security / Compliance Enforcement</a>
         <a href="#behavioral-automation-story">Story 5: ⚙️ Automation That Saved Time</a>
+        <a href="#behavioral-priorities-story">Story 5.1: ⚖️ Conflicting Priorities — Speed vs Security vs Cost</a>
         <a href="#behavioral-disagreement-story">Story 6: 🤝 Disagreement with Team/Manager</a>
+        <a href="#behavioral-mi-vs-sp-story">Story 6.1: 🔐 Disagreement with Security Team — MI vs SP</a>
+        <a href="#behavioral-mentoring-story">Story 6.2: 🧑‍🏫 Mentoring & DevSecOps Culture</a>
         <a href="#behavioral-reliability-story">Story 7: 🛠️ Infrastructure Reliability Improvement</a>
+        <a href="#behavioral-strengths-story">Story 7.1: 💪 Strengths and Weaknesses</a>
+        <a href="#behavioral-longterm-story">Story 7.2: 🎯 Short-Term Gain Sacrifice</a>
       </div>
     </nav>
   </div>
@@ -18502,6 +18541,805 @@ to manage cluster resources — its Service Account + Kubernetes RBAC is enough.
     </details>
   </section>
 
+  <!-- ═══════════ DNS ═══════════ -->
+  <div class="band"><span class="eyebrow">DNS 01</span><h2>What Happens When You Type a URL</h2></div>
+
+  <section id="dns-big-picture">
+    <span class="sec-num">DNS</span>
+    <h3>The Big Picture: All Steps Together</h3>
+    <p class="intro">Typing a URL kicks off four distinct phases. Know the order and what each one accomplishes.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Four phases: DNS resolution finds the IP, TCP opens a reliable channel via the 3-way handshake, TLS secures that channel with a certificate check and key exchange, then HTTP actually requests and returns the page. Each phase depends on the one before it — you can't do TLS without a TCP connection, and you can't open TCP without knowing the IP."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Overview</span>The four phases<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">End-to-End at a Glance</div>
+          <pre>You type: https://google.com
+        │
+        ▼
+  DNS Resolution        (find the IP)
+        │
+        ▼
+  TCP Connection        (open a channel)
+        │
+        ▼
+  TLS Handshake         (secure the channel)
+        │
+        ▼
+  HTTP Request          (ask for the page)
+        │
+        ▼
+  HTTP Response         (get the page back)</pre>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-resolution">
+    <span class="sec-num">DNS</span>
+    <h3>Phase 1: DNS Resolution — Finding the IP</h3>
+    <p class="intro">Goal: convert google.com → 172.217.160.46. Six steps, each with its own cache layer.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Resolution walks a cache hierarchy first — browser cache, then OS cache and hosts file. On a miss it goes to the recursive resolver, which does the real work: it asks a root server, which points to the .com TLD server, which points to the domain's authoritative nameserver, which returns the actual IP. The result gets cached at every level based on TTL, which is why it's milliseconds on repeat visits."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Steps 1-2</span>Browser cache & OS cache<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Browser Cache</div>
+          <ul>
+            <li>Your browser first checks its own memory: "Did I recently visit google.com? Do I already know the IP?"</li>
+            <li>If YES → skip everything, use the cached IP</li>
+            <li>If NO → move to the next step</li>
+            <li>TTL controls how long this cache stays valid</li>
+          </ul>
+          <pre>Chrome: chrome://net-internals/#dns   ← you can see this cache</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: OS Cache</div>
+          <ul>
+            <li>If the browser doesn't have it, ask the Operating System</li>
+            <li>Windows/Linux keeps its own DNS cache</li>
+            <li>Also checks the hosts file first — if found there, that wins</li>
+          </ul>
+          <pre>Windows: C:\Windows\System32\drivers\etc\hosts
+Linux:   /etc/hosts</pre>
+          <pre><code># Check OS DNS cache on Windows
+ipconfig /displaydns
+
+# Flush OS DNS cache
+ipconfig /flushdns                    # Windows
+sudo systemd-resolve --flush-caches   # Linux</code></pre>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Steps 3-6</span>Resolver → Root → TLD → Authoritative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 3: Recursive Resolver (RR)</div>
+          <ul>
+            <li>Your OS asks the configured DNS server — usually your ISP's DNS or a public one like 8.8.8.8</li>
+            <li>This is the Recursive Resolver — it does the hard work on your behalf</li>
+            <li>It checks its own cache first; if not found, it starts the full DNS journey</li>
+          </ul>
+          <pre>Your PC → Recursive Resolver (8.8.8.8 or ISP DNS)
+          "I don't know, let me find out for you"</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 4: Root DNS Server</div>
+          <ul>
+            <li>The Recursive Resolver asks a Root DNS Server</li>
+            <li>There are only 13 sets of Root DNS Servers in the world (operated by ICANN)</li>
+            <li>Root doesn't know the IP — but it knows who manages .com domains</li>
+          </ul>
+          <pre>RR asks Root:  "What's the IP for google.com?"
+Root replies:  "I don't know, but ask the .com TLD server at 192.5.6.30"</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 5: TLD (Top Level Domain) Server</div>
+          <ul>
+            <li>TLD = the ending of a domain (.com, .net, .org, .ae)</li>
+            <li>The TLD server knows who is responsible for google.com</li>
+            <li>It points to Google's own Authoritative DNS Server</li>
+          </ul>
+          <pre>RR asks TLD (.com):  "What's the IP for google.com?"
+TLD replies:         "I don't know the IP, but ask Google's
+                      Authoritative DNS at ns1.google.com"</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 6: Authoritative DNS Server</div>
+          <ul>
+            <li>This is the final authority — it actually knows the IP</li>
+            <li>It holds the actual DNS records (A, CNAME, MX, etc.)</li>
+            <li>It gives the final answer</li>
+          </ul>
+          <pre>RR asks Authoritative:  "What's the IP for google.com?"
+Authoritative replies:  "172.217.160.46"   ← FINAL ANSWER</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">DNS Full Flow Diagram</div>
+          <pre>Your Browser
+     ↓ (miss)
+OS Cache / hosts file
+     ↓ (miss)
+Recursive Resolver (ISP / 8.8.8.8)
+     ↓ (miss)
+Root DNS Server  →  "ask .com TLD"
+     ↓
+TLD DNS Server (.com)  →  "ask ns1.google.com"
+     ↓
+Authoritative DNS Server (Google)
+     ↓
+IP: 172.217.160.46
+     ↓
+Back to your browser ✅</pre>
+          <p>This entire process happens in milliseconds. Once resolved, the IP is cached at every level (browser, OS, RR) based on TTL.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-tcp">
+    <span class="sec-num">DNS</span>
+    <h3>Phase 2: TCP — Opening the Connection</h3>
+    <p class="intro">Goal: establish a reliable connection between your browser and the server, before any data is sent.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "TCP guarantees ordered, lossless delivery with error detection. Before any HTTP or TLS data moves, TCP has to connect via the 3-way handshake: client sends SYN, server replies SYN-ACK, client sends ACK. After that both sides know the connection is alive and TLS can begin."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">TCP</span>The 3-way handshake<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What is TCP?</div>
+          <ul>
+            <li>TCP = Transmission Control Protocol</li>
+            <li>Guarantees data arrives in order</li>
+            <li>Guarantees data is not lost</li>
+            <li>Errors are detected and retransmitted</li>
+            <li>Before any data (HTTP/TLS) is sent, TCP must first connect</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">The 3-Way Handshake</div>
+          <p>Think of it like a phone call setup:</p>
+          <pre>Step 1: SYN
+  Your Browser → Server
+  "Hey, I want to connect. Are you there?"
+  (SYN = Synchronize)
+
+Step 2: SYN-ACK
+  Server → Your Browser
+  "Yes I'm here! And I want to connect to you too."
+  (SYN-ACK = Synchronize + Acknowledge)
+
+Step 3: ACK
+  Your Browser → Server
+  "Great! Connection established. Let's talk."
+  (ACK = Acknowledge)</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Visual</div>
+          <pre>Browser          Server
+   |                |
+   |──── SYN ──────►|
+   |                |
+   |◄── SYN-ACK ────|
+   |                |
+   |──── ACK ──────►|
+   |                |
+   ✅ TCP Connected</pre>
+          <p>After this handshake, both sides know the connection is alive and ready. Now TLS begins.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-tls">
+    <span class="sec-num">DNS</span>
+    <h3>Phase 3: TLS Handshake — Securing the Connection</h3>
+    <p class="intro">Goal: encrypt the connection so nobody can read your data, and verify you're talking to the real server.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "TLS gives you three things: encryption so nobody reads the traffic, authentication so you know it's the real server, and integrity so nothing was tampered with. The handshake is Client Hello with supported versions/ciphers/SNI, Server Hello with the chosen cipher and certificate, certificate verification against a trusted CA, then key exchange — asymmetric encryption to agree on a shared secret, then symmetric encryption for the actual data because it's much faster."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">TLS</span>What TLS provides<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What is TLS?</div>
+          <ul>
+            <li>TLS = Transport Layer Security</li>
+            <li>The <strong>S</strong> in HTTPS = HTTP + TLS</li>
+            <li><strong>Encryption:</strong> nobody can read your data in transit</li>
+            <li><strong>Authentication:</strong> you're talking to the real server, not an imposter</li>
+            <li><strong>Integrity:</strong> data wasn't tampered with</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">TLS</span>Handshake step by step<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Step 1: Client Hello</div>
+          <p>Your browser sends:</p>
+          <pre>- TLS Version supported     → "I support TLS 1.2 and TLS 1.3"
+- Cipher Suites supported   → "I can use AES-256, ChaCha20..."
+- Random Number (Client)    → a random number (used later for key generation)
+- SNI (Server Name)         → "I want to talk to google.com"</pre>
+          <p><strong>SNI = Server Name Indication.</strong> Tells the server which website you want. Important when one server hosts multiple websites on the same IP — without SNI, the server wouldn't know which certificate to show you.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: Server Hello</div>
+          <p>Server responds:</p>
+          <pre>- TLS Version chosen        → "Let's use TLS 1.3"
+- Cipher Suite chosen       → "Let's use AES-256-GCM"
+- Random Number (Server)    → another random number
+- Certificate               → server's SSL certificate</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 3: Certificate Verification</div>
+          <p>Your browser checks the certificate:</p>
+          <pre>✅ Is it issued by a trusted CA (Certificate Authority)?
+✅ Is it for the right domain (google.com)?
+✅ Is it still valid (not expired)?
+✅ Is it not revoked?</pre>
+          <p>If any check fails → browser shows "Your connection is not private".</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 4: Key Exchange</div>
+          <p>Goal: both sides agree on a shared secret key to encrypt data — without sending the key over the network.</p>
+          <pre>- Browser generates a "Pre-Master Secret"
+- Encrypts it with server's PUBLIC key (from certificate)
+- Sends it to server
+- Server decrypts it with its PRIVATE key
+- Both sides now have the same secret
+- Both generate the same "Session Key" from:
+    Client Random + Server Random + Pre-Master Secret</pre>
+          <p>This is asymmetric encryption for the key exchange, then symmetric encryption for the actual data.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 5: Finished — Encrypted Channel Ready</div>
+          <pre>Browser → Server: "I'm ready, switching to encrypted" (using session key)
+Server → Browser: "Me too, switching to encrypted" (using session key)
+
+✅ TLS Handshake Complete</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">TLS Full Flow</div>
+          <pre>Browser                          Server
+   |                                |
+   |──── Client Hello ─────────────►|
+   |     (TLS version, ciphers,     |
+   |      random, SNI)              |
+   |                                |
+   |◄─── Server Hello ──────────────|
+   |     (chosen cipher, random,    |
+   |      certificate)              |
+   |                                |
+   |  [Browser verifies certificate]|
+   |                                |
+   |──── Key Exchange ─────────────►|
+   |     (pre-master secret         |
+   |      encrypted with pub key)   |
+   |                                |
+   |◄─── Finished ──────────────────|
+   |──── Finished ─────────────────►|
+   |                                |
+   ✅ Encrypted channel ready</pre>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-http">
+    <span class="sec-num">DNS</span>
+    <h3>Phase 4: HTTP Request &amp; Response</h3>
+    <p class="intro">Goal: actually ask for and receive the webpage, now over the encrypted channel.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Only after DNS, TCP, and TLS are all done does the actual HTTP request go out — a GET with the Host header and other headers, and the server replies with a status code, content type, and the body. Everything before this was just setup."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">HTTP</span>Request and response<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">HTTP Request (Browser → Server)</div>
+          <pre>GET /search?q=hello HTTP/1.1
+Host: google.com
+User-Agent: Chrome/120
+Accept: text/html</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">HTTP Response (Server → Browser)</div>
+          <pre>HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 45234
+
+&lt;html&gt;... (the webpage) ...&lt;/html&gt;</pre>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-end-to-end">
+    <span class="sec-num">DNS</span>
+    <h3>The Complete End-to-End Journey</h3>
+    <p class="intro">All four phases in a single diagram — the answer to "what happens when you type a URL and press Enter."</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Walk it top to bottom: DNS resolution through the cache hierarchy to the authoritative server gives you the IP. TCP 3-way handshake establishes the connection. TLS handshake verifies the certificate and derives a session key for an encrypted channel. Then the HTTP request goes out and the response comes back, and the browser renders the page."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state ok">Summary</span>Full journey diagram<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">You type https://google.com and press Enter</div>
+          <pre>                  │
+    ┌─────────────▼─────────────┐
+    │     DNS RESOLUTION        │
+    │  Browser Cache → OS Cache │
+    │  → RR → Root → TLD        │
+    │  → Authoritative          │
+    │  Result: 172.217.160.46   │
+    └─────────────┬─────────────┘
+                  │
+    ┌─────────────▼─────────────┐
+    │   TCP 3-WAY HANDSHAKE     │
+    │  SYN → SYN-ACK → ACK      │
+    │  Connection: ESTABLISHED  │
+    └─────────────┬─────────────┘
+                  │
+    ┌─────────────▼─────────────┐
+    │     TLS HANDSHAKE         │
+    │  Client Hello             │
+    │  (TLS ver, cipher, SNI,   │
+    │   random)                 │
+    │  Server Hello             │
+    │  (cert, cipher, random)   │
+    │  Certificate Verified ✅  │
+    │  Key Exchange             │
+    │  Session Key Generated    │
+    │  Encrypted Channel ✅     │
+    └─────────────┬─────────────┘
+                  │
+    ┌─────────────▼─────────────┐
+    │     HTTP REQUEST          │
+    │  GET /  HTTP/1.1          │
+    │  Host: google.com         │
+    └─────────────┬─────────────┘
+                  │
+    ┌─────────────▼─────────────┐
+    │     HTTP RESPONSE         │
+    │  200 OK                   │
+    │  &lt;html&gt;...&lt;/html&gt;         │
+    └─────────────┬─────────────┘
+                  │
+         🖥️ Page loads in browser</pre>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ DNS FUNDAMENTALS ═══════════ -->
+  <div class="band"><span class="eyebrow">DNS 02</span><h2>Fundamentals & Records</h2></div>
+
+  <section id="dns-basics">
+    <span class="sec-num">DNS</span>
+    <h3>What is DNS? The Absolute Basics</h3>
+    <p class="intro">DNS is the phonebook of the internet — it converts human-friendly names into machine-friendly IPs.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "DNS converts human-friendly names like google.com into machine-friendly IPs like 172.217.160.46. Without it you'd have to memorize an IP for every website. Your computer asks a DNS server for the IP, gets it back, and connects."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Basics</span>What DNS does<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">DNS = Domain Name System</div>
+          <ul>
+            <li>It's like a phonebook for the internet</li>
+            <li>Converts human-friendly names (google.com) to machine-friendly IPs (172.217.160.46)</li>
+            <li>Without DNS, you'd have to remember IPs for every website</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">How DNS Works (Simple Example)</div>
+          <ul>
+            <li>1. You type google.com in your browser</li>
+            <li>2. Your computer asks a DNS server: "What's the IP for google.com?"</li>
+            <li>3. The DNS server replies: "It's 172.217.160.46"</li>
+            <li>4. Your browser connects to that IP</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-record-types">
+    <span class="sec-num">DNS</span>
+    <h3>DNS Record Types</h3>
+    <p class="intro">DNS uses different record types to store information. These are the ones you must know.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "A records map a name to an IPv4 address — that's IP-based access like app.company.com to 10.0.1.5. CNAME is an alias mapping one name to another name, like www.app.com to app.azurewebsites.net. TXT stores text data, most commonly for domain ownership verification. MX points to mail servers, NS lists the nameservers for a domain."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Records</span>The record types that matter<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Record Type Reference</div>
+          <table>
+            <tr><th>Record Type</th><th>What It Does</th><th>Example</th></tr>
+            <tr><td><strong>A</strong></td><td>Maps a name to an IPv4 address</td><td>google.com → 172.217.160.46</td></tr>
+            <tr><td><strong>CNAME</strong></td><td>Maps a name to another name (alias)</td><td>www.google.com → google.com</td></tr>
+            <tr><td><strong>TXT</strong></td><td>Stores text data (often for verification)</td><td>"google-site-verification=abc123"</td></tr>
+            <tr><td><strong>MX</strong></td><td>Specifies mail servers for a domain</td><td>google.com → mail.google.com</td></tr>
+            <tr><td><strong>NS</strong></td><td>Lists name servers for a domain</td><td>google.com → ns1.google.com</td></tr>
+          </table>
+        </div>
+        <div class="step">
+          <div class="step-label">For Your Interview</div>
+          <ul>
+            <li><strong>A records</strong> are used for IP-based access (e.g. app.company.com → 10.0.1.5)</li>
+            <li><strong>CNAME records</strong> are used for aliases (e.g. www.app.com → app.azurewebsites.net)</li>
+            <li><strong>TXT records</strong> are used for verification (e.g. proving you own a domain)</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-public-private">
+    <span class="sec-num">DNS</span>
+    <h3>Public DNS vs Private DNS</h3>
+    <p class="intro">Public DNS works everywhere on the internet. Private DNS works only inside your network.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Public DNS resolves from anywhere on the internet — that's google.com, microsoft.com. Private DNS only resolves inside your network, like an Azure VNet or company intranet. You use private DNS for three reasons: security, so internal services aren't discoverable from the internet; simplicity, so you use sql-server.internal instead of memorizing 10.0.2.10; and control, so you manage internal names without exposing them publicly."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Comparison</span>Public vs private<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Difference</div>
+          <table>
+            <tr><th>Type</th><th>Where It Works</th><th>Example Use Case</th></tr>
+            <tr><td><strong>Public DNS</strong></td><td>Works everywhere (internet)</td><td>google.com, microsoft.com</td></tr>
+            <tr><td><strong>Private DNS</strong></td><td>Works only inside your network (Azure VNet, company intranet)</td><td>db.internal.company.com</td></tr>
+          </table>
+        </div>
+        <div class="step">
+          <div class="step-label">Why Use Private DNS?</div>
+          <ul>
+            <li><strong>Security:</strong> hide internal services from the internet</li>
+            <li><strong>Simplicity:</strong> use friendly names inside your network (e.g. sql-server.internal instead of 10.0.2.10)</li>
+            <li><strong>Control:</strong> manage internal names without exposing them publicly</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ AZURE DNS ═══════════ -->
+  <div class="band"><span class="eyebrow">DNS 03</span><h2>Azure DNS</h2></div>
+
+  <section id="dns-azure-private-zones">
+    <span class="sec-num">DNS</span>
+    <h3>Azure Private DNS Zones</h3>
+    <p class="intro">A private phonebook inside Azure, visible only to resources in your VNet — the backbone of Private Endpoints.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "A Private DNS Zone is a private phonebook only visible to resources inside your VNet. You create the zone, link it to the VNet so VMs and AKS can resolve it, and add records. For making an App Service internal-only: create a Private Endpoint which gives it a private IP, Azure auto-creates the privatelink.azurewebsites.net zone, you link that zone to your VNet, and disable public access. For a custom domain you manually add an A record pointing your name at the private IP."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Concept</span>What it is and how it works<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What is a Private DNS Zone?</div>
+          <ul>
+            <li>A private phonebook inside Azure</li>
+            <li>Only visible to resources inside your Virtual Network (VNet)</li>
+            <li>Used for Private Endpoints (e.g. making an App Service internal-only)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">How It Works</div>
+          <ul>
+            <li>1. You create a Private DNS Zone (e.g. company.internal)</li>
+            <li>2. You link it to your VNet (so VMs/AKS can see it)</li>
+            <li>3. You add DNS records (e.g. sql.company.internal → 10.0.2.10)</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Example</span>Making an App Service internal-only<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Steps</div>
+          <ul>
+            <li>1. Create a Private Endpoint for the App Service</li>
+            <li>2. This gives it a private IP (e.g. 10.0.1.5)</li>
+            <li>3. Azure auto-creates a Private DNS Zone (privatelink.azurewebsites.net)</li>
+            <li>4. Link the DNS Zone to your VNet (so VMs/AKS can resolve it)</li>
+            <li>5. Disable public access (so the app is only reachable internally)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">What If You Want a Custom Domain (e.g. app.company.com)?</div>
+          <ul>
+            <li>Manually create an A record in your custom Private DNS Zone: app.company.com → 10.0.1.5</li>
+            <li>Link this DNS Zone to your VNet (so internal clients can resolve it)</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-custom-servers">
+    <span class="sec-num">DNS</span>
+    <h3>Custom DNS Servers in Azure (VNet &amp; AKS)</h3>
+    <p class="intro">Overriding Azure-provided DNS with your own servers — and the forwarding rule that stops it from breaking Private Endpoints.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "By default a VNet uses Azure-provided DNS at 168.63.129.16. You can override it with your own DNS servers at the VNet level, but the critical gotcha is your custom DNS must forward Azure-specific queries back to 168.63.129.16 — otherwise Private Endpoints stop resolving and Azure services like Storage and SQL break. In AKS it's CoreDNS doing the resolution, and you override it with a coredns-custom ConfigMap that forwards specific domains to your internal DNS servers."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state warn">VNet</span>Custom DNS at the VNet level<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Default vs Custom</div>
+          <ul>
+            <li>By default, Azure VNets use Azure-provided DNS (168.63.129.16)</li>
+            <li>You can override this with your own DNS servers (e.g. your company's internal DNS)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">How to Set It Up</div>
+          <ul>
+            <li>1. Go to Virtual Network → DNS Servers</li>
+            <li>2. Select Custom and enter your DNS server IPs (e.g. 10.0.0.4, 10.0.0.5)</li>
+            <li>3. Restart VMs/AKS nodes to pick up the change</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Important — The Common Gotcha</div>
+          <ul>
+            <li>Your custom DNS server <strong>must forward Azure-specific queries back to 168.63.129.16</strong>, or:</li>
+            <li>Private Endpoints won't resolve</li>
+            <li>Azure services (like Storage, SQL) may break</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">AKS</span>Custom DNS in AKS (CoreDNS)<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">How AKS Resolves DNS</div>
+          <ul>
+            <li>AKS uses CoreDNS for DNS resolution</li>
+            <li>By default, it forwards unknown queries to Azure DNS (168.63.129.16)</li>
+            <li>If you want AKS to use only your company's DNS, you must modify CoreDNS</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 1: Create a ConfigMap to Override CoreDNS</div>
+          <pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  internal.override: |
+    company.internal:53 {
+        errors
+        cache 30
+        forward . 10.0.0.4 10.0.0.5   # Your company DNS servers
+    }</code></pre>
+        </div>
+        <div class="step">
+          <div class="step-label">Step 2: Apply, Restart, Test</div>
+          <pre><code># Apply the ConfigMap
+kubectl apply -f coredns-custom.yaml
+
+# Restart CoreDNS
+kubectl rollout restart deployment coredns -n kube-system
+
+# Test it
+kubectl run -it --rm --restart=Never dns-test --image=busybox:1.28 -- nslookup db.company.internal</code></pre>
+          <p>Should return your internal DNS server's response.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-split-horizon">
+    <span class="sec-num">DNS</span>
+    <h3>Split-Horizon DNS</h3>
+    <p class="intro">The same domain name resolves to different IPs depending on where you are — internal vs external.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Split-horizon DNS means the same name resolves differently depending on where the query comes from. Inside the VNet, app.company.com resolves to the private IP 10.0.1.5; from the internet it resolves to the public IP. You set it up by creating an A record with the public IP in your public DNS zone, and an A record with the private IP in a private DNS zone linked to your VNet — whichever zone the client can see wins."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Concept</span>Same name, different answers<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What is Split-Horizon DNS?</div>
+          <p>The same domain name resolves to different IPs depending on where you are:</p>
+          <ul>
+            <li>Inside the company network → Private IP (10.0.1.5)</li>
+            <li>Outside (internet) → Public IP (203.0.113.10)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Example</div>
+          <table>
+            <tr><th>Location</th><th>app.company.com Resolves To</th></tr>
+            <tr><td>Inside VNet</td><td>10.0.1.5 (private)</td></tr>
+            <tr><td>Outside (Internet)</td><td>203.0.113.10 (public)</td></tr>
+          </table>
+        </div>
+        <div class="step">
+          <div class="step-label">How to Set It Up</div>
+          <ul>
+            <li><strong>Public DNS (Internet):</strong> create an A record in your public DNS zone → app.company.com → 203.0.113.10</li>
+            <li><strong>Private DNS (VNet):</strong> create an A record in your private DNS zone → app.company.com → 10.0.1.5</li>
+            <li>Link the private DNS zone to your VNet</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ═══════════ DNS OPERATIONS ═══════════ -->
+  <div class="band"><span class="eyebrow">DNS 04</span><h2>Operations</h2></div>
+
+  <section id="dns-ttl">
+    <span class="sec-num">DNS</span>
+    <h3>TTL (Time To Live)</h3>
+    <p class="intro">How long a DNS record stays cached — and why you lower it before a migration.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "TTL is how long a DNS record is cached, in seconds. Lower TTL means faster propagation of changes but more DNS queries; higher TTL means less DNS traffic but slower updates. The practical pattern: before a migration, drop TTL to 300 seconds so the cutover propagates in 5 minutes, then raise it back to 3600 after you're done."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">TTL</span>Tradeoffs and when to change it<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Tradeoff</div>
+          <ul>
+            <li>TTL = how long a DNS record is cached (in seconds)</li>
+            <li><strong>Lower TTL</strong> = faster updates, but more DNS queries</li>
+            <li><strong>Higher TTL</strong> = less DNS traffic, but slower updates</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">When to Change TTL</div>
+          <ul>
+            <li>Before a migration (e.g. moving to a new IP), set TTL = 300 (5 mins)</li>
+            <li>After migration, increase it back to TTL = 3600 (1 hour)</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-reverse">
+    <span class="sec-num">DNS</span>
+    <h3>Reverse DNS (PTR Records)</h3>
+    <p class="intro">The opposite of an A record — IP back to name. Matters most for mail servers and logging.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Reverse DNS is a PTR record mapping an IP back to a name, the opposite of an A record. It matters for logging so you see names instead of raw IPs, and it's critical for email — many mail servers reject mail from an IP with no PTR record. In Azure it's not directly supported for most services; for VMs you request a PTR record through Azure Support."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">PTR</span>What it is and why it matters<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Forward vs Reverse</div>
+          <ul>
+            <li><strong>Normal DNS (A record):</strong> google.com → 172.217.160.46</li>
+            <li><strong>Reverse DNS (PTR):</strong> 172.217.160.46 → google.com</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Why Use Reverse DNS?</div>
+          <ul>
+            <li><strong>Logging:</strong> shows names instead of IPs in logs</li>
+            <li><strong>Email servers:</strong> some mail servers reject emails if the sending IP has no PTR record</li>
+            <li><strong>Troubleshooting:</strong> helps identify where traffic is coming from</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">How to Set Up in Azure</div>
+          <ul>
+            <li>Not directly supported for most Azure services</li>
+            <li>For VMs, you can request a PTR record from Azure Support</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-conditional-forwarding">
+    <span class="sec-num">DNS</span>
+    <h3>Conditional Forwarding</h3>
+    <p class="intro">Send DNS queries for specific domains to specific DNS servers — the backbone of hybrid cloud name resolution.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Conditional forwarding routes queries for specific domains to specific DNS servers — anything ending in company.internal goes to the internal DNS at 10.0.0.4, everything else goes to a public resolver. It's what makes hybrid cloud work, where some names resolve in Azure and others on-premises, and it also keeps internal names from leaking out to public resolvers."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Concept</span>Routing queries by domain<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">What is Conditional Forwarding?</div>
+          <p>Send DNS queries for specific domains to specific DNS servers.</p>
+          <pre>*.company.internal  →  Forward to 10.0.0.4  (internal DNS)
+Everything else     →  Forward to 8.8.8.8   (Google DNS)</pre>
+        </div>
+        <div class="step">
+          <div class="step-label">How to Set Up in Windows DNS Server</div>
+          <ul>
+            <li>1. Open DNS Manager</li>
+            <li>2. Right-click Conditional Forwarders → New Conditional Forwarder</li>
+            <li>3. Enter Domain: company.internal</li>
+            <li>4. Enter IPs: 10.0.0.4, 10.0.0.5</li>
+            <li>5. Save</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Why Use It?</div>
+          <ul>
+            <li><strong>Hybrid clouds:</strong> some names resolve in Azure, others on-premises</li>
+            <li><strong>Security:</strong> prevent internal names from leaking to the internet</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="dns-cheat-sheet">
+    <span class="sec-num">DNS</span>
+    <h3>Interview Cheat Sheet</h3>
+    <p class="intro">Quick one-line answers to the most common DNS interview questions.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Know these cold: A maps name to IPv4, CNAME is a name-to-name alias, public DNS is internet-wide while private is VNet-only, App Service goes internal via Private Endpoint plus disabled public access plus a linked Private DNS Zone, VNet custom DNS is set under VNet → DNS Servers, AKS DNS is CoreDNS ConfigMap, split-horizon is the same name resolving differently inside vs outside, TTL is cache duration, and conditional forwarding routes specific domains to specific servers."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state ok">Cheat Sheet</span>Quick answers<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Question → Short Answer</div>
+          <table>
+            <tr><th>Question</th><th>Short Answer</th></tr>
+            <tr><td>What is DNS?</td><td>Converts names (google.com) to IPs (172.217.160.46)</td></tr>
+            <tr><td>What's an A record?</td><td>Maps a name to an IPv4 address</td></tr>
+            <tr><td>What's a CNAME?</td><td>Alias: maps a name to another name</td></tr>
+            <tr><td>Public vs Private DNS?</td><td>Public = internet; Private = only inside your network</td></tr>
+            <tr><td>How to make an App Service internal-only?</td><td>Private Endpoint + disable public access + Private DNS Zone</td></tr>
+            <tr><td>How to use a custom domain internally?</td><td>Create an A record in Private DNS Zone pointing to the private IP</td></tr>
+            <tr><td>How to set custom DNS in a VNet?</td><td>VNet → DNS Servers → Custom → enter your DNS IPs</td></tr>
+            <tr><td>How to configure DNS in AKS?</td><td>Modify CoreDNS ConfigMap to forward to your DNS servers</td></tr>
+            <tr><td>What is split-horizon DNS?</td><td>Same name resolves to different IPs (internal vs external)</td></tr>
+            <tr><td>What is TTL?</td><td>How long DNS records are cached (in seconds)</td></tr>
+            <tr><td>What is conditional forwarding?</td><td>Send queries for specific domains to specific DNS servers</td></tr>
+          </table>
+        </div>
+      </div>
+    </details>
+  </section>
+
   <!-- ═══════════ BEHAVIORAL ═══════════ -->
   <div class="band"><span class="eyebrow">Behavioral 01</span><h2>STAR Stories</h2></div>
 
@@ -18783,6 +19621,243 @@ AzureDiagnostics
     </details>
   </section>
 
+  <section id="behavioral-platform-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 1.1: 🏆 Most Impactful Contribution — The Azure Platform</h3>
+    <p class="intro">Not just solving a problem — enabling scale across multiple teams. This is a platform-thinking story, not an individual fix.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "My most impactful contribution was building a standardized Azure Platform with Terraform, Azure DevOps, and AKS. Before, every team provisioned manually and differently — configuration drift, inconsistent security, slow releases. I built reusable Terraform modules aligned to our Landing Zone standards, standardized CI/CD pipelines with Checkov and Trivy scanning and approval gates, and implemented Hub-Spoke networking with Private Endpoints, Managed Identity, and centralized monitoring. Provisioning went from several days to under an hour, deployment failures dropped, and teams could self-service instead of raising manual requests."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state ok">Story</span>Before → Solution → After<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Story in Simple Words</div>
+          <ul>
+            <li><strong>Before:</strong> each team built Azure infrastructure differently. No consistency. Manual provisioning. Configuration drift. Slow deployments. Security gaps.</li>
+            <li><strong>Solution:</strong> build a standardized Azure Platform using Terraform, Azure DevOps, and AKS. Give teams reusable modules and pipelines so they can self-service.</li>
+            <li><strong>After:</strong> infrastructure provisioning went from days to hours. Deployments became reliable. Security was built in. Teams moved faster without chaos.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>The 165-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"One of my most impactful contributions was building a standardized Azure Platform using Terraform, Azure DevOps, and AKS, which significantly improved deployment consistency, security, and delivery speed across multiple application teams. Instead of every team building infrastructure differently, we provided a reusable platform with built-in governance and automation."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (120 seconds)</div>
+          <p>"The environment had multiple teams provisioning Azure resources manually, leading to configuration drift, inconsistent security, and longer release cycles. I designed reusable Terraform modules aligned with our Azure Landing Zone standards, covering networking, AKS, Key Vault, Storage Accounts, and monitoring."</p>
+          <p>"I standardized CI/CD pipelines in Azure DevOps, integrating infrastructure validation, security scanning using Checkov and Trivy, and automated approvals before production deployments. We also implemented Hub-Spoke networking, Private Endpoints, Managed Identity, Azure RBAC, and centralized monitoring with Azure Monitor and Log Analytics."</p>
+          <p>"As a result, infrastructure provisioning that previously took several days became a repeatable process completed in under an hour. We also reduced deployment failures, improved compliance, and enabled application teams to self-service infrastructure through approved modules instead of raising manual requests."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (15 seconds)</div>
+          <p>"For me, the biggest impact wasn't just delivering a platform — it was creating a secure, scalable, and automated engineering foundation that improved developer productivity while strengthening governance, reliability, and operational excellence."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q1</span>How did you design the Terraform modules to be reusable?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Finding the Common Patterns</div>
+          <p>"I started by analyzing how each team was building resources. I found common patterns:"</p>
+          <ul>
+            <li>All AKS clusters needed the same networking, RBAC, and monitoring</li>
+            <li>All databases needed encryption, backup, and access controls</li>
+            <li>All storage needed private endpoints and access policies</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Abstracting Into Modules with Secure Defaults</div>
+          <pre><code>module "aks" {
+  source = "git::https://github.com/org/terraform-modules//aks"
+
+  cluster_name            = "prod-cluster"
+  node_pool_size          = 3
+  enable_managed_identity = true    # secure by default
+  enable_rbac             = true    # secure by default
+  network_policy          = "azure" # network segmentation
+}</code></pre>
+          <p>"Modules had secure defaults and override options for edge cases. This way, 90% of teams used the defaults, and 10% customized only what they needed."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q2</span>What was in the standardized CI/CD pipeline?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Reusable Azure DevOps Pipeline Template</div>
+          <pre>Stage 1: Validate
+  - Terraform fmt check
+  - Checkov (IaC security)
+
+Stage 2: Plan
+  - Terraform plan (show what will change)
+  - Store plan artifact
+
+Stage 3: Security Review
+  - Trivy (image scanning for AKS)
+  - SBOM generation
+
+Stage 4: Manual Approval (prod only)
+  - Senior engineer reviews plan
+  - Approves or rejects
+
+Stage 5: Apply
+  - Terraform apply
+  - Post-deployment validation</pre>
+          <p>"Teams extended this template for their specific needs but kept the core."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q3</span>How did you implement the Azure Landing Zone?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Hub-Spoke Topology</div>
+          <ul>
+            <li><strong>Hub VNet:</strong> central networking, security, monitoring. Firewall, NVA, shared services.</li>
+            <li><strong>Spoke VNets:</strong> one per team or workload. Peered to Hub.</li>
+            <li><strong>Centralized DNS, DDoS, logging:</strong> enforced through Policy</li>
+          </ul>
+          <p>"Teams could provision their own Spoke VNet using Terraform, and it automatically peered to the Hub — no manual networking, no misconfiguration."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q4</span>How did you handle teams that resisted the standardization?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Show Value, Don't Force</div>
+          <ul>
+            <li>Pilot with one team → proved faster deployment + fewer incidents</li>
+            <li>Share metrics publicly (deployment time, MTTR, cost)</li>
+            <li>Make adoption easy (templates, documentation, 1-on-1 onboarding)</li>
+            <li>Offer an escape hatch for edge cases — but track exceptions</li>
+          </ul>
+          <p>"Within 3 months, adoption was over 80%. Teams weren't mandated; they chose the platform because it made their lives easier."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q5</span>How did you ensure teams didn't break the platform?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Governance Was Automated, Not Manual</div>
+          <ul>
+            <li><strong>Azure Policy:</strong> blocked non-compliant resources at provisioning time — no surprise public IPs, no unencrypted storage</li>
+            <li><strong>RBAC:</strong> teams had Contributor scope only on their own resource group, not the Hub</li>
+            <li><strong>Code review:</strong> all Terraform changes went through peer review in Git before deployment</li>
+            <li><strong>Audit logging:</strong> all changes tracked in Azure Monitor and Git history</li>
+          </ul>
+          <p>"This gave teams autonomy while preventing chaos."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Q6</span>What metrics did you track to show impact?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Before vs After</div>
+          <table>
+            <tr><th>Metric</th><th>Before</th><th>After</th><th>Impact</th></tr>
+            <tr><td>Infrastructure provisioning time</td><td>5–7 days</td><td>&lt;1 hour</td><td>50x faster</td></tr>
+            <tr><td>Deployment success rate</td><td>75%</td><td>99%</td><td>Fewer hotfixes</td></tr>
+            <tr><td>Time to production (code to live)</td><td>2 weeks</td><td>2 days</td><td>5x faster</td></tr>
+            <tr><td>Cost per environment</td><td>Untracked</td><td>Tagged &amp; visible</td><td>25% savings</td></tr>
+            <tr><td>Security findings</td><td>Discovered in prod</td><td>Caught in CI/CD</td><td>0 prod breaches</td></tr>
+          </table>
+          <p>"I reported these monthly to leadership. The data made the business case clear."</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-failure-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 1.2: ⚠️ Failure / Risk That Didn't Go as Planned</h3>
+    <p class="intro">An AKS upgrade that succeeded at the platform level but broke applications — honesty, ownership, and the process improvements that followed.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "We upgraded an AKS cluster after validating it in non-production, but afterward a few critical microservices started failing health checks and entered a restart loop. The cluster upgrade itself was fine — the problem was an application depending on a deprecated Kubernetes API version that our test environment never exercised, because it didn't match production's workload profile. We rolled back just the affected application rather than the whole cluster, restored service quickly, and then added API deprecation scanning, production-like testing, and canary deployments to the upgrade process. The lesson: validating the platform alone isn't enough — you have to validate application compatibility too."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state fail">Story</span>What happened, in plain words<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Short Version</div>
+          <ul>
+            <li>Upgraded an AKS cluster successfully — but afterward a few critical microservices started failing health checks and went into a restart loop</li>
+            <li>The platform was fine; an application depended on a deprecated Kubernetes API version that hadn't been fully validated in production-like conditions</li>
+            <li>Rolled back the affected app, restored service, then improved the upgrade process with compatibility checks and canary testing</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>The 135-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"One situation that didn't go as planned was an AKS cluster upgrade. We had validated the upgrade in our non-production environments, but after upgrading production, a few critical microservices started failing health checks and entered a restart loop. Although the cluster upgrade itself was successful, application compatibility wasn't fully validated, so we had to act quickly."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (90 seconds)</div>
+          <p>"I followed a structured approach: I checked Azure Monitor and Application Insights, then reviewed <code>kubectl describe</code> output and pod logs. We discovered that one application depended on a deprecated Kubernetes API version that wasn't caught during testing because the non-production environment didn't have the same workload profile as production."</p>
+          <p>"We immediately rolled back the affected application deployment while keeping the cluster stable, restoring service within a short time. After the incident, I introduced pre-upgrade compatibility checks, Kubernetes API deprecation scanning, mandatory production-like testing, and canary deployments for critical applications before cluster upgrades."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (15 seconds)</div>
+          <p>"The biggest lesson was that validating the platform alone isn't enough — you also need to validate application compatibility. Although the upgrade didn't go as planned, we restored service quickly and strengthened our upgrade process. That experience significantly improved our change management, platform reliability, and operational excellence."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q1</span>Why did the issue appear only in production?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"Because production had a more realistic workload profile. The non-production environment didn't include all the same microservices, traffic patterns, or dependencies. So the deprecated API usage wasn't exercised the same way, and the issue stayed hidden until production."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q2</span>What exactly was deprecated?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"An application was using an older Kubernetes API version that was no longer supported in the upgraded cluster version. The manifests had not been updated, and the change wasn't caught in pre-upgrade validation because the test environment wasn't representative enough."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Q3</span>How did you restore service quickly?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"We rolled back the affected application deployment rather than the entire cluster. That reduced risk and restored functionality faster. The cluster remained stable, and only the impacted workloads were reverted."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Q4</span>What checks did you add after the incident?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Process Improvements</div>
+          <ul>
+            <li><strong>Kubernetes API deprecation scanning</strong> — automated checks against manifests before any upgrade</li>
+            <li><strong>Pre-upgrade compatibility checks</strong> — validate application manifests against the target cluster version</li>
+            <li><strong>Mandatory production-like testing</strong> — test environments must match production's workload profile, dependencies, and traffic patterns</li>
+            <li><strong>Canary deployments for critical applications</strong> — roll critical workloads onto the upgraded version gradually rather than all at once</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
   <section id="behavioral-incident-story">
     <span class="sec-num">STAR Stories</span>
     <h3>Story 2: 🔴 Production Incident Under Pressure</h3>
@@ -18822,6 +19897,62 @@ AzureDiagnostics
             <li><strong>What did you change?</strong> Memory limits + HPA</li>
             <li><strong>What did you learn?</strong> Always set alerts before go-live, not after</li>
           </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-aks-502-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 2.1: 🚨 Hardest Incident / Escalation — The AKS 502 Outage</h3>
+    <p class="intro">A customer-facing 502 outage traced to a misconfigured readiness probe. Structured as a timed narrative: 30s opening, 60s middle, 15s close.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Production AKS environment, users hitting intermittent 502s, customer-facing so it was a high-priority escalation. I restored service first and investigated in parallel. Root cause: a new release had an incorrect readiness probe, so pods were marked Ready before the app finished initializing and the Ingress routed traffic to unready pods. Rolled back via ArgoCD, fixed the probe, validated. Permanently we added deployment validation in CI/CD, mandatory health-check testing, and alerting on pod readiness failures."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state fail">Story</span>The 105-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"One of the hardest incidents I handled was a production outage in an AKS environment where users started receiving intermittent 502 errors. Since it was customer-facing, it was a high-priority escalation. My first focus was restoring service quickly while investigating the root cause in parallel."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (60 seconds)</div>
+          <p>"I followed a structured approach: I checked Azure Monitor and Ingress logs, then reviewed K8s events. We found a new release had an incorrect readiness probe. Pods were marked 'healthy' before the app was fully initialized, so the Ingress routed traffic to unready pods. We rolled back using ArgoCD, updated the probe, and validated the fix."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (15 seconds)</div>
+          <p>"Permanently, we added deployment validation in CI/CD, mandatory health-check testing, and alerting on pod readiness failures. This reinforced the importance of structured troubleshooting and preventive engineering."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q1</span>Why did an incorrect readiness probe cause a 502 specifically?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"In AKS, the Ingress Controller (like NGINX or AGIC) only sends traffic to pods that are in a <code>Ready</code> state. Because the probe was misconfigured — for example it checked a port too early, or had a <code>successThreshold</code> of 1 before the DB connection was live — Kubernetes marked the pod as <code>Ready</code>. The Ingress sent the request, but the app couldn't process it yet, so the connection was refused or timed out, resulting in a 502 Bad Gateway."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q2</span>How did you find the root cause so quickly?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"I looked at the Ingress Controller logs. I saw that the 502s were only happening to specific backend IP addresses — the new pods. Then I ran <code>kubectl describe pod</code> and saw the pods were entering the <code>Ready</code> state, but the application logs showed they were still in the startup phase. The gap between the two was the root cause."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q3</span>What KQL query would you use in Azure Monitor to find these errors?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"I would query the <code>AzureDiagnostics</code> table for the Application Gateway, or the <code>ContainerLog</code> table for NGINX:"</p>
+          <pre><code>AzureDiagnostics
+| where ResourceType == "APPLICATIONGATEWAYS"
+| where httpStatus_d == 502
+| summarize count() by bin(TimeGenerated, 5m), clientIP_s</code></pre>
+          <p>"This shows me if the 502s are localized to a specific time or client."</p>
         </div>
       </div>
     </details>
@@ -18958,6 +20089,119 @@ AzureDiagnostics
     </details>
   </section>
 
+  <section id="behavioral-priorities-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 5.1: ⚖️ Conflicting Priorities — Dev Speed vs Security vs Cost</h3>
+    <p class="intro">Balancing three teams pulling in different directions, by shifting security left and making governance automated rather than a gate.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Conflicting priorities are normal in enterprise. I align everyone around business risk and measurable outcomes. Security shifts left into the CI/CD pipeline so it's automated, not a bottleneck. Developers get self-service via Terraform modules and standardized Landing Zone patterns. Finance gets cost governance through right-sizing, autoscaling, reserved instances, tagging, and visible dashboards. The key is deciding based on risk, cost, and business impact with stakeholders involved early — not working in silos."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>The 135-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"In my experience, conflicting priorities are normal, especially in enterprise environments. My approach is to align all teams around business risk and measurable outcomes. The goal is to find a balance where developers can move fast, security requirements are built into the process, and costs remain optimized without impacting reliability."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (90 seconds)</div>
+          <p>"I follow a shift-left approach where security and compliance are embedded into the CI/CD pipeline, not a deployment bottleneck. For developers, I enable self-service using Terraform modules, reusable pipelines, and standardized Azure Landing Zone patterns to reduce delivery time. For Security, we enforce RBAC, Managed Identity, Private Endpoints, policy-as-code, and automated vulnerability scanning using tools like Checkov and Microsoft Defender for Cloud. For Finance, I implement cost governance through right-sizing, AKS autoscaling, reserved instances where appropriate, resource tagging, and Azure Cost Management dashboards."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (15 seconds)</div>
+          <p>"The key is making decisions based on risk, cost, and business impact, with all stakeholders involved early rather than working in silos. By standardizing the platform and automating governance, I enable faster delivery while maintaining security, cost efficiency, scalability, and operational excellence."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q1</span>Concrete example of how you "shifted left" security?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"Instead of having security scan artifacts after deployment, we automated it during the build in Azure DevOps:"</p>
+          <pre>Developer pushes code
+   ↓
+Git trigger → Azure DevOps Pipeline
+   ↓
+Build + Terraform Plan
+   ↓
+Checkov (IaC security scan)
+   ↓
+Trivy (image vulnerability scan)
+   ↓
+SBOM generated
+   ↓
+If passed → Auto-deploy to staging
+If failed → Notification to developer (24-hour SLA to fix)
+   ↓
+Manual approval gate (only for prod)</pre>
+          <p>"The key: developers see failures immediately and fix them while the context is fresh. Security doesn't block the pipeline — it's automated."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q2</span>How did you convince developers CI/CD security was faster?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Data — Old Process vs New</div>
+          <table>
+            <tr><th>Old Process</th><th>New Process</th></tr>
+            <tr><td>Manual security review: 3–5 business days</td><td>Automated scan: 2 minutes (during build)</td></tr>
+            <tr><td>Back-and-forth fixes: 2–3 cycles</td><td>Developer fixes immediately: 30 min average</td></tr>
+            <tr><td>—</td><td>Auto-deploy to staging, manual prod approval: 1–2 hours</td></tr>
+            <tr><td><strong>Total: 10–15 days</strong></td><td><strong>Total: 4–6 hours</strong></td></tr>
+          </table>
+          <p>"When developers saw their deployments go from 2 weeks to 4 hours, they loved it. Security became an enabler, not a blocker."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q3</span>What Terraform modules did you create for self-service?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Reusable Modules Wrapping Security & Cost Controls</div>
+          <ul>
+            <li><strong>AKS Module</strong> → enforces network policy, RBAC, pod security policies, Managed Identity</li>
+            <li><strong>Virtual Network Module</strong> → enforces Private Endpoints, NSG rules, DDoS protection</li>
+            <li><strong>Key Vault Module</strong> → enforces RBAC, soft-delete, purge protection</li>
+            <li><strong>Storage Account Module</strong> → enforces Private Endpoints, encryption at rest/in-transit, immutable backup</li>
+            <li><strong>SQL Database Module</strong> → enforces firewall rules, encryption, Managed Identity authentication</li>
+          </ul>
+          <p>"Developers just called <code>module "aks" { ... }</code> and got a secure, compliant cluster without thinking about it. That's security by default."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Q4</span>How did you handle the Finance / Cost side?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Three Levers</div>
+          <ul>
+            <li><strong>1. Right-sizing:</strong> analyzed environments and found over-provisioned VMs. Moved from Standard_D4s to Standard_D2s where possible — 30% cost savings</li>
+            <li><strong>2. AKS Autoscaling:</strong> enabled both Horizontal Pod Autoscaler (HPA) and Cluster Autoscaler. Also used Spot VMs for non-production — another 40% savings on dev/test</li>
+            <li><strong>3. Azure Cost Management Dashboard:</strong> built a Grafana dashboard showing real-time spend by team, resource, and environment. Visibility alone drove accountability and behavioral change</li>
+          </ul>
+          <p>"We also reserved compute for predictable workloads — production databases, always-on APIs — but kept non-production flexible. The result: 30–40% total cost reduction without sacrificing performance or reliability."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q5</span>What if a team wants to bypass controls for "urgency"?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Tiered Escalation Process</div>
+          <table>
+            <tr><th>Tier</th><th>Requirement</th></tr>
+            <tr><td><strong>Tier 1 (Normal)</strong></td><td>Automated security scans, standard approval gate</td></tr>
+            <tr><td><strong>Tier 2 (Urgent)</strong></td><td>Team lead approval + post-deployment audit</td></tr>
+            <tr><td><strong>Tier 3 (Critical Incident)</strong></td><td>CTO approval + root cause analysis within 48 hours</td></tr>
+          </table>
+          <p>"The key: we never skip security, but we can accelerate approval if business risk is accepted at the right level. In practice most teams rarely go to Tier 2 because the standard pipeline is already fast. And if they do, they understand it comes with extra scrutiny — so they only do it when truly necessary."</p>
+        </div>
+      </div>
+    </details>
+  </section>
+
   <section id="behavioral-disagreement-story">
     <span class="sec-num">STAR Stories</span>
     <h3>Story 6: 🤝 Disagreement with Team/Manager</h3>
@@ -18995,6 +20239,146 @@ AzureDiagnostics
             <li><strong>How did you handle pushback?</strong> Came with a solution, not just a complaint</li>
             <li><strong>What if the manager still insisted?</strong> I'd document my concern formally and escalate to the security team</li>
             <li><strong>What was the outcome for devs?</strong> No slowdown — the pipeline deploys faster than manual anyway</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-mi-vs-sp-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 6.1: 🔐 Disagreement with Security Team — Managed Identity vs Service Principal</h3>
+    <p class="intro">The security team wanted Service Principal secrets because "that's what we've always done." Here's the case for Managed Identity with Workload Identity Federation — and how to make it professionally.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "I was designing an AKS app that needed to reach Key Vault, Storage, and SQL. Security wanted Service Principal secrets because that was the existing standard. I proposed Managed Identity with Workload Identity Federation instead — no secrets to store, rotate, or leak, and Azure handles the credential lifecycle entirely. I framed it as removing a class of risk rather than as criticism of their standard, showed the OIDC federation flow, and demoed it working. The point wasn't winning the argument — it was that fewer secrets means fewer things that can go wrong."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state warn">Story</span>The situation in plain words<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Setup</div>
+          <p>I was designing an AKS-based application that needed to talk to Azure resources — Key Vault, Storage, SQL.</p>
+          <ul>
+            <li><strong>Security team said:</strong> "Use Service Principal secrets — that's what we've always done."</li>
+            <li><strong>I said:</strong> "There's a better way. Let's use Managed Identity with Workload Identity Federation."</li>
+          </ul>
+          <p>That was the conflict — a reasonable existing standard versus a newer approach that removes an entire category of risk.</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Reasoning</span>Why I proposed Managed Identity<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Problem vs Fix</div>
+          <table>
+            <tr><th>Problem with Service Principals</th><th>How Managed Identity Fixes It</th></tr>
+            <tr><td>Secrets expire — someone must rotate them</td><td>No secrets at all — Azure handles it</td></tr>
+            <tr><td>Secrets can leak in code, env vars, logs</td><td>Nothing to leak</td></tr>
+            <tr><td>Manual rotation = human error risk</td><td>Fully automated by Azure</td></tr>
+            <tr><td>Hard to audit "who used this secret when"</td><td>Azure RBAC + audit logs built in</td></tr>
+            <tr><td>Developer burden: manage, store, rotate</td><td>Zero developer overhead</td></tr>
+          </table>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Follow-up</span>What is Workload Identity Federation?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Concept</div>
+          <ul>
+            <li>It allows a Kubernetes pod (via its Service Account) to authenticate to Entra ID <strong>without any secret</strong></li>
+            <li>The pod gets a token from Entra ID using OIDC federation — no password, no certificate, no rotation</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">The Flow</div>
+          <pre>Pod (K8s Service Account)
+        │  OIDC Token
+        ▼
+Entra ID (Workload Identity)
+        │  Access Token
+        ▼
+Azure Key Vault / Storage / SQL</pre>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Story</span>How I handled it & outcome<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Action</div>
+          <ul>
+            <li>Framed it as removing a risk class, not as criticism of their existing standard — their concern (control over credentials) was legitimate</li>
+            <li>Walked through the Workload Identity Federation flow so they could see there was no secret anywhere in the path</li>
+            <li>Addressed their real question directly: auditability. Showed that Azure RBAC + audit logs give better traceability than a shared SP secret does</li>
+            <li>Built a working proof of concept in a non-production cluster rather than arguing from theory</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Result</div>
+          <p>Security team agreed once they could see the audit trail was stronger, not weaker. Managed Identity became the default for new AKS workloads, with Service Principals reserved for the cases that genuinely need them — pipelines running outside Azure, where there's no Azure resource to attach an identity to.</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Follow-Up Answers Baked In</div>
+          <ul>
+            <li><strong>How did you handle the disagreement?</strong> Took their concern seriously and answered it with evidence, rather than dismissing the existing standard</li>
+            <li><strong>What if they'd still said no?</strong> I'd have documented the risk tradeoff in writing and deferred — it's their call to own, and a Service Principal properly managed in Key Vault is still a defensible design</li>
+            <li><strong>When would you still use a Service Principal?</strong> When the caller isn't an Azure resource — e.g. GitHub Actions or Jenkins running outside Azure</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-mentoring-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 6.2: 🧑‍🏫 Mentoring Junior Engineers / Promoting DevSecOps Culture</h3>
+    <p class="intro">Building practical habits rather than just sharing knowledge — and embedding security into normal engineering workflows.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Mentoring and DevSecOps culture go together. I focus on building habits, not just transferring knowledge — secure coding awareness, infrastructure standards, troubleshooting discipline, ownership in CI/CD. I mentor hands-on: pairing on Terraform, reviewing pipeline changes, explaining why we use RBAC or Managed Identity or Private Endpoints and how those controls reduce real risk. Security gets embedded into the normal workflow rather than bolted on, using reusable templates, secure defaults, code reviews, and post-incident learning."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>The 135-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"In my experience, mentoring junior engineers and promoting DevSecOps culture go together. I focus on building practical habits, not just sharing knowledge — things like secure coding awareness, infrastructure standards, troubleshooting discipline, and ownership in CI/CD. The goal is to help engineers move faster independently while making security and reliability part of their daily work."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (90 seconds)</div>
+          <p>"I usually mentor through hands-on guidance — pairing on Terraform, reviewing pipeline changes, explaining why we use RBAC, Managed Identity, or Private Endpoints, and showing how these controls reduce risk in real environments. I promote DevSecOps by embedding security into normal engineering workflows:"</p>
+          <pre>Code  →  CI/CD  →  Security Scan  →  Policy Validation  →  Deployment</pre>
+          <p>"In practice, I use reusable templates, secure defaults, code reviews, and post-incident learning so junior engineers understand both the technical decision and the operational impact. I also encourage a culture where teams ask questions early, document lessons learned, and treat security as a shared engineering responsibility."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (15 seconds)</div>
+          <p>"The best results come when mentoring, automation, and security standards work together — that's how you build a scalable, secure, and operationally mature engineering culture."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Approach</span>How the mentoring actually works<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Hands-On Methods</div>
+          <ul>
+            <li>Pairing on Terraform rather than just reviewing the final PR</li>
+            <li>Reviewing pipeline changes and explaining the reasoning, not just approving</li>
+            <li>Explaining <em>why</em> a control exists — RBAC, Managed Identity, Private Endpoints — and the real risk it reduces</li>
+            <li>Reusable templates and secure defaults, so the safe path is also the easy path</li>
+            <li>Post-incident learning sessions, so failures become shared knowledge instead of blame</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Culture Signals I Encourage</div>
+          <ul>
+            <li>Ask questions early — a question before deployment costs far less than an incident after</li>
+            <li>Document lessons learned so the next engineer doesn't repeat them</li>
+            <li>Treat security as a shared engineering responsibility, not another team's job</li>
           </ul>
         </div>
       </div>
@@ -19040,6 +20424,187 @@ AzureDiagnostics
             <li><strong>Why not AKS?</strong> The app had OS dependencies and the team had no container knowledge — fixed the burning fire first, planned containerization as phase 2</li>
             <li><strong>Rollback plan?</strong> Load Balancer rules let us shift traffic back instantly; Terraform state meant a clean recreate if needed</li>
           </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-strengths-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 7.1: 💪 Strengths and Weaknesses</h3>
+    <p class="intro">The classic question, answered with specifics and a genuine weakness plus the concrete fix.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Strengths: automation-first thinking and production troubleshooting. I use Terraform, GitHub Actions, Azure DevOps, and AKS to build repeatable platforms that reduce manual effort and deployment errors, and during incidents I stay calm, use monitoring and logs to find root cause, and restore service before optimizing. Weakness: earlier in my career I spent too long perfecting a solution before delivering it. I now time-box design discussions, ship an MVP where appropriate, gather feedback early, and iterate instead of over-engineering the first version."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>The 125-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"I would say my biggest strengths are automation, troubleshooting, and building reliable platforms. I enjoy simplifying complex environments using Infrastructure as Code and CI/CD. As for my weakness, earlier in my career I sometimes spent too much time trying to make a solution perfect before delivering it, but I've learned to balance quality with business priorities."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (80 seconds)</div>
+          <p>"One strength is automation-first thinking. I have worked with Terraform, GitHub Actions, Azure DevOps, and AKS to build repeatable and consistent platforms, reducing manual effort and deployment errors."</p>
+          <p>"Another strength is production troubleshooting. During incidents, I stay calm, use monitoring and logs to identify the root cause, and focus on restoring service before optimizing."</p>
+          <p>"Regarding my weakness, I now time-box design discussions, deliver an MVP where appropriate, gather feedback early, and then iterate instead of over-engineering the first solution."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (10-15 seconds)</div>
+          <p>"I believe these strengths help me build platforms that are scalable, secure, and reliable, while my focus on continuous improvement ensures I become more effective with every project and incident."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Summary</span>Quick reference<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Strengths → Evidence</div>
+          <table>
+            <tr><th>Strength</th><th>Evidence to Give</th></tr>
+            <tr><td>Automation-first thinking</td><td>Terraform, GitHub Actions, Azure DevOps, AKS — repeatable platforms, less manual effort, fewer deployment errors</td></tr>
+            <tr><td>Production troubleshooting</td><td>Stay calm during incidents, use monitoring and logs for root cause, restore service before optimizing</td></tr>
+            <tr><td>Building reliable platforms</td><td>Simplifying complex environments through IaC and CI/CD</td></tr>
+          </table>
+        </div>
+        <div class="step">
+          <div class="step-label">Weakness → The Fix</div>
+          <ul>
+            <li><strong>Weakness:</strong> earlier in my career, over-perfecting a solution before delivering it</li>
+            <li><strong>Fix applied:</strong> time-box design discussions</li>
+            <li><strong>Fix applied:</strong> deliver an MVP where appropriate</li>
+            <li><strong>Fix applied:</strong> gather feedback early and iterate, instead of over-engineering v1</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section id="behavioral-longterm-story">
+    <span class="sec-num">STAR Stories</span>
+    <h3>Story 7.2: 🎯 Short-Term Gain Sacrifice</h3>
+    <p class="intro">Choosing a slower, phased AKS migration over a quarter-end milestone — strategic thinking and risk management over optics.</p>
+    <div class="note say">
+          <span class="tag">Say this in interview</span>
+          "Leadership wanted all applications migrated to AKS in one quarter to show rapid cloud transformation. After assessing them, some weren't cloud-ready — stateful components, hardcoded configs, limited observability. I proposed categorizing workloads into low, medium, and high risk and migrating only low-risk apps first, which let us validate Terraform modules, pipelines, monitoring, backup, and rollback on real production feedback before touching business-critical workloads. The program took longer, but we avoided major incidents and ended up with a far more reliable platform."
+        </div>
+    <details class="entry" open>
+      <summary><span class="state ok">Story</span>Pressure → Reality → Recommendation → Result<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Story in Simple Words</div>
+          <ul>
+            <li><strong>The business pressure:</strong> leadership wanted to show rapid cloud transformation by migrating ALL applications to AKS in one quarter.</li>
+            <li><strong>The reality:</strong> some apps weren't ready — stateful, hardcoded configs, no observability.</li>
+            <li><strong>My recommendation:</strong> don't rush. Migrate low-risk apps first, validate the platform, learn, then tackle high-risk ones.</li>
+            <li><strong>The result:</strong> migration took a little longer, but we avoided major outages and built a more reliable platform.</li>
+          </ul>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Story</span>The 135-second narrative<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Part 1 — Opening (30 seconds)</div>
+          <p>"Yes. One example was when we decided not to migrate all applications to AKS in a single phase, even though that would have shown faster transformation progress. I recommended a gradual migration because I was more concerned about platform stability than achieving a quick milestone."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 2 — The Middle (90 seconds)</div>
+          <p>"The leadership team wanted to accelerate cloud adoption by moving several critical applications to AKS within one quarter. After assessing the applications, I found that some were not cloud-ready. They had stateful components, hardcoded configurations, and limited observability."</p>
+          <p>"I proposed categorizing workloads into low, medium, and high-risk and migrating only the low-risk applications first. This first wave allowed us to validate our Terraform modules, CI/CD pipelines, monitoring, backup strategy, and rollback procedures. We also refined our platform based on real production feedback before onboarding business-critical workloads."</p>
+          <p>"The trade-off was that the migration program took a little longer, but we avoided major production incidents and built confidence across development and business teams."</p>
+        </div>
+        <div class="step">
+          <div class="step-label">Part 3 — Closing (15 seconds)</div>
+          <p>"Although we sacrificed short-term delivery metrics, the phased approach resulted in a much smoother migration with fewer production issues. It ultimately delivered a more scalable, reliable, and operationally mature platform, which was a far better long-term outcome than simply moving everything as quickly as possible."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q1</span>How did you categorize apps as low/medium/high risk?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Risk Matrix Criteria</div>
+          <ul>
+            <li><strong>Business criticality</strong> (P1/P2/P3)</li>
+            <li><strong>Technical complexity</strong> (stateful, external dependencies, custom integrations)</li>
+            <li><strong>Observability</strong> (existing monitoring, logging)</li>
+            <li><strong>Team readiness</strong> (devs familiar with containers, K8s)</li>
+            <li><strong>Migration effort</strong> (lift-and-shift vs refactor)</li>
+          </ul>
+          <p>"Each team scored their own apps against these criteria. I then reviewed them with the platform, security, and ops teams to finalize categorization."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q2</span>What was the immediate consequence of delaying?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <p>"Leadership initially wanted a migration dashboard 'all green' by end-of-quarter. I had to show them:"</p>
+          <ul>
+            <li>The risk of moving high-criticality apps first — potential revenue loss, brand damage</li>
+            <li>The cost of incident response if we moved too fast</li>
+            <li>The increased long-term velocity after the platform matured</li>
+          </ul>
+          <p>"I presented a phased roadmap showing ramping migration velocity over months, rather than a single spike then plateau."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state ok">Q3</span>How did you prove the phased migration was worth the delay?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Pilot Phase Data</div>
+          <table>
+            <tr><th>Metric</th><th>Before Migration</th><th>After Pilot Migration</th></tr>
+            <tr><td>Avg. deployment time</td><td>5 hours</td><td>30 minutes</td></tr>
+            <tr><td>Production incidents</td><td>3/month</td><td>0 in pilot</td></tr>
+            <tr><td>Team satisfaction score</td><td>4/10</td><td>8/10</td></tr>
+            <tr><td>Manual intervention</td><td>6/week</td><td>1/week</td></tr>
+          </table>
+          <p>"This proved that migrating the right way was worth the extra few months."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state warn">Q4</span>Did anyone push back on your recommendation?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">The Pushback</div>
+          <ul>
+            <li>"We promised the board a Q3 migration."</li>
+            <li>"Some apps will never move if we don't force them now."</li>
+            <li>"We have experienced engineers who can handle the risk."</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">My Counter-Argument</div>
+          <p>"I focused on operational excellence and avoiding a platform that collapses under its own weight. I offered a mid-quarter review point — if we saw unexpected issues in the pilot, we'd revisit the timeline. That transparency built trust."</p>
+        </div>
+      </div>
+    </details>
+    <details class="entry" open>
+      <summary><span class="state info">Q5</span>How did you manage the migration backlog?<span class="chev">›</span></summary>
+      <div class="entry-body">
+        <div class="step">
+          <div class="step-label">Migration Board (Jira / Azure DevOps)</div>
+          <ul>
+            <li><strong>Low-risk apps:</strong> scheduled for Q1</li>
+            <li><strong>Medium-risk:</strong> scheduled for Q1–Q2, with training in parallel</li>
+            <li><strong>High-risk:</strong> scheduled for Q3–Q4, including refactoring</li>
+          </ul>
+        </div>
+        <div class="step">
+          <div class="step-label">Each App Had a Migration Playbook</div>
+          <ul>
+            <li>Prerequisites (containerize, remove hardcoded IPs)</li>
+            <li>Migration steps</li>
+            <li>Validation checklist</li>
+            <li>Rollback plan</li>
+          </ul>
+          <p>"This made the process transparent and repeatable."</p>
         </div>
       </div>
     </details>
